@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design System UI - Workflow Builder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>🎨 Design System Workflow Builder</h1>
+            <div class="header-controls">
+                <button id="newWorkflow" class="btn btn-primary">+ New Workflow</button>
+                <button id="llmsButton" class="btn btn-secondary">📋 llms.txt</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Left Panel: ComfyUI Canvas -->
+            <section class="panel panel-left">
+                <div class="panel-header">
+                    <h2>Workflow Canvas</h2>
+                    <div class="panel-controls">
+                        <button id="zoomIn" class="btn-icon" title="Zoom In">+</button>
+                        <button id="zoomOut" class="btn-icon" title="Zoom Out">−</button>
+                        <button id="fitView" class="btn-icon" title="Fit View">⊡</button>
+                    </div>
+                </div>
+                <div id="canvas" class="canvas-area">
+                    <!-- ComfyUI canvas will render here -->
+                    <svg id="canvasSvg" class="canvas-svg"></svg>
+                    <div class="canvas-placeholder">
+                        <p>📦 Drag nodes from right panel or import workflow</p>
+                        <button id="importWorkflow" class="btn btn-small">Import JSON</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Center Panel: Config & Nodes -->
+            <section class="panel panel-center">
+                <div class="panel-header">
+                    <h2>Configuration</h2>
+                    <span class="badge" id="workflowStatus">Ready</span>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="nodes">Nodes</button>
+                    <button class="tab-btn" data-tab="params">Parameters</button>
+                    <button class="tab-btn" data-tab="patterns">Templates</button>
+                </div>
+
+                <!-- Nodes Tab -->
+                <div id="nodes" class="tab-content active">
+                    <div class="node-library">
+                        <div class="node-category">
+                            <h3>Input</h3>
+                            <div class="node-list">
+                                <div class="node-item draggable" data-node-type="text-input">
+                                    📝 Text Input
+                                </div>
+                                <div class="node-item draggable" data-node-type="file-input">
+                                    📁 File Input
+                                </div>
+                                <div class="node-item draggable" data-node-type="image-input">
+                                    🖼️ Image Input
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="node-category">
+                            <h3>Processing</h3>
+                            <div class="node-list">
+                                <div class="node-item draggable" data-node-type="llm-node">
+                                    🤖 LLM Call
+                                </div>
+                                <div class="node-item draggable" data-node-type="transform">
+                                    ⚡ Transform
+                                </div>
+                                <div class="node-item draggable" data-node-type="filter">
+                                    🔍 Filter
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="node-category">
+                            <h3>Output</h3>
+                            <div class="node-list">
+                                <div class="node-item draggable" data-node-type="text-output">
+                                    📤 Text Output
+                                </div>
+                                <div class="node-item draggable" data-node-type="file-output">
+                                    💾 File Output
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parameters Tab -->
+                <div id="params" class="tab-content">
+                    <div class="params-list">
+                        <div id="selectedNodeParams">
+                            <p class="text-muted">Select a node to edit parameters</p>
+                        </div>
+                    </div>
+                    <button id="suggestParams" class="btn btn-secondary full-width">
+                        🎯 AI Suggest Parameters
+                    </button>
+                </div>
+
+                <!-- Templates Tab -->
+                <div id="patterns" class="tab-content">
+                    <div class="patterns-grid">
+                        <div class="pattern-item" data-pattern="text-classifier">
+                            <h4>Text Classifier</h4>
+                            <p>Input → LLM → Category</p>
+                            <button class="btn btn-small">Load</button>
+                        </div>
+                        <div class="pattern-item" data-pattern="rag-pipeline">
+                            <h4>RAG Pipeline</h4>
+                            <p>Query → Retrieve → Generate</p>
+                            <button class="btn btn-small">Load</button>
+                        </div>
+                        <div class="pattern-item" data-pattern="agent-loop">
+                            <h4>Agent Loop</h4>
+                            <p>Thought → Action → Observe</p>
+                            <button class="btn btn-small">Load</button>
+                        </div>
+                        <div class="pattern-item" data-pattern="eval-loop">
+                            <h4>Eval Loop</h4>
+                            <p>Execute → Score → Iterate</p>
+                            <button class="btn btn-small">Load</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Execution & Results -->
+            <section class="panel panel-right">
+                <div class="panel-header">
+                    <h2>Execution</h2>
+                </div>
+
+                <!-- Execution Controls -->
+                <div class="execution-controls">
+                    <button id="executeWorkflow" class="btn btn-primary full-width">
+                        ▶️ Execute Workflow
+                    </button>
+                    <button id="validateWorkflow" class="btn btn-secondary full-width">
+                        ✓ Validate
+                    </button>
+                </div>
+
+                <!-- Terminal Output -->
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <h3>Terminal Output</h3>
+                        <button id="clearTerminal" class="btn-icon">×</button>
+                    </div>
+                    <div id="terminal" class="terminal">
+                        <div class="terminal-line">Ready to execute...</div>
+                    </div>
+                </div>
+
+                <!-- Evaluation Results -->
+                <div class="eval-container hidden">
+                    <div class="eval-header">
+                        <h3>Evaluation (Gemma 4 12B)</h3>
+                        <span class="eval-status" id="evalStatus">Evaluating...</span>
+                    </div>
+                    <div id="evalResults" class="eval-results">
+                        <!-- Results injected here -->
+                    </div>
+                    <button id="iterateWorkflow" class="btn btn-secondary full-width">
+                        🔄 Iterate Workflow
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modals -->
+        <!-- llms.txt Modal -->
+        <div id="llmsModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>llms.txt - Agent Instruction Layer</h2>
+                    <button class="modal-close">×</button>
+                </div>
+                <div id="llmsContent" class="modal-body">
+                    <!-- llms.txt content injected here -->
+                </div>
+                <div class="modal-footer">
+                    <button id="copyLlms" class="btn btn-secondary">📋 Copy</button>
+                    <button id="downloadLlms" class="btn btn-secondary">⬇️ Download</button>
+                    <button class="btn btn-primary modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Iteration Suggestions Modal -->
+        <div id="iterationModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Optimization Suggestions</h2>
+                    <button class="modal-close">×</button>
+                </div>
+                <div id="suggestionsList" class="modal-body">
+                    <!-- Suggestions injected here -->
+                </div>
+                <div class="modal-footer">
+                    <button id="applyAllSuggestions" class="btn btn-primary">Apply All</button>
+                    <button class="btn btn-secondary modal-close">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
