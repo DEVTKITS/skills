@@ -1,6 +1,17 @@
+---
+name: design-system-ui
+description: Draft — single-page web UI where humans and agents co-design ComfyUI-style workflows, execute them, and let a Gemma 4 12B evaluator score and iterate. Open-source, agent-navigable via llms.txt.
+disable-model-invocation: true
+---
+
 # Design System UI + Workflow Builder
 
 Interactive web UI for designing, executing, and evaluating AI workflows with integrated ComfyUI, terminal execution, and local model evaluation — all without leaving the page.
+
+> **Status: in-progress draft.** The Python backend runs with zero dependencies
+> (stdlib only) and the execute/evaluate/iterate loop works end-to-end with a
+> **mock** Gemma 4 12B. The Go and Rust clients build against stdlib only. Mojo
+> agent layer is a design sketch (Mojo not required to run the system).
 
 ## Purpose
 
@@ -113,6 +124,4 @@ User/Agent → Design workflow (ComfyUI)
 
 ---
 
-**Model-invoked skill** — agents can interact without explicit user request.
-
-disable-model-invocation: false
+**User-invoked draft** — lives in `in-progress/` until it graduates to a stable bucket.
