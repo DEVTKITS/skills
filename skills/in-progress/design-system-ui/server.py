@@ -130,26 +130,51 @@ class WorkflowExecutor:
 
 
 # --------------------------------------------------------------------------- #
-# Gemma 4 12B evaluator (mock; swap `infer` for a real backend)               #
+# Gemma 4 12B evaluator — live via Ollama when reachable, heuristic fallback  #
 # --------------------------------------------------------------------------- #
 class GemmaEvaluator:
-    """Scores a workflow's output. Replace `infer` with Ollama/HF to go live."""
+    """
+    Scores a workflow's output.
 
-    MODEL = "gemma-4-12b"
+    If an Ollama server is reachable (OLLAMA_URL, default localhost:11434) the
+    configured Gemma model (GEMMA_MODEL, default "gemma:12b") writes the
+    qualitative critique. Otherwise a deterministic heuristic produces the
+    score and feedback, so the system always works — with or without a GPU.
+    """
 
-    def infer(self, prompt: str) -> str:
-        """
-        Mock inference. To make this real, call e.g. Ollama:
+    MODEL = os.environ.get("GEMMA_MODEL", "gemma:12b")
+    OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+    TIMEOUT_S = float(os.environ.get("GEMMA_TIMEOUT", "60"))
 
-            import urllib.request
+    def infer(self, prompt: str) -> str | None:
+        """Call Ollama /api/generate. Returns None when unreachable/failing."""
+        import urllib.error
+        import urllib.request
+
+        try:
             req = urllib.request.Request(
-                "http://localhost:11434/api/generate",
-                data=json.dumps({"model": "gemma:12b", "prompt": prompt,
+                f"{self.OLLAMA_URL}/api/generate",
+                data=json.dumps({"model": self.MODEL, "prompt": prompt,
                                  "stream": False}).encode(),
-                headers={"Content-Type": "application/json"})
-            return json.loads(urllib.request.urlopen(req).read())["response"]
-        """
-        return "mock-evaluation"
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=self.TIMEOUT_S) as resp:
+                return json.loads(resp.read()).get("response")
+        except (urllib.error.URLError, OSError, TimeoutError,
+                json.JSONDecodeError) as exc:
+            log.debug("Ollama unreachable (%s) — using heuristic evaluator", exc)
+            return None
+
+    def _critique_prompt(self, wf: dict, results: dict, score: int) -> str:
+        return (
+            "You are a strict workflow reviewer. Given this node-graph "
+            "workflow and its execution results, write a concise critique "
+            "(max 120 words): what works, what is missing, one concrete "
+            "improvement.\n\n"
+            f"Workflow JSON:\n{json.dumps(wf)[:4000]}\n\n"
+            f"Execution results:\n{json.dumps(results)[:2000]}\n\n"
+            f"Heuristic score: {score}/100."
+        )
 
     def evaluate(self, wf: dict, results: dict) -> dict:
         nodes = wf.get("nodes", [])
@@ -182,11 +207,18 @@ class GemmaEvaluator:
                                 "description": "Create data flow between nodes",
                                 "action": "CONNECT_NODES(fromId, toId)"})
 
-        # `verdict` drives the iterate-or-finish loop the user described.
+        # Live model critique when Ollama is up; heuristic text otherwise.
+        critique = self.infer(self._critique_prompt(wf, results, score))
+        gemma_live = critique is not None
+        if gemma_live:
+            fb += ["", f"— {self.MODEL} critique —", critique.strip()]
+
+        # `verdict` drives the iterate-or-finish loop.
         verdict = "done" if score >= 85 else "iterate"
         return {"score": score, "feedback": "\n".join(fb),
                 "suggestions": suggestions, "verdict": verdict,
-                "model": self.MODEL, "timestamp": now_iso()}
+                "model": self.MODEL, "gemma_live": gemma_live,
+                "timestamp": now_iso()}
 
 
 EXECUTOR = WorkflowExecutor()

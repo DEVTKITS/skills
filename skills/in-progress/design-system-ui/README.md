@@ -5,21 +5,24 @@ ComfyUI-style node graphs, execute them, and let a **Gemma 4 12B** evaluator
 score the result and decide *iterate* or *done*. Every page exposes `/llms.txt`
 so terminal agents can drive the whole thing without a browser.
 
-> **Status: in-progress draft.** The core loop runs and is verified end-to-end.
-> The Gemma 4 12B evaluator is currently **mocked** — swap one method to go live.
+> **Status: in-progress draft.** The core loop runs and is verified by an
+> automated 22-check test suite (`./test.sh`). Gemma inference goes **live
+> automatically** when an Ollama server is running; otherwise a deterministic
+> heuristic evaluator answers with the same response schema.
 
-## What actually works today (verified)
+## What actually works today (verified by `./test.sh`)
 
 | Piece | State |
 |-------|-------|
 | Python backend (`server.py`) | ✅ Runs on **stdlib only** — `python3 server.py`, no pip install |
-| Single-page UI (`index.html` + `app.js` + `styles.css`) | ✅ Served at `/` |
+| Single-page UI (`index.html` + `app.js` + `styles.css`) | ✅ Served at `/`; drag-drop nodes, shift-click to connect |
 | `/llms.txt` agent layer | ✅ Served on every deployment |
-| Execute → evaluate → **verdict iterate/done** loop | ✅ Works (mock Gemma score) |
+| Execute → evaluate → **verdict iterate/done** loop | ✅ Works; UI applies suggestions + re-executes ("Apply All") |
+| Gemma 4 12B via Ollama | ✅ Auto-detected (`gemma_live: true`); heuristic fallback when absent |
 | Go client (`main.go`) | ✅ Builds with stdlib only, talks to backend |
 | Rust client (`client.rs`) | ✅ Builds with `rustc`, no crates, talks to backend |
+| Test suite (`test.sh`) | ✅ 22 assertions incl. polyglot clients — CI-ready |
 | Mojo agent layer (`agents.mojo`) | 📐 Design sketch — not required to run |
-| Real Gemma 4 12B inference | ⏳ Mocked; wire to Ollama/HF to enable |
 
 ## Quick start (zero dependencies)
 
@@ -82,19 +85,24 @@ Full request/response shapes and node types are documented in
                                           swap infer() ─► Ollama gemma:12b / HF
 ```
 
-## Going live with Gemma 4 12B
+## Going live with Gemma 4 12B (zero code changes)
 
-The evaluator is one method away from real. In `server.py`,
-`GemmaEvaluator.infer(prompt)` returns a mock string. Point it at Ollama:
+Start Ollama with a Gemma model — the evaluator detects it and switches to
+live critique automatically, falling back to the heuristic when unreachable:
 
 ```bash
 ollama pull gemma:12b && ollama serve
+python3 server.py     # evaluate responses now carry "gemma_live": true
 ```
 
-Then have `infer` POST to `http://localhost:11434/api/generate`
-(`{"model":"gemma:12b","prompt":prompt,"stream":false}`) and read `.response`.
-No other change is required — scoring, verdict, and the iterate loop already
-consume the result.
+Configuration via environment: `OLLAMA_URL` (default `http://localhost:11434`),
+`GEMMA_MODEL` (default `gemma:12b`), `GEMMA_TIMEOUT` (default `60`).
+
+## Testing
+
+```bash
+./test.sh    # 22 assertions: endpoints, iterate loop, error paths, Go+Rust clients
+```
 
 ## Files
 
@@ -108,6 +116,7 @@ design-system-ui/
 ├── app.js              frontend logic (canvas, terminal, eval)
 ├── server.py           zero-dependency backend (execute + evaluate + iterate)
 ├── start.sh            launcher
+├── test.sh             smoke-test suite (22 checks, CI-ready)
 ├── main.go             Go client / desktop bridge (stdlib only)
 ├── client.rs           Rust terminal client (stdlib only)
 ├── agents.mojo         Mojo agent-layer sketch
@@ -122,7 +131,9 @@ design-system-ui/
 - [x] Zero-dependency runnable backend + verified execute/evaluate/iterate loop
 - [x] stdlib Go + Rust clients that talk to the backend
 - [x] `/llms.txt` served on every deployment
-- [ ] Real Gemma 4 12B via Ollama (wire `GemmaEvaluator.infer`)
+- [x] Real Gemma 4 12B via Ollama with automatic heuristic fallback
+- [x] Automated smoke-test suite (`test.sh`, 22 checks)
+- [x] UI iterate loop: real suggestions, Apply All → auto re-execute
 - [ ] Live terminal streaming (Server-Sent Events / WebSocket)
 - [ ] ComfyUI JSON import/export round-trip
 - [ ] Go/Gio desktop + mobile shell embedding the UI

@@ -46,7 +46,12 @@ A valid workflow needs at least one input node and one output node.
 ## Evaluate response and the iterate loop
 /api/workflow/evaluate returns:
   {"score": 0-100, "feedback": "...", "suggestions": [...],
-   "verdict": "iterate" | "done", "model": "gemma-4-12b"}
+   "verdict": "iterate" | "done", "model": "gemma:12b",
+   "gemma_live": true|false}
+
+gemma_live=true means a real Gemma model (via Ollama) wrote the critique;
+false means the deterministic heuristic evaluator answered (Ollama not
+running). Both modes return the same schema — agents need no special casing.
 
 Recommended agent loop:
   1. Build or LOAD a pattern (GET /api/patterns for the catalog).
@@ -66,7 +71,17 @@ curl -X POST http://localhost:8000/api/workflow/execute \
   -H 'Content-Type: application/json' \
   -d '{"id":"wf1","nodes":[{"id":"in1","type":"text-input","x":0,"y":0,"params":{}},{"id":"out1","type":"text-output","x":100,"y":0,"params":{}}],"edges":[{"from":"in1","to":"out1"}]}'
 
-## Going live (replace the mock evaluator)
-The evaluator is mocked. To use a real Gemma 4 12B, edit GemmaEvaluator.infer
-in server.py to call Ollama (http://localhost:11434/api/generate, model
-"gemma:12b") or a Hugging Face inference endpoint.
+## Going live with real Gemma (zero code changes)
+Start Ollama with a Gemma model and the evaluator switches to live inference
+automatically (falls back to the heuristic when unreachable):
+
+  ollama pull gemma:12b && ollama serve
+
+Environment overrides:
+  OLLAMA_URL     backend URL   (default http://localhost:11434)
+  GEMMA_MODEL    model name    (default gemma:12b)
+  GEMMA_TIMEOUT  seconds       (default 60)
+
+## Self-test
+Run ./test.sh — boots the server on a scratch port and asserts every endpoint,
+the iterate loop, and the Go + Rust clients (22 checks).

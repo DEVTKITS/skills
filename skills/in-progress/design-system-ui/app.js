@@ -74,6 +74,9 @@ class DesignSystemApp {
         // Suggest parameters
         document.getElementById('suggestParams').addEventListener('click', () => this.suggestParameters());
 
+        // Apply all iteration suggestions, then re-execute
+        document.getElementById('applyAllSuggestions').addEventListener('click', () => this.applyAllSuggestions());
+
         // Import workflow
         document.getElementById('importWorkflow').addEventListener('click', () => this.importWorkflow());
 
@@ -153,7 +156,7 @@ class DesignSystemApp {
         }
     }
 
-    async evaluateResults(results) {
+    async evaluateResults(execution) {
         const evalContainer = document.querySelector('.eval-container');
         evalContainer.classList.remove('hidden');
 
@@ -165,24 +168,45 @@ class DesignSystemApp {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     workflow: this.workflow,
-                    results: results
+                    results: execution.results || {}
                 })
             });
 
             const evalData = await response.json();
+            this.lastEvaluation = evalData;
+
+            const verdictBadge = evalData.verdict === 'done'
+                ? '<span style="color:var(--color-success)">✓ done</span>'
+                : '<span style="color:var(--color-warning)">🔄 iterate</span>';
+            const liveNote = evalData.gemma_live
+                ? `live ${this.escapeHtml(evalData.model)}`
+                : 'heuristic (start Ollama for live Gemma)';
+
             document.getElementById('evalResults').innerHTML = `
-                <strong>Score:</strong> ${evalData.score}/100<br>
+                <strong>Score:</strong> ${evalData.score}/100 &nbsp; ${verdictBadge}<br>
+                <small class="text-muted">Evaluator: ${liveNote}</small><br>
                 <strong>Feedback:</strong><br>
                 ${evalData.feedback.split('\n').map(line =>
-                    `<div>${line}</div>`
+                    `<div>${this.escapeHtml(line)}</div>`
                 ).join('')}
             `;
 
             document.getElementById('evalStatus').textContent = 'Complete';
+            document.getElementById('iterateWorkflow').style.display =
+                evalData.verdict === 'iterate' ? '' : 'none';
+
+            this.logTerminal(`Evaluation: ${evalData.score}/100 → ${evalData.verdict}`,
+                evalData.verdict === 'done' ? 'success' : 'warning');
 
         } catch (error) {
             this.logTerminal(`Evaluation error: ${error.message}`, 'error');
         }
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text ?? '';
+        return div.innerHTML;
     }
 
     // === Parameter Suggestions ===
@@ -331,9 +355,24 @@ class DesignSystemApp {
             text.textContent = node.type.replace('-', ' ');
             group.appendChild(text);
 
-            group.addEventListener('click', () => this.selectNode(node));
+            group.addEventListener('click', (e) => this.onNodeClick(node, e));
             svg.appendChild(group);
         });
+    }
+
+    // Click selects; Shift+click connects the previously selected node to this one.
+    onNodeClick(node, event) {
+        if (event.shiftKey && this.selectedNode && this.selectedNode.id !== node.id) {
+            const exists = this.workflow.edges.some(
+                e => e.from === this.selectedNode.id && e.to === node.id);
+            if (!exists) {
+                this.workflow.edges.push({ from: this.selectedNode.id, to: node.id });
+                this.logTerminal(`🔗 Connected ${this.selectedNode.id} → ${node.id}`, 'success');
+                this.redrawCanvas();
+            }
+            return;
+        }
+        this.selectNode(node);
     }
 
     onNodeDragStart(e) {
@@ -573,25 +612,61 @@ END llms.txt
 
     showIterationSuggestions() {
         const modal = document.getElementById('iterationModal');
-        const suggestions = document.getElementById('suggestionsList');
-        suggestions.innerHTML = `
-            <div class="suggestion-item">
-                <h4>Suggestion 1: Increase model temperature</h4>
-                <p>Current: 0.7 → Suggested: 0.85</p>
-                <p>Reasoning: Output variability could improve result diversity</p>
-                <button class="btn btn-small" onclick="window.app.applySuggestion(1)">Apply</button>
-            </div>
-            <div class="suggestion-item">
-                <h4>Suggestion 2: Add evaluation node</h4>
-                <p>Add quality scoring between LLM output and final result</p>
-                <button class="btn btn-small" onclick="window.app.applySuggestion(2)">Apply</button>
-            </div>
-        `;
+        const list = document.getElementById('suggestionsList');
+        const suggestions = this.lastEvaluation?.suggestions || [];
+
+        if (suggestions.length === 0) {
+            list.innerHTML = '<p class="text-muted">No suggestions — run an evaluation first, or the workflow already scored "done".</p>';
+        } else {
+            list.innerHTML = suggestions.map((s, i) => `
+                <div class="suggestion-item">
+                    <h4>${this.escapeHtml(s.title)}</h4>
+                    <p>${this.escapeHtml(s.description)}</p>
+                    <p class="text-muted"><code>${this.escapeHtml(s.action)}</code></p>
+                    <button class="btn btn-small" onclick="window.app.applySuggestion(${i})">Apply</button>
+                </div>
+            `).join('');
+        }
         modal.classList.remove('hidden');
     }
 
-    applySuggestion(suggestionId) {
-        this.logTerminal(`Applied suggestion ${suggestionId}`, 'success');
+    applySuggestion(index) {
+        const s = this.lastEvaluation?.suggestions?.[index];
+        if (!s) return;
+
+        if (s.action.startsWith('ADD_NODE')) {
+            // Place the suggested node after the last node on the canvas.
+            const last = this.workflow.nodes[this.workflow.nodes.length - 1];
+            this.workflow.nodes.push({
+                id: `llm-node-${Date.now()}`,
+                type: 'llm-node',
+                x: (last?.x ?? 50) + 150,
+                y: last?.y ?? 100,
+                params: { model: 'gemma-4', temperature: 0.7 }
+            });
+        } else if (s.action.startsWith('CONNECT_NODES')) {
+            // Connect the first node pair that isn't connected yet, in order.
+            const connected = new Set(this.workflow.edges.map(e => `${e.from}->${e.to}`));
+            for (let i = 0; i < this.workflow.nodes.length - 1; i++) {
+                const from = this.workflow.nodes[i].id;
+                const to = this.workflow.nodes[i + 1].id;
+                if (!connected.has(`${from}->${to}`)) {
+                    this.workflow.edges.push({ from, to });
+                    break;
+                }
+            }
+        }
+
+        this.redrawCanvas();
+        this.logTerminal(`✓ Applied: ${s.title}`, 'success');
+    }
+
+    applyAllSuggestions() {
+        const count = this.lastEvaluation?.suggestions?.length || 0;
+        for (let i = 0; i < count; i++) this.applySuggestion(i);
+        document.getElementById('iterationModal').classList.add('hidden');
+        if (count > 0) this.logTerminal('🔄 Re-executing after applying suggestions...');
+        if (count > 0) this.executeWorkflow();
     }
 }
 
