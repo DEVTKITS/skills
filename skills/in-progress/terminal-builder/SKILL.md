@@ -1,6 +1,6 @@
 ---
 name: terminal-builder
-description: Build and run "baukasten" — a dependency-free C terminal builder hub (arrow/number-key TUI) that plans creation work (presentations, slides, apps, sites, dashboards, hubs, documents, graphics) fully offline and only routes AI-flagged steps through a configurable connector (MCP outbox, webhook, gateway API, Discord). Includes profiles, custom skills, ComfyUI workflow export, DE/EN, light/dark, contrast mode, read-aloud, and a nanobot helper.
+description: Build and run "baukasten" — a dependency-free C terminal builder hub (arrow/number-key TUI) that plans creation work (presentations, slides, apps, sites, dashboards, hubs, documents, graphics) fully offline and routes only AI-flagged steps through a connector WITH a return channel (Matrix client API, DkZ nanochat bridge, MCP outbox, webhook, gateway API, Discord — replies land in the nanobot). Includes an in-console AI chat (OpenCode :9900, Hermes via bridge, or active connector), terminal tools (SSH profiles, shell launcher with pager, read-only file navigator with fzf-style fuzzy filter, zsh/$SHELL launcher, fuzzy shell-history search, navi-style cheat sheets with placeholders), 4 DkZ-palette themes incl. Matrix green and Cosmo, matrix-rain intro, first-run setup, profiles, custom skills, ComfyUI workflow export, DE/EN, contrast mode, read-aloud, and a nanobot helper.
 disable-model-invocation: true
 ---
 
