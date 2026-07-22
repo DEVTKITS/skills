@@ -1,4 +1,30 @@
-# baukasten — Terminal-Builder-Hub
+# baukasten / SERUM — Terminal-Builder-Hub
+
+> **Modular (Unity-Build):** Der Code liegt in `src/` als Modul-Dateien,
+> die `src/serum.c` zu einem Binary zusammenzieht — die Grundlage für den
+> späteren „Builder für moderne Terminals". Details: [src/README.md](./src/README.md).
+> Bauen unverändert mit `make`.
+
+## SERUM — Direkt-LLM (ohne Bridge)
+
+Der Chat (`i`) spricht per `o` neben Konnektor/OpenCode/Hermes auch drei
+**Direktziele** an: **Ollama** (`localhost:11434`, `p` = Modell-Picker aus
+`/api/tags`, transparente Alias-Übersetzung `qwen3.6:27b → echtes Tag`),
+**Anthropic** (Claude, Key aus `ANTHROPIC_API_KEY`) und **OpenAI-kompatibel**
+(vLLM/LM-Studio/LibreChat, Key aus `OPENAI_API_KEY`). Antworten mit Retry/
+Backoff (Esc bricht ab) und Dauer-Anzeige. `a` im Chat startet das
+**A2A-Triumvirat** (Architekt · Security · Integration, seriell, 429-fest).
+Unter Verbindungen: `h` = Healthcheck, `g` = URLs/Key setzen.
+
+Weitere neue Bausteine: **Dienst-Monitor** (`z` → 7, Healthcheck für
+Odysseus/Ollama/NanoChat/OpenCode/ChromaDB/Voicebox), **Cosmo-Profil-Presets**
+(desktop·vps·agent·builder·monitor, bündeln Konnektor+Chat-Ziel+Theme),
+**Skill-Import** (Skills-Screen `i`: Repo-URL → `git clone` + FLOWS.md, oder
+YouTube-URL → Skill-/Workflow-Extraktion per SERUM), und ein **Setup-
+Modul-Toggle** für das Matrix-Regen-Intro.
+
+---
+
 
 **DE** · Ein Terminal-Menü in C (keine Abhängigkeiten außer libc), das
 Erstell-Arbeit — Präsentationen, Folien, Apps, Sites, Dashboards, Hubs,
