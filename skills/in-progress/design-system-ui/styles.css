@@ -530,6 +530,84 @@ html, body {
     word-break: break-all;
 }
 
+/* ── Agent activity: red monitor-edge glow while an AI is working ── */
+#agentGlow {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 400ms ease;
+    box-shadow: inset 0 0 0 3px rgba(239, 68, 68, 0.9),
+                inset 0 0 42px 12px rgba(239, 68, 68, 0.35);
+}
+
+body.agent-active #agentGlow {
+    opacity: 1;
+    animation: agent-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes agent-pulse {
+    0%, 100% { box-shadow: inset 0 0 0 3px rgba(239, 68, 68, 0.9),
+                           inset 0 0 42px 12px rgba(239, 68, 68, 0.35); }
+    50%      { box-shadow: inset 0 0 0 5px rgba(239, 68, 68, 1),
+                           inset 0 0 68px 22px rgba(239, 68, 68, 0.55); }
+}
+
+/* Flash on the element an agent just acted on */
+.agent-flash {
+    animation: agent-flash 900ms ease-out 2;
+    outline: 2px solid var(--color-error) !important;
+    outline-offset: 2px;
+}
+
+@keyframes agent-flash {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    50%      { box-shadow: 0 0 18px 4px rgba(239, 68, 68, 0.8); }
+}
+
+/* Live activity ticker under the header */
+.activity-bar {
+    display: none;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-lg);
+    background: rgba(239, 68, 68, 0.12);
+    border-bottom: 1px solid var(--color-error);
+    font-size: 0.8rem;
+}
+
+body.agent-active .activity-bar { display: flex; }
+
+.activity-dot {
+    width: 0.6rem; height: 0.6rem; border-radius: 50%;
+    background: var(--color-error);
+    animation: agent-pulse-dot 1s ease-in-out infinite;
+}
+
+@keyframes agent-pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.6); opacity: 0.6; }
+}
+
+/* ── Chat tab ── */
+.chat-panel { display: flex; flex-direction: column; height: 100%; gap: var(--space-md); }
+.chat-log {
+    flex: 1; overflow-y: auto; display: flex; flex-direction: column;
+    gap: var(--space-sm); padding: var(--space-sm);
+    background: var(--color-surface-light); border-radius: var(--radius-md);
+    min-height: 10rem;
+}
+.chat-msg { padding: var(--space-sm) var(--space-md); border-radius: var(--radius-md); max-width: 92%; white-space: pre-wrap; }
+.chat-msg.user { align-self: flex-end; background: var(--color-primary); color: #fff; }
+.chat-msg.assistant { align-self: flex-start; background: var(--color-border); }
+.chat-input-row { display: flex; gap: var(--space-sm); }
+.chat-input-row input {
+    flex: 1; padding: var(--space-sm) var(--space-md);
+    background: var(--color-surface-light); color: var(--color-text);
+    border: 1px solid var(--color-border); border-radius: var(--radius-md);
+}
+
 /* Utility Classes */
 .text-muted {
     color: var(--color-text-muted);

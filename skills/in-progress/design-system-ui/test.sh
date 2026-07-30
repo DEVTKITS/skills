@@ -73,6 +73,26 @@ PARAMS=$(curl -s -X POST "$BASE/api/workflow/suggest-params" \
   -H 'Content-Type: application/json' -d '{"nodeType":"llm-node"}')
 assert_contains "param suggestions"           '"model": "gemma-4"'   "$PARAMS"
 
+say "── agent visibility / chat / stock / integrations ───"
+POSTED=$(curl -s -X POST "$BASE/api/agent/activity" \
+  -H 'Content-Type: application/json' \
+  -d '{"actor":"test-agent","action":"click","target":"#executeWorkflow","detail":"smoke","state":"working"}')
+assert_contains "activity event accepted"     '"ok": true'           "$POSTED"
+FEED=$(curl -s "$BASE/api/agent/activity?since=0")
+assert_contains "glow active while working"   '"active": true'       "$FEED"
+assert_contains "event in feed"               '#executeWorkflow'     "$FEED"
+CHAT=$(curl -s -X POST "$BASE/api/chat" \
+  -H 'Content-Type: application/json' -d '{"message":"hi","history":[]}')
+assert_contains "chat replies (live or offline)" '"reply"'           "$CHAT"
+STOCK=$(curl -s "$BASE/api/stock/status")
+assert_contains "stock status lists pexels"   '"pexels"'             "$STOCK"
+SEARCH=$(curl -s -X POST "$BASE/api/stock/search" \
+  -H 'Content-Type: application/json' -d '{"provider":"pexels","query":"x"}')
+assert_contains "unconnected stock says how to connect" 'PEXELS_API_KEY' "$SEARCH"
+INTEG=$(curl -s "$BASE/api/integrations")
+assert_contains "integrations manifest"       '"adapter_ready"'      "$INTEG"
+assert_contains "unverified names stay honest" 'unverified_roadmap'  "$INTEG"
+
 say "── polyglot clients ─────────────────────────────────"
 if command -v go >/dev/null 2>&1; then
   if go build -o /tmp/dsui-test-go main.go 2>>"$LOG"; then

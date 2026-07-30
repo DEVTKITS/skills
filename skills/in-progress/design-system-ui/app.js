@@ -10,8 +10,11 @@ class DesignSystemApp {
         };
         this.selectedNode = null;
         this.executionState = 'idle';
+        this.lastActivitySeq = 0;
         this.initEventListeners();
         this.generateLlmsContent();
+        this.initChat();
+        this.startActivityPolling();
     }
 
     // === Event Listeners ===
@@ -669,6 +672,110 @@ END llms.txt
         if (count > 0) this.executeWorkflow();
     }
 }
+
+// === Agent Activity: red glow + element flash =========================
+// Open protocol: any agent (Playwright, terminal, another LLM) can make its
+// work visible either by POSTing to /api/agent/activity or, when running
+// in-page, by calling window.agentActivity directly.
+DesignSystemApp.prototype.startActivityPolling = function () {
+    const poll = async () => {
+        try {
+            const res = await fetch(`/api/agent/activity?since=${this.lastActivitySeq}`);
+            const data = await res.json();
+            document.body.classList.toggle('agent-active', !!data.active);
+            for (const ev of data.events || []) {
+                this.lastActivitySeq = Math.max(this.lastActivitySeq, ev.seq);
+                this.renderActivityEvent(ev);
+            }
+        } catch (_) { /* backend briefly away — keep polling */ }
+        setTimeout(poll, 1000);
+    };
+    poll();
+};
+
+DesignSystemApp.prototype.renderActivityEvent = function (ev) {
+    const text = `${ev.actor} · ${ev.action}${ev.target ? ' → ' + ev.target : ''}` +
+                 (ev.detail ? ` (${ev.detail})` : '');
+    const bar = document.getElementById('activityText');
+    if (bar) bar.textContent = text;
+    if (ev.target) this.flashElement(ev.target);
+    if (ev.state === 'error') this.logTerminal(`⚠️ ${text}`, 'error');
+};
+
+DesignSystemApp.prototype.flashElement = function (selector) {
+    let el = null;
+    try { el = document.querySelector(selector); } catch (_) { /* not a selector */ }
+    if (!el) {
+        // Maybe it names a workflow node id — flash the canvas instead.
+        if (this.workflow.nodes.some(n => n.id === selector)) {
+            el = document.getElementById('canvas');
+        }
+    }
+    if (el) {
+        el.classList.remove('agent-flash');
+        void el.offsetWidth; // restart the animation
+        el.classList.add('agent-flash');
+        setTimeout(() => el.classList.remove('agent-flash'), 2000);
+    }
+};
+
+// In-page hook for agents running inside the browser context.
+window.agentActivity = {
+    async post(action, target = '', detail = '', state = 'working', actor = 'in-page-agent') {
+        try {
+            await fetch('/api/agent/activity', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ actor, action, target, detail, state })
+            });
+        } catch (_) { /* fire and forget */ }
+    },
+    start(detail = '') { return this.post('session-start', '', detail); },
+    stop(detail = '') { return this.post('session-end', '', detail, 'done'); },
+    click(target, detail = '') { return this.post('click', target, detail); }
+};
+
+// === Chat tab ==========================================================
+DesignSystemApp.prototype.initChat = function () {
+    this.chatHistory = [];
+    const send = () => this.sendChat();
+    document.getElementById('chatSend').addEventListener('click', send);
+    document.getElementById('chatInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') send();
+    });
+};
+
+DesignSystemApp.prototype.sendChat = async function () {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    if (!message) return;
+    input.value = '';
+    this.appendChat('user', message);
+
+    try {
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, history: this.chatHistory })
+        });
+        const data = await res.json();
+        const suffix = data.live ? '' : '\n\n[offline — starte `ollama serve` für ein Live-Modell]';
+        this.appendChat('assistant', (data.reply || '(keine Antwort)') + suffix);
+        this.chatHistory.push({ role: 'user', content: message },
+                              { role: 'assistant', content: data.reply || '' });
+    } catch (err) {
+        this.appendChat('assistant', `Fehler: ${err.message}`);
+    }
+};
+
+DesignSystemApp.prototype.appendChat = function (role, content) {
+    const log = document.getElementById('chatLog');
+    const div = document.createElement('div');
+    div.className = `chat-msg ${role}`;
+    div.textContent = content;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+};
 
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

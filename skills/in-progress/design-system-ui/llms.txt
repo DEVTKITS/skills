@@ -16,9 +16,68 @@ GET  /                          -> the single-page UI (HTML)
 GET  /llms.txt                  -> this file
 GET  /health                    -> {status, service, timestamp}
 GET  /api/patterns              -> {patterns: {id: {name, description, icon}}}
+GET  /api/integrations          -> honest capability manifest: builtin / adapter_ready / unverified_roadmap
+GET  /api/stock/status          -> stock providers + whether each is connected
+GET  /api/agent/activity?since=N -> {active, events[], latest_seq} activity feed
 POST /api/workflow/execute      -> run a workflow, returns {status, output, results, timestamp}
 POST /api/workflow/evaluate     -> Gemma 4 12B scoring, returns {score, feedback, suggestions, verdict}
 POST /api/workflow/suggest-params -> {model, temperature, ...} for a node type
+POST /api/agent/activity        -> broadcast what you are doing (see protocol below)
+POST /api/chat                  -> {message, history[]} -> {reply, model, live}
+POST /api/stock/search          -> {provider, query, per_page} -> provider results
+
+## Agent visibility protocol (MANDATORY for agents driving this UI)
+Humans must be able to SEE when an AI is working. While you operate the
+system, POST /api/agent/activity with:
+
+  {"actor":  "<your name, e.g. claude|gpt|deepseek|opencode|pi|playwright>",
+   "action": "click|type|execute|evaluate|session-start|session-end|work",
+   "target": "<CSS selector or workflow node id you are acting on>",
+   "detail": "<short human-readable description>",
+   "state":  "working|done|error"}
+
+Effects in the UI (polled every second):
+  - state=working within the last ~6s -> red glow around the whole monitor
+    edge (body.agent-active) + activity ticker "KI arbeitet: <actor> ...".
+  - target that matches a DOM selector -> that element flashes red twice.
+  - target that matches a workflow node id -> the canvas flashes.
+  - state=done on your last event -> glow fades out.
+
+Protocol rules:
+  1. POST action=session-start before your first UI operation.
+  2. POST one event per meaningful step (a click, an execution, a read).
+  3. POST state=done (action=session-end) when finished; state=error on abort.
+  4. In-page agents may call window.agentActivity.click(sel, detail) /
+     .start() / .stop() instead of raw fetches — same protocol.
+
+A complete reference implementation is demo/agent_demo.mjs (Playwright): it
+loads a template, executes, reads the verdict — every step broadcast, with
+screenshots. Run: cd demo && npm install playwright &&
+CHROMIUM_PATH=<chromium> node agent_demo.mjs http://localhost:8000 ./shots
+
+## Chat (in-UI assistant, also usable headless)
+POST /api/chat {"message": "...", "history": [{"role":"user|assistant","content":"..."}]}
+-> {"reply": "...", "model": "gemma:12b"|"heuristic", "live": true|false}
+live=true when Ollama answers; false -> static offline help, same schema.
+
+## Stock media (1-click connect)
+A provider is connected the moment its env var is set — nothing else:
+  PEXELS_API_KEY       -> pexels   (photos+videos)
+  UNSPLASH_ACCESS_KEY  -> unsplash (photos)
+  PIXABAY_API_KEY      -> pixabay  (photos+videos)
+Check GET /api/stock/status, then POST /api/stock/search
+{"provider":"pexels","query":"studio background","per_page":10}.
+Responses are passed through verbatim from the provider API.
+
+## Integration surface for other ecosystems
+Everything above is plain HTTP+JSON — no SDK. That is the deliberate
+interface for Claude, GPT, DeepSeek, opencode, pi-agent, OpenManus,
+OpenHands, browser-use etc.: read this file, then call the endpoints.
+GET /api/integrations tells you honestly which integrations are built in,
+which are adapter-ready patterns, and which remain unverified roadmap names.
+On-demand pattern for heavy agent frameworks: keep them OFF until a task
+arrives, run them against this API, broadcast via the activity protocol,
+shut them down (see README "On-demand agents").
 
 ## Workflow object (request body for /api/workflow/execute)
 {

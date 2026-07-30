@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Red monitor-edge glow, visible whenever an AI agent is working -->
+    <div id="agentGlow" aria-hidden="true"></div>
+
     <div class="app-container">
         <!-- Header -->
         <header class="app-header">
@@ -16,6 +19,13 @@
                 <button id="llmsButton" class="btn btn-secondary">📋 llms.txt</button>
             </div>
         </header>
+
+        <!-- Live agent activity ticker (shown while body.agent-active) -->
+        <div class="activity-bar" id="activityBar">
+            <span class="activity-dot"></span>
+            <strong>KI arbeitet:</strong>
+            <span id="activityText">–</span>
+        </div>
 
         <!-- Main Content -->
         <main class="app-main">
@@ -51,6 +61,7 @@
                     <button class="tab-btn active" data-tab="nodes">Nodes</button>
                     <button class="tab-btn" data-tab="params">Parameters</button>
                     <button class="tab-btn" data-tab="patterns">Templates</button>
+                    <button class="tab-btn" data-tab="chat">Chat</button>
                 </div>
 
                 <!-- Nodes Tab -->
@@ -134,6 +145,18 @@
                             <h4>Eval Loop</h4>
                             <p>Execute → Score → Iterate</p>
                             <button class="btn btn-small">Load</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Chat Tab -->
+                <div id="chat" class="tab-content">
+                    <div class="chat-panel">
+                        <div id="chatLog" class="chat-log">
+                            <div class="chat-msg assistant">Hi! Ich bin der Builder-Assistent. Frag mich zu Workflows, Templates oder Iterationen. (Live-Modell via Ollama, sonst Offline-Hilfe.)</div>
+                        </div>
+                        <div class="chat-input-row">
+                            <input id="chatInput" type="text" placeholder="Nachricht… (Enter zum Senden)">
+                            <button id="chatSend" class="btn btn-primary">Senden</button>
                         </div>
                     </div>
                 </div>

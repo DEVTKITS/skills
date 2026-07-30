@@ -221,8 +221,163 @@ class GemmaEvaluator:
                 "timestamp": now_iso()}
 
 
+# --------------------------------------------------------------------------- #
+# Agent activity feed — powers the red "AI is working" glow and click flashes #
+# --------------------------------------------------------------------------- #
+class ActivityFeed:
+    """
+    Open protocol for making agent work visible to humans.
+
+    Any agent (Playwright script, terminal agent, Claude/GPT/DeepSeek/opencode/
+    pi) POSTs what it is doing; the UI polls and renders a red monitor-edge
+    glow while an agent is active plus a flash on the element being acted on.
+    """
+
+    MAX_EVENTS = 200
+    ACTIVE_WINDOW_S = 6.0  # glow stays on this long after the last event
+
+    def __init__(self) -> None:
+        self.events: list[dict] = []
+        self._seq = 0
+
+    def post(self, event: dict) -> dict:
+        import time
+        self._seq += 1
+        entry = {
+            "seq": self._seq,
+            "actor": str(event.get("actor", "agent"))[:64],
+            "action": str(event.get("action", "work"))[:64],
+            "target": str(event.get("target", ""))[:256],   # CSS selector or node id
+            "detail": str(event.get("detail", ""))[:512],
+            "state": event.get("state", "working"),          # working | done | error
+            "monotonic": time.monotonic(),
+            "timestamp": now_iso(),
+        }
+        self.events.append(entry)
+        self.events = self.events[-self.MAX_EVENTS:]
+        return {"ok": True, "seq": entry["seq"]}
+
+    def snapshot(self, since: int = 0) -> dict:
+        import time
+        now = time.monotonic()
+        active = any(
+            e["state"] == "working" and now - e["monotonic"] < self.ACTIVE_WINDOW_S
+            for e in self.events[-20:]
+        )
+        fresh = [{k: v for k, v in e.items() if k != "monotonic"}
+                 for e in self.events if e["seq"] > since]
+        return {"active": active, "events": fresh[-50:],
+                "latest_seq": self._seq}
+
+
+# --------------------------------------------------------------------------- #
+# Chat — routes to Ollama when live, helpful fallback otherwise               #
+# --------------------------------------------------------------------------- #
+class ChatService:
+    def reply(self, message: str, history: list[dict]) -> dict:
+        prompt = ("You are the assistant inside a workflow-builder UI. "
+                  "Help the user design, execute and iterate node workflows. "
+                  "Be concise.\n\n")
+        for turn in history[-6:]:
+            prompt += f"{turn.get('role', 'user')}: {turn.get('content', '')}\n"
+        prompt += f"user: {message}\nassistant:"
+        answer = EVALUATOR.infer(prompt)
+        if answer is not None:
+            return {"reply": answer.strip(), "model": EVALUATOR.MODEL,
+                    "live": True}
+        return {"reply": ("(offline assistant) Ollama is not running, so I can "
+                          "only give static help: load a template from the "
+                          "Templates tab, connect nodes with shift+click, then "
+                          "Execute → the Gemma evaluator scores it and "
+                          "suggests iterations. Start `ollama serve` for a "
+                          "live chat model."),
+                "model": "heuristic", "live": False}
+
+
+# --------------------------------------------------------------------------- #
+# Stock providers — 1-click connect via API keys in the environment           #
+# --------------------------------------------------------------------------- #
+class StockProviders:
+    """Image/video stock search. A provider is 'connected' once its API key
+    env var is set — that is the whole 1-click setup."""
+
+    PROVIDERS = {
+        "pexels": {"env": "PEXELS_API_KEY",
+                   "url": "https://api.pexels.com/v1/search?query={q}&per_page={n}",
+                   "auth_header": "Authorization", "kind": "photos+videos"},
+        "unsplash": {"env": "UNSPLASH_ACCESS_KEY",
+                     "url": "https://api.unsplash.com/search/photos?query={q}&per_page={n}",
+                     "auth_header": "Authorization", "auth_prefix": "Client-ID ",
+                     "kind": "photos"},
+        "pixabay": {"env": "PIXABAY_API_KEY",
+                    "url": "https://pixabay.com/api/?key={key}&q={q}&per_page={n}",
+                    "auth_header": None, "kind": "photos+videos"},
+    }
+
+    def status(self) -> dict:
+        return {name: {"connected": bool(os.environ.get(cfg["env"])),
+                       "env_var": cfg["env"], "kind": cfg["kind"]}
+                for name, cfg in self.PROVIDERS.items()}
+
+    def search(self, provider: str, query: str, per_page: int = 10) -> dict:
+        import urllib.error
+        import urllib.parse
+        import urllib.request
+
+        cfg = self.PROVIDERS.get(provider)
+        if not cfg:
+            return {"error": f"unknown provider '{provider}'",
+                    "available": list(self.PROVIDERS)}
+        key = os.environ.get(cfg["env"], "")
+        if not key:
+            return {"error": f"{provider} not connected",
+                    "connect": f"set env var {cfg['env']} and restart — "
+                               "that is the whole 1-click setup"}
+
+        q = urllib.parse.quote(query)
+        url = cfg["url"].format(q=q, n=per_page, key=key)
+        headers = {}
+        if cfg.get("auth_header"):
+            headers[cfg["auth_header"]] = cfg.get("auth_prefix", "") + key
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                return {"provider": provider, "query": query,
+                        "results": json.loads(resp.read())}
+        except (urllib.error.URLError, OSError, TimeoutError) as exc:
+            return {"error": f"{provider} request failed: {exc}"}
+
+
 EXECUTOR = WorkflowExecutor()
 EVALUATOR = GemmaEvaluator()
+ACTIVITY = ActivityFeed()
+CHAT = ChatService()
+STOCK = StockProviders()
+
+# What is genuinely built in vs. adapter-ready vs. unverified. Served at
+# /api/integrations so agents and humans see honest capability status.
+INTEGRATIONS = {
+    "builtin": {
+        "ollama-gemma": "Auto-detected local inference (OLLAMA_URL); evaluator + chat go live automatically",
+        "agent-activity-protocol": "POST /api/agent/activity → red monitor-edge glow + element flash in the UI",
+        "stock-providers": "Pexels / Unsplash / Pixabay via env API keys (see /api/stock/status)",
+        "llms-txt": "Extra-detailed agent surface at /llms.txt",
+    },
+    "adapter_ready": {
+        "playwright": "demo/agent_demo.mjs drives the real UI via the activity protocol (chromium preinstalled in this env)",
+        "browser-use": "Any browser-use agent can drive the UI; broadcast steps via the activity protocol",
+        "openmanus": "Point an OpenManus tool at the HTTP API in /llms.txt; on-demand, not resident",
+        "openhands": "Same HTTP surface; run only when a task is queued (on-demand pattern documented in README)",
+        "github-cli": "Design/skill import-export via git; any agent with gh/git credentials can sync the repo",
+        "claude|gpt|deepseek|opencode|pi-agent": "All drive the same /llms.txt HTTP surface — no SDK needed",
+    },
+    "unverified_roadmap": {
+        "openmontage / openstream / openclaw / odysseus / nanobot":
+            "Could not verify these as existing installable projects; the "
+            "activity protocol + HTTP API are the stable interfaces such "
+            "tools would plug into once identified",
+    },
+}
 
 PATTERNS = {
     "text-classifier": {"name": "Text Classifier",
@@ -300,6 +455,15 @@ class Handler(BaseHTTPRequestHandler):
             self._serve_static("llms.txt")
         elif path == "/api/patterns":
             self._json({"patterns": PATTERNS})
+        elif path == "/api/agent/activity":
+            from urllib.parse import parse_qs
+            qs = parse_qs(urlparse(self.path).query)
+            since = int(qs.get("since", ["0"])[0] or 0)
+            self._json(ACTIVITY.snapshot(since))
+        elif path == "/api/integrations":
+            self._json({"integrations": INTEGRATIONS})
+        elif path == "/api/stock/status":
+            self._json({"providers": STOCK.status()})
         elif path == "/health":
             self._json({"status": "healthy", "service": "design-system-ui",
                         "timestamp": now_iso()})
@@ -318,6 +482,15 @@ class Handler(BaseHTTPRequestHandler):
                                           payload.get("results", {})))
         elif path == "/api/workflow/suggest-params":
             self._json(PARAM_SUGGESTIONS.get(payload.get("nodeType", ""), {}))
+        elif path == "/api/agent/activity":
+            self._json(ACTIVITY.post(payload))
+        elif path == "/api/chat":
+            self._json(CHAT.reply(payload.get("message", ""),
+                                  payload.get("history", [])))
+        elif path == "/api/stock/search":
+            self._json(STOCK.search(payload.get("provider", ""),
+                                    payload.get("query", ""),
+                                    int(payload.get("per_page", 10))))
         else:
             self._json({"error": "not found", "path": path}, 404)
 

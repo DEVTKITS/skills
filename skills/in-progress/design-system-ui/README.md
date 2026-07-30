@@ -21,7 +21,12 @@ so terminal agents can drive the whole thing without a browser.
 | Gemma 4 12B via Ollama | ✅ Auto-detected (`gemma_live: true`); heuristic fallback when absent |
 | Go client (`main.go`) | ✅ Builds with stdlib only, talks to backend |
 | Rust client (`client.rs`) | ✅ Builds with `rustc`, no crates, talks to backend |
-| Test suite (`test.sh`) | ✅ 22 assertions incl. polyglot clients — CI-ready |
+| Agent visibility: red monitor-edge glow + click flashes | ✅ Open protocol (`POST /api/agent/activity`), UI polls 1s |
+| Playwright demo agent (`demo/agent_demo.mjs`) | ✅ Drives the real UI in Chromium, broadcasts every step, screenshots |
+| Chat tab | ✅ Live via Ollama when running; offline help otherwise |
+| Stock media 1-click connect | ✅ Pexels/Unsplash/Pixabay — set the env API key, done |
+| Integrations manifest (`/api/integrations`) | ✅ Honest builtin / adapter-ready / unverified split |
+| Test suite (`test.sh`) | ✅ 30 assertions incl. polyglot clients — CI-ready |
 | Mojo agent layer (`agents.mojo`) | 📐 Design sketch — not required to run |
 
 ## Quick start (zero dependencies)
@@ -101,8 +106,35 @@ Configuration via environment: `OLLAMA_URL` (default `http://localhost:11434`),
 ## Testing
 
 ```bash
-./test.sh    # 22 assertions: endpoints, iterate loop, error paths, Go+Rust clients
+./test.sh    # 30 assertions: endpoints, iterate loop, agent visibility, chat, stock, Go+Rust clients
 ```
+
+## Watching the AI work (agent visibility)
+
+While any agent operates the builder, the whole viewport gets a pulsing
+**red monitor-edge glow**, an activity ticker shows `KI arbeitet: <actor> ·
+<action> → <target>`, and the element being clicked **flashes red** — so a
+human always sees what the machine is doing. The protocol is open HTTP
+(`POST /api/agent/activity`, spec in [`llms.txt`](./llms.txt)) and works for
+Playwright, browser-use, terminal agents, or any LLM.
+
+Reference implementation with screenshots:
+
+```bash
+cd demo && npm install playwright
+CHROMIUM_PATH=/path/to/chromium node agent_demo.mjs http://localhost:8000 ./shots
+```
+
+## On-demand agents (OpenManus / OpenHands / browser-use …)
+
+Heavy agent frameworks should not idle in the background. The supported
+pattern: keep them **off**; when a task arrives, start the framework, point
+it at this HTTP surface (it only needs `llms.txt`), require it to broadcast
+via the activity protocol, and shut it down when `state=done`. Nothing here
+depends on which framework you choose — `GET /api/integrations` reports
+honestly what is built in, what is adapter-ready, and which requested names
+could not be verified as real projects (openmontage, openstream, openclaw,
+odysseus, nanobot).
 
 ## Files
 
