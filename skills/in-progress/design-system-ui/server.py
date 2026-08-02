@@ -22,7 +22,10 @@ import os
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
+
+import helpdata
+import providers
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("design-system-ui")
@@ -274,7 +277,57 @@ class ActivityFeed:
 # Chat — routes to Ollama when live, helpful fallback otherwise               #
 # --------------------------------------------------------------------------- #
 class ChatService:
-    def reply(self, message: str, history: list[dict]) -> dict:
+    """Chat that understands the prefix syntax and routes to any provider."""
+
+    def reply(self, message: str, history: list[dict],
+              provider: str | None = None) -> dict:
+        # --- prefix syntax: /command  #pattern  !provider  @node  ~skill ---
+        msg = message.strip()
+        if msg.startswith("#"):
+            pat = msg[1:].split()[0]
+            if pat in PATTERNS:
+                return {"reply": f"Template '{pat}' geladen.", "action":
+                        {"type": "load_pattern", "pattern": pat},
+                        "model": "builtin", "live": True}
+            return {"reply": f"Unbekanntes Pattern '{pat}'. Verfügbar: "
+                             + ", ".join(PATTERNS), "model": "builtin",
+                    "live": True}
+        if msg.startswith("/"):
+            cmd = msg[1:].split()[0].lower()
+            known = {"execute", "validate", "clear", "iterate", "selftest"}
+            if cmd in known:
+                return {"reply": f"Kommando '{cmd}' ausgelöst.",
+                        "action": {"type": "command", "command": cmd},
+                        "model": "builtin", "live": True}
+            return {"reply": f"Unbekanntes Kommando '/{cmd}'. Bekannt: "
+                             + ", ".join(sorted(known)),
+                    "model": "builtin", "live": True}
+        if msg.startswith("!"):
+            parts = msg[1:].split(maxsplit=1)
+            prov, arg = parts[0], (parts[1] if len(parts) > 1 else "")
+            if prov == "firecrawl" and arg:
+                res = providers.scrape(arg)
+                return {"reply": json.dumps(res)[:2000], "model": "firecrawl",
+                        "live": res.get("ok", False)}
+            if prov in ("pexels", "unsplash", "pixabay") and arg:
+                res = providers.stock_search(prov, arg)
+                return {"reply": json.dumps(res)[:2000], "model": prov,
+                        "live": res.get("ok", False),
+                        "action": {"type": "stock_results", "data": res}}
+            return {"reply": f"Provider-Aufruf '!{prov}' braucht ein Argument, "
+                             "z. B. !firecrawl https://example.com",
+                    "model": "builtin", "live": True}
+
+        # --- normal chat: chosen cloud provider, else local Ollama ---
+        if provider and provider not in ("auto", "ollama"):
+            res = providers.chat(provider, message, history)
+            if res.get("ok"):
+                return {"reply": res["reply"], "model": res.get("model", provider),
+                        "provider": provider, "live": True}
+            return {"reply": f"Provider '{provider}' nicht verfügbar: "
+                             f"{res.get('error')}. {res.get('connect', '')}",
+                    "model": provider, "live": False}
+
         prompt = ("You are the assistant inside a workflow-builder UI. "
                   "Help the user design, execute and iterate node workflows. "
                   "Be concise.\n\n")
@@ -285,13 +338,138 @@ class ChatService:
         if answer is not None:
             return {"reply": answer.strip(), "model": EVALUATOR.MODEL,
                     "live": True}
-        return {"reply": ("(offline assistant) Ollama is not running, so I can "
-                          "only give static help: load a template from the "
-                          "Templates tab, connect nodes with shift+click, then "
-                          "Execute → the Gemma evaluator scores it and "
-                          "suggests iterations. Start `ollama serve` for a "
-                          "live chat model."),
+        return {"reply": ("(Offline-Assistent) Kein Modell verbunden. Kurzhilfe: "
+                          "Template im Templates-Tab laden, Nodes mit Shift+Klick "
+                          "verbinden, dann Execute — Gemma bewertet und schlägt "
+                          "Iterationen vor. Präfixe: /execute, #rag-pipeline, "
+                          "!firecrawl <url>. Für ein Live-Modell `ollama serve` "
+                          "starten oder oben einen Cloud-Provider wählen."),
                 "model": "heuristic", "live": False}
+
+
+# --------------------------------------------------------------------------- #
+# GitHub / repo integration — read-only inspection plus skill discovery       #
+# --------------------------------------------------------------------------- #
+class RepoService:
+    """Fast repo integration: what branch are we on, which skills exist,
+    and turn a skill into a workflow node. Read-only by design."""
+
+    def _git(self, *args: str) -> str:
+        import subprocess
+        try:
+            out = subprocess.run(["git", *args], cwd=str(ROOT),
+                                 capture_output=True, text=True, timeout=10)
+            return out.stdout.strip() or out.stderr.strip()
+        except (OSError, subprocess.SubprocessError) as exc:
+            return f"git unavailable: {exc}"
+
+    def status(self) -> dict:
+        return {
+            "branch": self._git("rev-parse", "--abbrev-ref", "HEAD"),
+            "last_commit": self._git("log", "-1", "--pretty=%h %s"),
+            "dirty_files": [ln for ln in
+                            self._git("status", "--porcelain").splitlines() if ln][:20],
+            "remote": self._git("remote", "get-url", "origin"),
+        }
+
+    def skills(self) -> dict:
+        """Discover sibling skills in the repo so they can feed workflows."""
+        found = []
+        skills_root = ROOT.parent.parent  # skills/<bucket>/<skill>
+        if skills_root.is_dir():
+            for bucket in sorted(p for p in skills_root.iterdir() if p.is_dir()):
+                for skill in sorted(p for p in bucket.iterdir() if p.is_dir()):
+                    md = skill / "SKILL.md"
+                    if md.is_file():
+                        desc = ""
+                        for line in md.read_text(errors="replace").splitlines()[:12]:
+                            if line.lower().startswith("description:"):
+                                desc = line.split(":", 1)[1].strip()
+                                break
+                        found.append({"name": skill.name, "bucket": bucket.name,
+                                      "description": desc[:200],
+                                      "ref": f"~{skill.name}"})
+        return {"skills": found, "count": len(found)}
+
+
+# --------------------------------------------------------------------------- #
+# Debug & stress testing                                                      #
+# --------------------------------------------------------------------------- #
+class DebugService:
+    def selftest(self) -> dict:
+        checks = []
+
+        def check(name: str, fn):
+            try:
+                fn()
+                checks.append({"name": name, "ok": True})
+            except Exception as exc:  # noqa: BLE001 — report, never crash
+                checks.append({"name": name, "ok": False, "error": str(exc)})
+
+        sample = {"id": "selftest",
+                  "nodes": [{"id": "in", "type": "text-input", "params": {}},
+                            {"id": "llm", "type": "llm-node", "params": {}},
+                            {"id": "out", "type": "text-output", "params": {}}],
+                  "edges": [{"from": "in", "to": "llm"},
+                            {"from": "llm", "to": "out"}]}
+
+        check("executor runs a valid workflow",
+              lambda: EXECUTOR.execute(sample)["status"] == "success" or
+              (_ for _ in ()).throw(AssertionError("not success")))
+        check("validator rejects an empty workflow",
+              lambda: EXECUTOR.validate({"nodes": [], "edges": []}) or
+              (_ for _ in ()).throw(AssertionError("no errors reported")))
+        check("evaluator returns a verdict",
+              lambda: EVALUATOR.evaluate(sample, {})["verdict"] in ("done", "iterate")
+              or (_ for _ in ()).throw(AssertionError("bad verdict")))
+        check("help registry loads", lambda: helpdata.all_help()["count"] > 0 or
+              (_ for _ in ()).throw(AssertionError("no help topics")))
+        check("provider registry loads", lambda: len(providers.status()) > 0 or
+              (_ for _ in ()).throw(AssertionError("no providers")))
+        check("activity feed accepts events",
+              lambda: ACTIVITY.post({"actor": "selftest", "action": "probe"})["ok"])
+
+        failed = [c for c in checks if not c["ok"]]
+        return {"checks": checks, "passed": len(checks) - len(failed),
+                "failed": len(failed),
+                "ampel": "green" if not failed else "red",
+                "timestamp": now_iso()}
+
+    def stress(self, runs: int = 25) -> dict:
+        import time
+        runs = max(1, min(500, int(runs)))
+        sample = {"id": "stress",
+                  "nodes": [{"id": "in", "type": "text-input", "params": {}},
+                            {"id": "llm", "type": "llm-node",
+                             "params": {"model": "gemma-4"}},
+                            {"id": "t", "type": "transform", "params": {}},
+                            {"id": "out", "type": "text-output", "params": {}}],
+                  "edges": [{"from": "in", "to": "llm"},
+                            {"from": "llm", "to": "t"},
+                            {"from": "t", "to": "out"}]}
+        durations, errors = [], 0
+        for _ in range(runs):
+            t0 = time.perf_counter()
+            try:
+                res = EXECUTOR.execute(dict(sample))
+                if res["status"] != "success":
+                    errors += 1
+            except Exception:  # noqa: BLE001
+                errors += 1
+            durations.append((time.perf_counter() - t0) * 1000)
+
+        durations.sort()
+        n = len(durations)
+        return {
+            "runs": runs, "errors": errors,
+            "ms": {"min": round(durations[0], 3),
+                   "avg": round(sum(durations) / n, 3),
+                   "p95": round(durations[min(n - 1, int(n * 0.95))], 3),
+                   "max": round(durations[-1], 3)},
+            "throughput_per_s": round(1000 * n / max(0.001, sum(durations)), 1),
+            "ampel": "green" if errors == 0 else ("yellow" if errors < runs * 0.1 else "red"),
+            "timestamp": now_iso(),
+        }
 
 
 # --------------------------------------------------------------------------- #
@@ -353,6 +531,8 @@ EVALUATOR = GemmaEvaluator()
 ACTIVITY = ActivityFeed()
 CHAT = ChatService()
 STOCK = StockProviders()
+REPO = RepoService()
+DEBUG = DebugService()
 
 # What is genuinely built in vs. adapter-ready vs. unverified. Served at
 # /api/integrations so agents and humans see honest capability status.
@@ -456,7 +636,6 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/api/patterns":
             self._json({"patterns": PATTERNS})
         elif path == "/api/agent/activity":
-            from urllib.parse import parse_qs
             qs = parse_qs(urlparse(self.path).query)
             since = int(qs.get("since", ["0"])[0] or 0)
             self._json(ACTIVITY.snapshot(since))
@@ -464,6 +643,29 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"integrations": INTEGRATIONS})
         elif path == "/api/stock/status":
             self._json({"providers": STOCK.status()})
+        elif path == "/api/providers":
+            self._json({"providers": providers.status(),
+                        "summary": providers.summary()})
+        elif path == "/api/help":
+            qs = parse_qs(urlparse(self.path).query)
+            key = qs.get("topic", [""])[0]
+            self._json(helpdata.topic(key) if key else helpdata.all_help())
+        elif path == "/api/prefixes":
+            self._json({"prefixes": helpdata.PREFIXES})
+        elif path == "/api/github/status":
+            self._json(REPO.status())
+        elif path == "/api/github/skills":
+            self._json(REPO.skills())
+        elif path == "/api/debug/selftest":
+            self._json(DEBUG.selftest())
+        elif path == "/favicon.ico":
+            svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
+                   '<rect width="32" height="32" rx="7" fill="#0ea5e9"/>'
+                   '<circle cx="11" cy="11" r="3.5" fill="#fff"/>'
+                   '<circle cx="21" cy="21" r="3.5" fill="#fff"/>'
+                   '<path d="M13 13 L19 19" stroke="#fff" stroke-width="2.2"/>'
+                   '</svg>')
+            self._send(200, svg.encode(), "image/svg+xml")
         elif path == "/health":
             self._json({"status": "healthy", "service": "design-system-ui",
                         "timestamp": now_iso()})
@@ -486,11 +688,23 @@ class Handler(BaseHTTPRequestHandler):
             self._json(ACTIVITY.post(payload))
         elif path == "/api/chat":
             self._json(CHAT.reply(payload.get("message", ""),
-                                  payload.get("history", [])))
+                                  payload.get("history", []),
+                                  payload.get("provider")))
         elif path == "/api/stock/search":
-            self._json(STOCK.search(payload.get("provider", ""),
-                                    payload.get("query", ""),
-                                    int(payload.get("per_page", 10))))
+            self._json(providers.stock_search(payload.get("provider", ""),
+                                              payload.get("query", ""),
+                                              int(payload.get("per_page", 12)),
+                                              payload.get("media", "photos")))
+        elif path == "/api/providers/chat":
+            self._json(providers.chat(payload.get("provider", ""),
+                                      payload.get("message", ""),
+                                      payload.get("history", []),
+                                      payload.get("model")))
+        elif path == "/api/scrape":
+            self._json(providers.scrape(payload.get("url", ""),
+                                        payload.get("formats")))
+        elif path == "/api/debug/stress":
+            self._json(DEBUG.stress(int(payload.get("runs", 25))))
         else:
             self._json({"error": "not found", "path": path}, 404)
 

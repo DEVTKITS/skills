@@ -21,6 +21,14 @@ so terminal agents can drive the whole thing without a browser.
 | Gemma 4 12B via Ollama | ✅ Auto-detected (`gemma_live: true`); heuristic fallback when absent |
 | Go client (`main.go`) | ✅ Builds with stdlib only, talks to backend |
 | Rust client (`client.rs`) | ✅ Builds with `rustc`, no crates, talks to backend |
+| Hamburger-Menü mit 9 Oberflächen | ✅ Builder, Chat+Canvas, Skills, Provider, Stock, GitHub, Agenten, Debug, Docs |
+| Info-Buttons mit wechselnden Tipps | ✅ Blinken dezent, Popover rotiert Tipps alle 4,5 s, blätterbar |
+| Ampelsystem | ✅ Grün/Gelb/Rot je Provider, Summe in Kopfzeile und Menü |
+| Vorlesen (TTS) | ✅ 1× Klick markiert, 2× Klick liest per Browser-Sprachausgabe vor |
+| Provider (OpenRouter, NVIDIA, HuggingFace, Firecrawl, Stability, Replicate, Stock, Ollama) | ✅ 10 Anbieter, 1-Klick per Env-Key, eigene via `CUSTOM_PROVIDERS` |
+| Präfix-Syntax `/` `#` `@` `!` `$` `~` | ✅ Chat übersetzt sie in echte Builder-Aktionen |
+| GitHub-Integration | ✅ Repo-Status + alle Skills im Repo als `~ref` |
+| Debug & Stresstest | ✅ Selbsttest + Lasttest mit p95-Latenz, in UI und API |
 | Agent visibility: red monitor-edge glow + click flashes | ✅ Open protocol (`POST /api/agent/activity`), UI polls 1s |
 | Playwright demo agent (`demo/agent_demo.mjs`) | ✅ Drives the real UI in Chromium, broadcasts every step, screenshots |
 | Chat tab | ✅ Live via Ollama when running; offline help otherwise |
@@ -106,7 +114,11 @@ Configuration via environment: `OLLAMA_URL` (default `http://localhost:11434`),
 ## Testing
 
 ```bash
-./test.sh    # 30 assertions: endpoints, iterate loop, agent visibility, chat, stock, Go+Rust clients
+./test.sh                    # 54 Prüfungen: Endpunkte, Iterationsschleife, Provider,
+                             # Hilfe, Debug, Repo, UI-Oberflächen, Go- und Rust-Clients
+cd demo && npm install playwright
+CHROMIUM_PATH=/opt/pw-browsers/chromium node ui_tour.mjs http://localhost:8000 ./shots
+                             # Playwright-Rundgang durch alle 9 Oberflächen
 ```
 
 ## Watching the AI work (agent visibility)
@@ -147,15 +159,20 @@ design-system-ui/
 ├── styles.css          responsive, light/dark aware
 ├── app.js              frontend logic (canvas, terminal, eval)
 ├── server.py           zero-dependency backend (execute + evaluate + iterate)
+├── providers.py        Provider-Registry mit Ampelstatus (10 Anbieter + custom)
+├── helpdata.py         Hilfethemen, wechselnde Tipps, Präfix-Syntax
 ├── start.sh            launcher
-├── test.sh             smoke-test suite (22 checks, CI-ready)
+├── test.sh             smoke-test suite (54 checks, CI-ready)
 ├── main.go             Go client / desktop bridge (stdlib only)
 ├── client.rs           Rust terminal client (stdlib only)
 ├── agents.mojo         Mojo agent-layer sketch
 ├── requirements.txt    optional deps (only for real Gemma via HF)
 ├── go.mod              Go module (no external requires)
+├── demo/
+│   ├── agent_demo.mjs        Playwright-Agent, der die UI sichtbar bedient
+│   └── ui_tour.mjs           Regressionsrundgang durch alle Oberflächen
 └── examples/
-    └── text-classifier.json   sample workflow
+    └── text-classifier.json  Beispiel-Workflow
 ```
 
 ## Roadmap

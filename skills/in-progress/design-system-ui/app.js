@@ -752,19 +752,41 @@ DesignSystemApp.prototype.sendChat = async function () {
     input.value = '';
     this.appendChat('user', message);
 
+    const provider = document.getElementById('chatProvider')?.value || 'auto';
+
     try {
         const res = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, history: this.chatHistory })
+            body: JSON.stringify({ message, history: this.chatHistory, provider })
         });
         const data = await res.json();
-        const suffix = data.live ? '' : '\n\n[offline — starte `ollama serve` für ein Live-Modell]';
+        const suffix = data.live ? '' : '\n\n[offline — `ollama serve` starten oder Provider wählen]';
         this.appendChat('assistant', (data.reply || '(keine Antwort)') + suffix);
         this.chatHistory.push({ role: 'user', content: message },
                               { role: 'assistant', content: data.reply || '' });
+        if (data.action) this.handleChatAction(data.action);
     } catch (err) {
         this.appendChat('assistant', `Fehler: ${err.message}`);
+    }
+};
+
+// Präfix-Syntax aus dem Chat in echte Builder-Aktionen übersetzen
+DesignSystemApp.prototype.handleChatAction = function (action) {
+    if (action.type === 'load_pattern') {
+        this.loadPattern(action.pattern);
+        this.mirrorCanvas();
+    } else if (action.type === 'command') {
+        const map = {
+            execute: () => this.executeWorkflow(),
+            validate: () => this.validateWorkflow(),
+            clear: () => this.newWorkflow(),
+            iterate: () => this.showIterationSuggestions(),
+            selftest: () => this.showView('debug')
+        };
+        (map[action.command] || (() => {}))();
+    } else if (action.type === 'stock_results') {
+        this.appendChat('assistant', 'Ergebnisse siehe Oberfläche „Stock Medien".');
     }
 };
 
@@ -777,8 +799,429 @@ DesignSystemApp.prototype.appendChat = function (role, content) {
     log.scrollTop = log.scrollHeight;
 };
 
-// Initialize app when DOM is ready
+// ══════════════════════════════════════════════════════════════════════
+// Hamburger-Menü & Oberflächen-Routing
+// ══════════════════════════════════════════════════════════════════════
+const VIEW_NAMES = {
+    builder: 'Workflow Builder', chat: 'Chat & Canvas', skills: 'Skill Builder',
+    providers: 'Provider & APIs', stock: 'Stock Medien', github: 'GitHub & Skills',
+    agents: 'Agenten & Sichtbarkeit', debug: 'Debug & Stresstest', docs: 'Docs'
+};
+
+DesignSystemApp.prototype.initShell = function () {
+    const open = () => document.body.classList.add('drawer-open');
+    const close = () => document.body.classList.remove('drawer-open');
+
+    document.getElementById('hamburger').addEventListener('click', () =>
+        document.body.classList.toggle('drawer-open'));
+    document.getElementById('drawerClose').addEventListener('click', close);
+    document.getElementById('drawerScrim').addEventListener('click', close);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { close(); this.closeInfo(); }
+    });
+
+    document.querySelectorAll('.drawer-item').forEach(item => {
+        item.addEventListener('click', () => {
+            this.showView(item.dataset.view);
+            close();
+        });
+    });
+};
+
+DesignSystemApp.prototype.showView = function (view) {
+    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+    const el = document.getElementById(`view-${view}`);
+    if (el) el.classList.remove('hidden');
+    document.querySelectorAll('.drawer-item').forEach(i =>
+        i.classList.toggle('active', i.dataset.view === view));
+    document.getElementById('viewName').textContent = VIEW_NAMES[view] || view;
+    this.currentView = view;
+
+    // Lazy-load pro Oberfläche
+    if (view === 'providers') this.loadProviders();
+    if (view === 'github') this.loadRepo();
+    if (view === 'agents') this.loadIntegrations();
+    if (view === 'docs') this.loadDocs();
+    if (view === 'chat') this.mirrorCanvas();
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// Info-System: blinkende Buttons mit wechselnden Tipps
+// ══════════════════════════════════════════════════════════════════════
+DesignSystemApp.prototype.initInfoSystem = async function () {
+    this.helpData = { topics: {}, prefixes: {} };
+    try {
+        const res = await fetch('/api/help');
+        this.helpData = await res.json();
+    } catch (_) { /* Offline: Popovers zeigen dann einen Hinweis */ }
+
+    this.infoTopic = null;
+    this.infoTipIndex = 0;
+
+    document.body.addEventListener('click', (e) => {
+        const btn = e.target.closest('.info-btn');
+        if (btn) { e.stopPropagation(); this.openInfo(btn); return; }
+        if (!e.target.closest('.info-popover')) this.closeInfo();
+    });
+
+    document.querySelector('.info-close').addEventListener('click', () => this.closeInfo());
+    document.getElementById('infoNextTip').addEventListener('click', () => this.cycleTip(1));
+    document.getElementById('infoPrevTip').addEventListener('click', () => this.cycleTip(-1));
+
+    this.renderPrefixes();
+};
+
+DesignSystemApp.prototype.openInfo = function (btn) {
+    const key = btn.dataset.help;
+    const topic = (this.helpData.topics || {})[key];
+    const pop = document.getElementById('infoPopover');
+
+    document.querySelectorAll('.info-btn.open').forEach(b => b.classList.remove('open'));
+    btn.classList.add('open');
+
+    if (!topic) {
+        document.getElementById('infoTitle').textContent = 'Hilfe';
+        document.getElementById('infoGuide').textContent =
+            'Für dieses Element liegt noch kein Hilfetext vor.';
+        document.getElementById('infoTip').textContent = '';
+        document.getElementById('infoPatterns').innerHTML = '';
+        document.getElementById('infoTipCount').textContent = '';
+    } else {
+        this.infoTopic = topic;
+        this.infoTipIndex = 0;
+        document.getElementById('infoTitle').textContent = topic.title;
+        document.getElementById('infoGuide').textContent = topic.guide;
+        document.getElementById('infoPatterns').innerHTML =
+            (topic.patterns || []).map(p => `<code>${this.escapeHtml(p)}</code>`).join('');
+        this.renderTip();
+        // Tipps wechseln automatisch weiter, solange das Popover offen ist
+        clearInterval(this.infoTimer);
+        this.infoTimer = setInterval(() => this.cycleTip(1), 4500);
+    }
+
+    // Popover neben dem Button positionieren, im Viewport halten
+    pop.classList.remove('hidden');
+    const r = btn.getBoundingClientRect();
+    const pr = pop.getBoundingClientRect();
+    let left = Math.min(r.left, window.innerWidth - pr.width - 12);
+    let top = r.bottom + 8;
+    if (top + pr.height > window.innerHeight - 8) top = Math.max(8, r.top - pr.height - 8);
+    pop.style.left = `${Math.max(8, left)}px`;
+    pop.style.top = `${top}px`;
+};
+
+DesignSystemApp.prototype.renderTip = function () {
+    const tips = this.infoTopic?.tips || [];
+    if (!tips.length) return;
+    const el = document.getElementById('infoTip');
+    el.textContent = tips[this.infoTipIndex % tips.length];
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = '';
+    document.getElementById('infoTipCount').textContent =
+        `${(this.infoTipIndex % tips.length) + 1}/${tips.length}`;
+};
+
+DesignSystemApp.prototype.cycleTip = function (delta) {
+    const tips = this.infoTopic?.tips || [];
+    if (!tips.length) return;
+    this.infoTipIndex = (this.infoTipIndex + delta + tips.length) % tips.length;
+    this.renderTip();
+};
+
+DesignSystemApp.prototype.closeInfo = function () {
+    clearInterval(this.infoTimer);
+    document.getElementById('infoPopover').classList.add('hidden');
+    document.querySelectorAll('.info-btn.open').forEach(b => b.classList.remove('open'));
+};
+
+DesignSystemApp.prototype.renderPrefixes = function () {
+    const el = document.getElementById('prefixList');
+    if (!el) return;
+    const px = this.helpData.prefixes || {};
+    el.innerHTML = Object.entries(px).map(([sym, p]) => `
+        <div class="prefix-item">
+            <code>${this.escapeHtml(sym)}</code> <strong>${this.escapeHtml(p.name)}</strong><br>
+            <span class="text-muted">${this.escapeHtml(p.desc)}</span><br>
+            <code>${this.escapeHtml(p.example)}</code>
+        </div>`).join('') || '<p class="text-muted">Keine Präfixe geladen.</p>';
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// TTS: 1× Klick markiert, 2× Klick liest vor
+// ══════════════════════════════════════════════════════════════════════
+DesignSystemApp.prototype.initTTS = function () {
+    this.ttsEnabled = true;
+    const toggle = document.getElementById('ttsToggle');
+    toggle.addEventListener('change', () => {
+        this.ttsEnabled = toggle.checked;
+        if (!this.ttsEnabled) this.stopSpeaking();
+    });
+
+    const SELECTOR = 'p, li, h1, h2, h3, h4, .chat-msg, .terminal-line, .eval-results, .info-guide, .info-tip, .code-block, .prefix-item, .provider-card';
+
+    document.body.addEventListener('click', (e) => {
+        if (!this.ttsEnabled) return;
+        if (e.target.closest('button, a, input, textarea, select, .drawer-item')) return;
+        const block = e.target.closest(SELECTOR);
+        if (!block) return;
+        document.querySelectorAll('.tts-selected').forEach(el => el.classList.remove('tts-selected'));
+        block.classList.add('tts-selected');
+        this.ttsBlock = block;
+    });
+
+    document.body.addEventListener('dblclick', (e) => {
+        if (!this.ttsEnabled) return;
+        const block = e.target.closest(SELECTOR);
+        if (!block) return;
+        e.preventDefault();
+        if (this.speakingBlock === block) { this.stopSpeaking(); return; }
+        this.speak(block);
+    });
+};
+
+DesignSystemApp.prototype.speak = function (block) {
+    if (!('speechSynthesis' in window)) {
+        this.logTerminal('⚠️ Browser unterstützt keine Sprachausgabe', 'warning');
+        return;
+    }
+    this.stopSpeaking();
+    const text = (block.innerText || block.textContent || '').trim();
+    if (!text) return;
+
+    const u = new SpeechSynthesisUtterance(text.slice(0, 3000));
+    u.lang = /[äöüßÄÖÜ]|\b(der|die|das|und|nicht|wird|Klick)\b/.test(text) ? 'de-DE' : 'en-US';
+    u.onend = () => { block.classList.remove('tts-speaking'); this.speakingBlock = null; };
+    u.onerror = () => { block.classList.remove('tts-speaking'); this.speakingBlock = null; };
+
+    block.classList.add('tts-speaking');
+    this.speakingBlock = block;
+    window.speechSynthesis.speak(u);
+};
+
+DesignSystemApp.prototype.stopSpeaking = function () {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    document.querySelectorAll('.tts-speaking').forEach(el => el.classList.remove('tts-speaking'));
+    this.speakingBlock = null;
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// Provider, Stock, GitHub, Debug, Skills, Docs
+// ══════════════════════════════════════════════════════════════════════
+DesignSystemApp.prototype.loadProviders = async function () {
+    const grid = document.getElementById('providerGrid');
+    try {
+        const res = await fetch('/api/providers');
+        const { providers, summary } = await res.json();
+        this.setAmpel(summary);
+
+        grid.innerHTML = Object.values(providers).map(p => `
+            <div class="provider-card">
+                <header>
+                    <span class="ampel" data-state="${p.ampel}"></span>
+                    <h4>${this.escapeHtml(p.name)}</h4>
+                    <span class="provider-kind">${this.escapeHtml(p.kind)}</span>
+                </header>
+                <p>${this.escapeHtml(p.note || '')}</p>
+                <p><strong>${this.escapeHtml(p.state)}</strong></p>
+                <p><code>${this.escapeHtml(p.connect_hint)}</code></p>
+                ${p.docs ? `<p class="text-muted">${this.escapeHtml(p.docs)}</p>` : ''}
+            </div>`).join('');
+
+        // Chat-Provider-Auswahl mit den LLM-fähigen Anbietern füllen
+        const sel = document.getElementById('chatProvider');
+        if (sel) {
+            const llm = Object.values(providers).filter(p => ['llm', 'local'].includes(p.kind));
+            sel.innerHTML = '<option value="auto">auto (lokal)</option>' +
+                llm.map(p => `<option value="${p.id}">${this.escapeHtml(p.name)}` +
+                             `${p.ampel === 'green' ? ' ✓' : ' ✗'}</option>`).join('');
+        }
+    } catch (err) {
+        grid.innerHTML = `<p class="text-muted">Fehler: ${this.escapeHtml(err.message)}</p>`;
+    }
+};
+
+DesignSystemApp.prototype.setAmpel = function (summary) {
+    const state = summary.connected > 0 ? 'green' : 'red';
+    const text = `${summary.connected}/${summary.total}`;
+    for (const id of ['headerAmpel', 'drawerAmpel']) {
+        const el = document.getElementById(id);
+        if (el) el.dataset.state = state;
+    }
+    const h = document.getElementById('headerAmpelText');
+    if (h) h.textContent = text;
+    const d = document.getElementById('drawerAmpelText');
+    if (d) d.textContent = `${text} Provider verbunden`;
+};
+
+DesignSystemApp.prototype.initStock = function () {
+    document.getElementById('stockSearch').addEventListener('click', async () => {
+        const out = document.getElementById('stockResults');
+        const provider = document.getElementById('stockProvider').value;
+        const media = document.getElementById('stockMedia').value;
+        const query = document.getElementById('stockQuery').value.trim();
+        if (!query) { out.textContent = 'Bitte einen Suchbegriff eingeben.'; return; }
+        out.textContent = 'Suche…';
+        try {
+            const res = await fetch('/api/stock/search', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider, query, media, per_page: 12 })
+            });
+            const data = await res.json();
+            if (!data.ok) {
+                out.innerHTML = `<p class="text-muted">${this.escapeHtml(data.error || 'Fehler')}` +
+                    `${data.connect ? '<br><code>' + this.escapeHtml(data.connect) + '</code>' : ''}</p>`;
+                return;
+            }
+            const items = data.data.photos || data.data.results || data.data.hits ||
+                          data.data.videos || [];
+            out.innerHTML = items.length
+                ? items.map(it => {
+                    const url = it.src?.medium || it.urls?.small || it.webformatURL ||
+                                it.image || it.preview || '';
+                    return url ? `<img src="${this.escapeHtml(url)}" alt="" loading="lazy">` : '';
+                  }).join('')
+                : '<p class="text-muted">Keine Treffer.</p>';
+        } catch (err) {
+            out.textContent = `Fehler: ${err.message}`;
+        }
+    });
+};
+
+DesignSystemApp.prototype.loadRepo = async function () {
+    try {
+        const st = await (await fetch('/api/github/status')).json();
+        document.getElementById('repoStatus').textContent =
+            `Branch:  ${st.branch}\nCommit:  ${st.last_commit}\nRemote:  ${st.remote}\n` +
+            `Geändert: ${st.dirty_files.length ? '\n  ' + st.dirty_files.join('\n  ') : 'nichts'}`;
+
+        const sk = await (await fetch('/api/github/skills')).json();
+        document.getElementById('repoSkills').innerHTML = sk.skills.map(s => `
+            <div class="skill-chip" data-ref="${this.escapeHtml(s.ref)}">
+                <strong>${this.escapeHtml(s.name)}</strong>
+                <span class="text-muted">(${this.escapeHtml(s.bucket)})</span><br>
+                <span class="text-muted">${this.escapeHtml((s.description || '').slice(0, 90))}</span>
+            </div>`).join('') || '<p class="text-muted">Keine Skills gefunden.</p>';
+
+        document.querySelectorAll('.skill-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                navigator.clipboard?.writeText(chip.dataset.ref);
+                this.logTerminal(`📋 ${chip.dataset.ref} kopiert`, 'success');
+            });
+        });
+    } catch (err) {
+        document.getElementById('repoStatus').textContent = `Fehler: ${err.message}`;
+    }
+};
+
+DesignSystemApp.prototype.initDebug = function () {
+    const out = document.getElementById('debugOutput');
+    document.getElementById('runSelftest').addEventListener('click', async () => {
+        out.textContent = 'Selbsttest läuft…';
+        const d = await (await fetch('/api/debug/selftest')).json();
+        out.textContent = `Ampel: ${d.ampel}   bestanden ${d.passed}, fehlgeschlagen ${d.failed}\n\n` +
+            d.checks.map(c => `${c.ok ? '✓' : '✗'} ${c.name}${c.error ? ' — ' + c.error : ''}`).join('\n');
+    });
+    document.getElementById('runStress').addEventListener('click', async () => {
+        const runs = parseInt(document.getElementById('stressRuns').value, 10) || 50;
+        out.textContent = `Stresstest mit ${runs} Läufen…`;
+        const d = await (await fetch('/api/debug/stress', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ runs })
+        })).json();
+        out.textContent = `Ampel: ${d.ampel}\nLäufe: ${d.runs}   Fehler: ${d.errors}\n` +
+            `min ${d.ms.min} ms · avg ${d.ms.avg} ms · p95 ${d.ms.p95} ms · max ${d.ms.max} ms\n` +
+            `Durchsatz: ${d.throughput_per_s}/s`;
+    });
+};
+
+DesignSystemApp.prototype.initSkillBuilder = function () {
+    const build = () => {
+        const name = document.getElementById('skillName').value.trim() || 'unnamed-skill';
+        const desc = document.getElementById('skillDesc').value.trim() ||
+                     'Beschreibung fehlt — Agenten wählen den Skill danach aus.';
+        const trig = document.getElementById('skillTriggers').value.trim();
+        return `---\nname: ${name}\ndescription: ${desc}\n---\n\n# ${name}\n\n` +
+               `${desc}\n\n## Trigger\n${trig || '(keine angegeben)'}\n\n` +
+               `## Workflow\n\`\`\`json\n${JSON.stringify(this.workflow, null, 2)}\n\`\`\`\n`;
+    };
+    document.getElementById('skillPreview').addEventListener('click', () => {
+        document.getElementById('skillOutput').textContent = build();
+    });
+    document.getElementById('skillExport').addEventListener('click', () => {
+        const md = build();
+        document.getElementById('skillOutput').textContent = md;
+        const blob = new Blob([md], { type: 'text/markdown' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${document.getElementById('skillName').value.trim() || 'skill'}-SKILL.md`;
+        a.click();
+    });
+};
+
+DesignSystemApp.prototype.loadIntegrations = async function () {
+    try {
+        const { integrations } = await (await fetch('/api/integrations')).json();
+        document.getElementById('integrationList').innerHTML =
+            Object.entries(integrations).map(([bucket, items]) => `
+                <h4>${this.escapeHtml(bucket)}</h4>
+                <ul>${Object.entries(items).map(([k, v]) =>
+                    `<li><strong>${this.escapeHtml(k)}</strong>: ${this.escapeHtml(v)}</li>`
+                ).join('')}</ul>`).join('');
+    } catch (_) { /* ignore */ }
+
+    document.getElementById('agentDemo').addEventListener('click', async () => {
+        const steps = [['#executeWorkflow', 'Button anvisieren'],
+                       ['#canvas', 'Canvas prüfen'],
+                       ['#terminal', 'Terminal lesen']];
+        await window.agentActivity.start('UI-Sichtbarkeitstest');
+        for (const [target, detail] of steps) {
+            await window.agentActivity.click(target, detail);
+            await new Promise(r => setTimeout(r, 1400));
+        }
+        await window.agentActivity.stop('Test beendet');
+    }, { once: true });
+};
+
+DesignSystemApp.prototype.loadDocs = async function () {
+    try {
+        const txt = await (await fetch('/llms.txt')).text();
+        document.getElementById('docsContent').textContent = txt;
+    } catch (err) {
+        document.getElementById('docsContent').textContent = `Fehler: ${err.message}`;
+    }
+};
+
+// Canvas-Spiegel in der Split-Ansicht
+DesignSystemApp.prototype.mirrorCanvas = function () {
+    const src = document.getElementById('canvasSvg');
+    const dst = document.getElementById('canvasMirrorSvg');
+    if (src && dst) dst.innerHTML = src.innerHTML;
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// Bootstrap
+// ══════════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-    window.app = new DesignSystemApp();
-    console.log('Design System UI initialized');
+    const app = new DesignSystemApp();
+    window.app = app;
+
+    app.initShell();
+    app.initInfoSystem();
+    app.initTTS();
+    app.initStock();
+    app.initDebug();
+    app.initSkillBuilder();
+    app.loadProviders();
+
+    document.getElementById('refreshProviders')?.addEventListener('click', () => app.loadProviders());
+    document.getElementById('refreshRepo')?.addEventListener('click', () => app.loadRepo());
+    document.getElementById('chatExecute')?.addEventListener('click', () => app.executeWorkflow());
+
+    // Canvas-Spiegel aktuell halten
+    const origRedraw = app.redrawCanvas.bind(app);
+    app.redrawCanvas = function () { origRedraw(); app.mirrorCanvas(); };
+
+    app.showView('builder');
+    console.log('Design System UI initialised');
 });

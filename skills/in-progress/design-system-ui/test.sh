@@ -93,6 +93,51 @@ INTEG=$(curl -s "$BASE/api/integrations")
 assert_contains "integrations manifest"       '"adapter_ready"'      "$INTEG"
 assert_contains "unverified names stay honest" 'unverified_roadmap'  "$INTEG"
 
+say "── providers / help / debug / repo ──────────────────"
+PROV=$(curl -s "$BASE/api/providers")
+assert_contains "provider registry"           '"openrouter"'         "$PROV"
+assert_contains "nvidia cloud present"        '"nvidia"'             "$PROV"
+assert_contains "huggingface present"         '"huggingface"'        "$PROV"
+assert_contains "ampel status per provider"   '"ampel"'              "$PROV"
+assert_contains "connect hint given"          'connect_hint'         "$PROV"
+
+HELP=$(curl -s "$BASE/api/help?topic=canvas")
+assert_contains "help topic has guide"        '"guide"'              "$HELP"
+assert_contains "help topic has rotating tips" '"tips"'              "$HELP"
+PREF=$(curl -s "$BASE/api/prefixes")
+assert_contains "prefix syntax registry"      'pattern'              "$PREF"
+
+SELF=$(curl -s "$BASE/api/debug/selftest")
+assert_contains "selftest all green"          '"ampel": "green"'     "$SELF"
+assert_contains "selftest reports failures"   '"failed": 0'          "$SELF"
+STRESS=$(curl -s -X POST "$BASE/api/debug/stress" \
+  -H 'Content-Type: application/json' -d '{"runs":20}')
+assert_contains "stress test runs clean"      '"errors": 0'          "$STRESS"
+assert_contains "stress reports latency"      '"p95"'                "$STRESS"
+
+REPO=$(curl -s "$BASE/api/github/status")
+assert_contains "repo status has branch"      '"branch"'             "$REPO"
+SKILLS=$(curl -s "$BASE/api/github/skills")
+assert_contains "repo skills discovered"      '"skills"'             "$SKILLS"
+
+PFX=$(curl -s -X POST "$BASE/api/chat" -H 'Content-Type: application/json' \
+  -d '{"message":"#rag-pipeline","history":[]}')
+assert_contains "chat prefix loads pattern"   'load_pattern'         "$PFX"
+CMD=$(curl -s -X POST "$BASE/api/chat" -H 'Content-Type: application/json' \
+  -d '{"message":"/execute","history":[]}')
+assert_contains "chat prefix runs command"    '"command"'            "$CMD"
+
+say "── UI surfaces present ──────────────────────────────"
+HTML=$(curl -s "$BASE/")
+assert_contains "hamburger menu"              'id="hamburger"'       "$HTML"
+assert_contains "drawer with all views"       'data-view="providers"' "$HTML"
+assert_contains "info buttons with help keys" 'data-help="canvas"'   "$HTML"
+assert_contains "ampel indicator"             'id="headerAmpel"'     "$HTML"
+assert_contains "tts toggle"                  'id="ttsToggle"'       "$HTML"
+assert_contains "split chat+canvas view"      'id="view-chat"'       "$HTML"
+assert_contains "skill builder view"          'id="view-skills"'     "$HTML"
+assert_contains "debug view"                  'id="view-debug"'      "$HTML"
+
 say "── polyglot clients ─────────────────────────────────"
 if command -v go >/dev/null 2>&1; then
   if go build -o /tmp/dsui-test-go main.go 2>>"$LOG"; then
