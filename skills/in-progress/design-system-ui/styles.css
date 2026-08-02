@@ -833,3 +833,9 @@ body.drawer-open .drawer { transform: translateX(0); visibility: visible; }
         grid-template-columns: 1fr;
     }
 }
+
+/* OpenCLAW-Steuerung */
+.claw-status-row {
+    display: flex; align-items: center; gap: var(--space-sm);
+    margin-bottom: var(--space-md); font-size: 0.8rem;
+}

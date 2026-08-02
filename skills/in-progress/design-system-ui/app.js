@@ -712,6 +712,19 @@ DesignSystemApp.prototype.renderActivityEvent = function (ev) {
                  (ev.detail ? ` (${ev.detail})` : '');
     const bar = document.getElementById('activityText');
     if (bar) bar.textContent = text;
+
+    // Verlauf in der Agenten-Ansicht mitschreiben, damit nachvollziehbar
+    // bleibt, was eine KI getan hat — nicht nur der letzte Schritt.
+    const logEl = document.getElementById('agentLog');
+    if (logEl) {
+        if (!this.agentLogLines) this.agentLogLines = [];
+        const stamp = (ev.timestamp || '').slice(11, 19);
+        this.agentLogLines.push(`${stamp}  ${text}`);
+        this.agentLogLines = this.agentLogLines.slice(-100);
+        logEl.textContent = this.agentLogLines.join('\n');
+        logEl.scrollTop = logEl.scrollHeight;
+    }
+
     if (ev.target) this.flashElement(ev.target);
     if (ev.state === 'error') this.logTerminal(`⚠️ ${text}`, 'error');
 };
@@ -854,7 +867,7 @@ DesignSystemApp.prototype.showView = function (view) {
     // Lazy-load pro Oberfläche
     if (view === 'providers') this.loadProviders();
     if (view === 'github') this.loadRepo();
-    if (view === 'agents') this.loadIntegrations();
+    if (view === 'agents') { this.loadIntegrations(); this.refreshOpenClawStatus(); }
     if (view === 'docs') this.loadDocs();
     if (view === 'chat') this.mirrorCanvas();
 };
@@ -1197,6 +1210,97 @@ DesignSystemApp.prototype.loadIntegrations = async function () {
     }, { once: true });
 };
 
+// ── OpenCLAW: Agenten-Shell aus der Oberfläche heraus starten ──────────
+// Schreibweise: OpenCLAW. Nicht "OpenCloud"/"opencloude", nicht Claude.
+DesignSystemApp.prototype.initOpenClaw = function () {
+    const btn = document.getElementById('clawRun');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+        const task = document.getElementById('clawTask').value.trim();
+        const pattern = document.getElementById('clawPattern').value || null;
+        if (!task && !pattern) {
+            document.getElementById('clawOutput').textContent =
+                'Bitte einen Auftrag beschreiben oder ein Muster wählen.';
+            return;
+        }
+        btn.disabled = true;
+        document.getElementById('clawOutput').textContent = 'OpenCLAW wird gestartet…';
+
+        try {
+            const res = await fetch('/api/openclaw/run', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ task, pattern })
+            });
+            const data = await res.json();
+            if (!data.ok) {
+                document.getElementById('clawOutput').textContent =
+                    `Nicht gestartet: ${data.error || 'unbekannter Fehler'}`;
+                btn.disabled = false;
+                return;
+            }
+            this.pollOpenClaw();
+        } catch (err) {
+            document.getElementById('clawOutput').textContent = `Fehler: ${err.message}`;
+            btn.disabled = false;
+        }
+    });
+
+    this.refreshOpenClawStatus();
+};
+
+DesignSystemApp.prototype.refreshOpenClawStatus = async function () {
+    try {
+        const s = await (await fetch('/api/openclaw/status')).json();
+        const ampel = document.getElementById('clawAmpel');
+        const text = document.getElementById('clawStatusText');
+        if (!ampel || !text) return s;
+
+        if (s.running) {
+            ampel.dataset.state = 'yellow';
+            text.textContent = `läuft: ${s.task || '(ohne Beschreibung)'}`;
+        } else if (s.shell_available) {
+            ampel.dataset.state = 'green';
+            text.textContent = `Shell bereit: ${s.shell_cmd}`;
+        } else {
+            ampel.dataset.state = 'yellow';
+            text.textContent = s.shell_configured
+                ? `OPENCLAW_CMD gesetzt, aber Programm fehlt — Fallback-Modus`
+                : 'keine Shell installiert — Runner fährt die Schleife selbst (Fallback)';
+        }
+        return s;
+    } catch (_) { return null; }
+};
+
+DesignSystemApp.prototype.pollOpenClaw = function () {
+    const out = document.getElementById('clawOutput');
+    const btn = document.getElementById('clawRun');
+    const tick = async () => {
+        const s = await this.refreshOpenClawStatus();
+        if (!s) { setTimeout(tick, 1500); return; }
+
+        if (s.running) {
+            out.textContent = (s.log || []).join('\n') || 'OpenCLAW arbeitet…';
+            setTimeout(tick, 1200);
+            return;
+        }
+        const r = s.result || {};
+        const rounds = (r.rounds || []).map(x =>
+            `  Runde ${x.round}: ${x.score}/100 → ${x.verdict}` +
+            `${x.gemma_live ? ' (live Gemma)' : ' (Heuristik)'}`).join('\n');
+        out.textContent =
+            `Modus: ${r.mode || '?'}\n` +
+            (r.pattern ? `Muster: ${r.pattern}\n` : '') +
+            (r.verdict ? `Urteil: ${r.verdict}` +
+                (r.final_score != null ? `  (${r.final_score}/100)` : '') + '\n' : '') +
+            (r.error ? `Fehler: ${r.error}\n` : '') +
+            (rounds ? `\n${rounds}\n` : '') +
+            `\n— Protokoll —\n${(s.log || []).join('\n')}`;
+        btn.disabled = false;
+    };
+    tick();
+};
+
 DesignSystemApp.prototype.loadDocs = async function () {
     try {
         const txt = await (await fetch('/llms.txt')).text();
@@ -1228,6 +1332,7 @@ document.addEventListener('DOMContentLoaded', () => {
     app.initStock();
     app.initDebug();
     app.initSkillBuilder();
+    app.initOpenClaw();
     app.loadProviders();
 
     document.getElementById('refreshProviders')?.addEventListener('click', () => app.loadProviders());

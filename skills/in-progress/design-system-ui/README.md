@@ -6,7 +6,7 @@ score the result and decide *iterate* or *done*. Every page exposes `/llms.txt`
 so terminal agents can drive the whole thing without a browser.
 
 > **Status: in-progress draft.** The core loop runs and is verified by an
-> automated 60-check test suite (`./test.sh`) plus a Playwright tour through
+> automated 67-check test suite (`./test.sh`) plus a Playwright tour through
 > all nine surfaces. Gemma inference goes **live automatically** when an
 > Ollama server is running; otherwise a deterministic heuristic evaluator
 > answers with the same response schema.
@@ -35,9 +35,9 @@ so terminal agents can drive the whole thing without a browser.
 | Chat tab | ✅ Live via Ollama when running; offline help otherwise |
 | Stock media 1-click connect | ✅ Pexels/Unsplash/Pixabay — set the env API key, done |
 | Integrations manifest (`/api/integrations`) | ✅ Honest builtin / adapter-ready / unverified split |
-| OpenCLAW On-Demand-Runner | ✅ `adapters/openclaw_runner.py` — fährt die Iterationsschleife auch ohne installierte Shell |
+| **Mit OpenCLAW designen** | ✅ Direkt aus der Agenten-Ansicht starten: Auftrag eintippen, zusehen (roter Rand), Ergebnis lesen — `adapters/openclaw_runner.py` fährt die Schleife auch ohne installierte Shell |
 | Sicherheit | ✅ Importiertes Workflow-JSON wird nie als Markup interpretiert — DOM-XSS-Regressionstest (`demo/xss_check.mjs`) |
-| Test suite (`test.sh`) | ✅ 60 Prüfungen inkl. polyglotter Clients und XSS-Test — CI-ready |
+| Test suite (`test.sh`) | ✅ 67 Prüfungen inkl. polyglotter Clients und XSS-Test — CI-ready |
 | Mojo agent layer (`agents.mojo`) | 📐 Design sketch — not required to run |
 
 ## Quick start (zero dependencies)
@@ -117,7 +117,7 @@ Configuration via environment: `OLLAMA_URL` (default `http://localhost:11434`),
 ## Testing
 
 ```bash
-./test.sh                    # 60 Prüfungen: Endpunkte, Iterationsschleife, Provider,
+./test.sh                    # 67 Prüfungen: Endpunkte, Iterationsschleife, Provider,
                              # Hilfe, Debug, Repo, UI-Oberflächen, Go- und Rust-Clients
 cd demo && npm install playwright
 CHROMIUM_PATH=/opt/pw-browsers/chromium node ui_tour.mjs http://localhost:8000 ./shots
@@ -150,7 +150,11 @@ Muster: **aus lassen** → Auftrag kommt herein → Framework starten → gegen
 diese HTTP-Oberfläche arbeiten lassen (es braucht nur `llms.txt`) → jeden
 Schritt über das Aktivitätsprotokoll melden → bei `state=done` herunterfahren.
 
-Dafür gibt es einen fertigen Runner:
+In der Oberfläche: **Menü → Agenten & Sichtbarkeit → „Mit OpenCLAW designen"**.
+Auftrag eintippen, starten — der Monitorrand leuchtet rot, das Aktivitäts-
+protokoll zeigt jeden Schritt, am Ende steht das Urteil.
+
+Auf der Kommandozeile:
 
 ```bash
 python3 adapters/openclaw_runner.py "Baue einen RAG-Workflow und optimiere ihn"
@@ -210,7 +214,7 @@ design-system-ui/
 - [x] stdlib Go + Rust clients that talk to the backend
 - [x] `/llms.txt` served on every deployment
 - [x] Real Gemma 4 12B via Ollama with automatic heuristic fallback
-- [x] Automated smoke-test suite (`test.sh`, 60 checks inkl. DOM-XSS-Regression)
+- [x] Automated smoke-test suite (`test.sh`, 67 checks inkl. DOM-XSS-Regression)
 - [x] UI iterate loop: real suggestions, Apply All → auto re-execute
 - [ ] Live terminal streaming (Server-Sent Events / WebSocket)
 - [ ] ComfyUI JSON import/export round-trip

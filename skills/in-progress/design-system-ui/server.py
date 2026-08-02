@@ -19,6 +19,7 @@ import json
 import logging
 import mimetypes
 import os
+import sys
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -526,8 +527,88 @@ class StockProviders:
             return {"error": f"{provider} request failed: {exc}"}
 
 
+# --------------------------------------------------------------------------- #
+# OpenCLAW — Agenten-Shell aus der Oberfläche heraus starten                   #
+# --------------------------------------------------------------------------- #
+# Schreibweise: OpenCLAW. Nicht "OpenCloud", nicht "opencloude", nicht Claude.
+class OpenClawService:
+    """
+    Startet adapters/openclaw_runner.py auf Zuruf im Hintergrund, damit der
+    Mensch im Design-Dashboard zusehen kann: der Runner meldet jeden Schritt
+    über das Aktivitätsprotokoll, also leuchtet währenddessen der Monitorrand.
+
+    Bewusst nur EIN Lauf gleichzeitig — die Shell ist on-demand, nicht resident.
+    """
+
+    def __init__(self) -> None:
+        self.lock = __import__("threading").Lock()
+        self.state: dict = {"running": False, "task": None, "started": None,
+                            "finished": None, "result": None, "log": []}
+
+    def status(self) -> dict:
+        shell = os.environ.get("OPENCLAW_CMD", "").strip()
+        binary = shell.split()[0] if shell else ""
+        import shutil
+        return {**self.state,
+                "shell_configured": bool(shell),
+                "shell_available": bool(binary and shutil.which(binary)),
+                "shell_cmd": shell,
+                "mode": "shell" if (binary and shutil.which(binary)) else "fallback",
+                "hint": ("OPENCLAW_CMD zeigt auf die OpenCLAW-Shell; ohne sie "
+                         "fährt der Runner die Schleife selbst")}
+
+    def run(self, task: str, pattern: str | None = None) -> dict:
+        import subprocess
+        import threading
+
+        with self.lock:
+            if self.state["running"]:
+                return {"ok": False, "error": "Es läuft bereits ein OpenCLAW-Auftrag",
+                        "state": self.state}
+            self.state = {"running": True, "task": task, "started": now_iso(),
+                          "finished": None, "result": None, "log": []}
+
+        def worker() -> None:
+            cmd = [sys.executable, str(ROOT / "adapters" / "openclaw_runner.py")]
+            if pattern:
+                cmd += ["--pattern", pattern]
+            if task:
+                cmd.append(task)
+            env = {**os.environ, "BASE_URL": f"http://127.0.0.1:{CURRENT_PORT}"}
+            try:
+                proc = subprocess.run(cmd, capture_output=True, text=True,
+                                      timeout=float(os.environ.get(
+                                          "OPENCLAW_TIMEOUT", "300")),
+                                      env=env, cwd=str(ROOT))
+                out = proc.stdout.strip()
+                result = None
+                # Der Runner gibt am Ende ein JSON-Objekt aus.
+                brace = out.rfind("\n{")
+                candidate = out[brace + 1:] if brace >= 0 else out
+                try:
+                    result = json.loads(candidate)
+                except json.JSONDecodeError:
+                    result = {"raw": out[-2000:]}
+                self.state.update({"result": result,
+                                   "log": out.splitlines()[-40:],
+                                   "stderr": proc.stderr[-1000:]})
+            except subprocess.TimeoutExpired:
+                self.state.update({"result": {"error": "Zeitüberschreitung"}})
+            except (OSError, subprocess.SubprocessError) as exc:
+                self.state.update({"result": {"error": str(exc)}})
+            finally:
+                self.state["running"] = False
+                self.state["finished"] = now_iso()
+
+        threading.Thread(target=worker, daemon=True).start()
+        return {"ok": True, "started": True, "task": task}
+
+
+CURRENT_PORT = int(os.environ.get("PORT", "8000"))
+
 EXECUTOR = WorkflowExecutor()
 EVALUATOR = GemmaEvaluator()
+OPENCLAW = OpenClawService()
 ACTIVITY = ActivityFeed()
 CHAT = ChatService()
 STOCK = StockProviders()
@@ -665,6 +746,8 @@ class Handler(BaseHTTPRequestHandler):
             self._json(REPO.skills())
         elif path == "/api/debug/selftest":
             self._json(DEBUG.selftest())
+        elif path == "/api/openclaw/status":
+            self._json(OPENCLAW.status())
         elif path == "/favicon.ico":
             svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
                    '<rect width="32" height="32" rx="7" fill="#0ea5e9"/>'
@@ -712,6 +795,9 @@ class Handler(BaseHTTPRequestHandler):
                                         payload.get("formats")))
         elif path == "/api/debug/stress":
             self._json(DEBUG.stress(int(payload.get("runs", 25))))
+        elif path == "/api/openclaw/run":
+            self._json(OPENCLAW.run(str(payload.get("task", ""))[:2000],
+                                    payload.get("pattern")))
         else:
             self._json({"error": "not found", "path": path}, 404)
 
@@ -720,7 +806,9 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
+    global CURRENT_PORT
     port = int(os.environ.get("PORT", "8000"))
+    CURRENT_PORT = port
     host = os.environ.get("HOST", "0.0.0.0")
     httpd = ThreadingHTTPServer((host, port), Handler)
     log.info("Design System UI serving on http://%s:%d", host, port)

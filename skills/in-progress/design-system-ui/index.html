@@ -354,6 +354,32 @@
                     <div class="btn-row">
                         <button id="agentDemo" class="btn btn-secondary">Sichtbarkeit testen (3 Schritte)</button>
                     </div>
+
+                    <h3>Mit OpenCLAW designen
+                        <button class="info-btn" data-help="openclaw" aria-label="Hilfe zu OpenCLAW">i</button>
+                    </h3>
+                    <p class="text-muted">
+                        <strong>OpenCLAW</strong> — die Agenten-Shell. Nicht „OpenCloud", nicht
+                        „opencloude", nicht Anthropics Claude. Beschreibe den Auftrag, OpenCLAW
+                        baut und optimiert den Workflow, während du zusiehst.
+                    </p>
+                    <div class="claw-status-row">
+                        <span class="ampel" id="clawAmpel" data-state="red"></span>
+                        <span id="clawStatusText" class="text-muted">Status wird geladen…</span>
+                    </div>
+                    <div class="btn-row">
+                        <input id="clawTask" type="text"
+                               placeholder="z. B. Baue einen RAG-Workflow und optimiere ihn">
+                        <select id="clawPattern" class="mini-select">
+                            <option value="">Muster automatisch</option>
+                            <option value="text-classifier">text-classifier</option>
+                            <option value="rag-pipeline">rag-pipeline</option>
+                            <option value="agent-loop">agent-loop</option>
+                            <option value="eval-loop">eval-loop</option>
+                        </select>
+                        <button id="clawRun" class="btn btn-primary">▶️ OpenCLAW starten</button>
+                    </div>
+                    <div id="clawOutput" class="code-block">Noch kein Lauf.</div>
                     <h3>Aktivitätsprotokoll</h3>
                     <div id="agentLog" class="code-block">Noch keine Ereignisse.</div>
                     <h3>Integrationen</h3>

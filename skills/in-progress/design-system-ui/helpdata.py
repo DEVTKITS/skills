@@ -176,6 +176,20 @@ TOPICS: dict[str, dict] = {
         ],
         "patterns": ["POST /api/agent/activity"],
     },
+    "openclaw": {
+        "title": "Mit OpenCLAW designen",
+        "guide": ("OpenCLAW ist die Agenten-Shell, die den Workflow für dich "
+                  "baut und optimiert. Auftrag beschreiben, starten, zusehen — "
+                  "der Monitorrand leuchtet, solange sie arbeitet."),
+        "tips": [
+            "Schreibweise: OpenCLAW. Nicht „OpenCloud“, nicht „opencloude“, nicht Claude.",
+            "Ohne installierte Shell fährt der Runner die Schleife selbst — sofort nutzbar.",
+            "OPENCLAW_CMD auf die Shell zeigen lassen, dann übernimmt sie echt.",
+            "Dasselbe funktioniert mit OpenHands oder OpenManus — nur die Variable ändern.",
+            "Die Shell läuft nur während des Auftrags und wird danach beendet.",
+        ],
+        "patterns": ["POST /api/openclaw/run", "GET /api/openclaw/status"],
+    },
     "debug": {
         "title": "Debug & Stresstest",
         "guide": ("Selbsttest prüft alle Endpunkte, der Stresstest fährt viele "

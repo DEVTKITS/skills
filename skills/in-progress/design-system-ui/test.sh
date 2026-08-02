@@ -165,6 +165,25 @@ FEED=$(curl -s "$BASE/api/agent/activity?since=0")
 assert_contains "runner meldet sich als openclaw"  '"openclaw"'    "$FEED"
 assert_contains "runner meldet Sitzungsstart"      'session-start' "$FEED"
 
+say "── OpenCLAW aus der Oberfläche ──────────────────────"
+CS=$(curl -s "$BASE/api/openclaw/status")
+assert_contains "openclaw status endpoint"     '"mode"'          "$CS"
+assert_contains "meldet Fallback ohne Shell"   '"fallback"'      "$CS"
+START=$(curl -s -X POST "$BASE/api/openclaw/run" -H 'Content-Type: application/json' \
+          -d '{"task":"Baue einen RAG-Workflow und optimiere ihn"}')
+assert_contains "lauf startet ueber die API"   '"started": true' "$START"
+for _ in $(seq 1 60); do
+  curl -s "$BASE/api/openclaw/status" | grep -q '"running": false' && break
+  python3 -c 'import time; time.sleep(0.4)'
+done
+DONE=$(curl -s "$BASE/api/openclaw/status")
+assert_contains "lauf erreicht ein Urteil"     '"verdict"'       "$DONE"
+assert_contains "waehlt Muster aus Auftrag"    'rag-pipeline'    "$DONE"
+HELP_CLAW=$(curl -s "$BASE/api/help?topic=openclaw")
+assert_contains "hilfe kennt die Schreibweise" 'opencloude'      "$HELP_CLAW"
+UIHTML=$(curl -s "$BASE/")
+assert_contains "steuerung in der Oberflaeche" 'id="clawRun"'    "$UIHTML"
+
 say "── Sicherheit ───────────────────────────────────────"
 if command -v node >/dev/null 2>&1 && [ -d demo/node_modules/playwright ]; then
   if (cd demo && CHROMIUM_PATH="${CHROMIUM_PATH:-/opt/pw-browsers/chromium}" \

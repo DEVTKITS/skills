@@ -225,7 +225,17 @@ Muster für schwere Agenten-Frameworks (on-demand statt dauerhaft):
   diese API arbeiten lassen → Schritte über das Aktivitätsprotokoll melden →
   bei state=done herunterfahren.
 
-### OpenCLAW — fertiger On-Demand-Runner
+### OpenCLAW — aus der Oberfläche ODER per API startbar
+Aus der UI: Menü → "Agenten & Sichtbarkeit" → "Mit OpenCLAW designen".
+Per API:
+  POST /api/openclaw/run    {"task": "...", "pattern": "rag-pipeline"|null}
+                            -> {"ok": true, "started": true}
+  GET  /api/openclaw/status -> {running, task, mode, shell_available,
+                                result:{mode,pattern,verdict,final_score,rounds},
+                                log[]}
+  Es läuft bewusst nur EIN Auftrag gleichzeitig — die Shell ist on-demand.
+
+Auf der Kommandozeile — fertiger On-Demand-Runner
 SCHREIBWEISE: OpenCLAW (die Agenten-Shell). NICHT "OpenCloud", nicht
 "opencloude", und nicht Anthropics Claude — das sind verschiedene Dinge.
 
@@ -272,7 +282,7 @@ dem Text erkannt. Abschaltbar im Menü. Läuft lokal im Browser, ohne Cloud.
 ────────────────────────────────────────────────────────────────────────
 ## 11. SELBSTTEST
 ────────────────────────────────────────────────────────────────────────
-  ./test.sh                  60 Prüfungen: Endpunkte, Iterationsschleife,
+  ./test.sh                  67 Prüfungen: Endpunkte, Iterationsschleife,
                              Provider, Hilfe, Debug, Repo, UI-Oberflächen,
                              Go- und Rust-Clients
   GET  /api/debug/selftest   interne Prüfungen zur Laufzeit
