@@ -407,39 +407,53 @@ class DesignSystemApp {
         this.renderParameterPanel();
     }
 
+    // Baut das Parameterformular über DOM-APIs statt über HTML-Strings:
+    // Node-Typen und Parameterwerte stammen aus importierten Workflow-JSONs
+    // und dürfen deshalb nie als Markup interpretiert werden.
     renderParameterPanel() {
         const panel = document.getElementById('selectedNodeParams');
+        panel.replaceChildren();
+
         if (!this.selectedNode) {
-            panel.innerHTML = '<p class="text-muted">Select a node to edit parameters</p>';
+            const hint = document.createElement('p');
+            hint.className = 'text-muted';
+            hint.textContent = 'Node im Canvas auswählen';
+            panel.appendChild(hint);
             return;
         }
 
-        let html = `<h3>${this.selectedNode.type}</h3>`;
-        html += `<div class="param-fields">`;
+        const heading = document.createElement('h3');
+        heading.textContent = this.selectedNode.type;
+        panel.appendChild(heading);
 
-        // Default parameters based on node type
         const defaultParams = {
             'llm-node': { model: 'gemma-4', temperature: '0.7', maxTokens: '1000' },
             'text-input': { placeholder: 'Enter text' },
             'file-input': { fileType: 'any' }
         };
-
         const params = defaultParams[this.selectedNode.type] || {};
 
+        const fields = document.createElement('div');
+        fields.className = 'param-fields';
+
         Object.keys(params).forEach(key => {
-            html += `
-                <div class="param-field">
-                    <label>${key}:</label>
-                    <input type="text"
-                           data-param="${key}"
-                           value="${this.selectedNode.params[key] || params[key] || ''}"
-                           onchange="window.app.updateNodeParam('${key}', this.value)">
-                </div>
-            `;
+            const wrap = document.createElement('div');
+            wrap.className = 'param-field';
+
+            const label = document.createElement('label');
+            label.textContent = `${key}:`;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.dataset.param = key;
+            input.value = this.selectedNode.params[key] ?? params[key] ?? '';
+            input.addEventListener('change', () => this.updateNodeParam(key, input.value));
+
+            wrap.append(label, input);
+            fields.appendChild(wrap);
         });
 
-        html += '</div>';
-        panel.innerHTML = html;
+        panel.appendChild(fields);
     }
 
     updateNodeParam(key, value) {
@@ -1192,11 +1206,13 @@ DesignSystemApp.prototype.loadDocs = async function () {
     }
 };
 
-// Canvas-Spiegel in der Split-Ansicht
+// Canvas-Spiegel in der Split-Ansicht — echte Knoten klonen statt Markup
+// zu serialisieren und neu zu parsen.
 DesignSystemApp.prototype.mirrorCanvas = function () {
     const src = document.getElementById('canvasSvg');
     const dst = document.getElementById('canvasMirrorSvg');
-    if (src && dst) dst.innerHTML = src.innerHTML;
+    if (!src || !dst) return;
+    dst.replaceChildren(...Array.from(src.childNodes, n => n.cloneNode(true)));
 };
 
 // ══════════════════════════════════════════════════════════════════════

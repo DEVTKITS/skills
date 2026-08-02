@@ -248,7 +248,7 @@ dem Text erkannt. Abschaltbar im Menü. Läuft lokal im Browser, ohne Cloud.
 ────────────────────────────────────────────────────────────────────────
 ## 11. SELBSTTEST
 ────────────────────────────────────────────────────────────────────────
-  ./test.sh                  54 Prüfungen: Endpunkte, Iterationsschleife,
+  ./test.sh                  55 Prüfungen: Endpunkte, Iterationsschleife,
                              Provider, Hilfe, Debug, Repo, UI-Oberflächen,
                              Go- und Rust-Clients
   GET  /api/debug/selftest   interne Prüfungen zur Laufzeit

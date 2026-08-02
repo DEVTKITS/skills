@@ -555,7 +555,9 @@ INTEGRATIONS = {
         "openmontage / openstream / openclaw / odysseus / nanobot":
             "Could not verify these as existing installable projects; the "
             "activity protocol + HTTP API are the stable interfaces such "
-            "tools would plug into once identified",
+            "tools would plug into once identified. Note the spelling: "
+            "OpenCLAW (the agent shell) — not 'OpenCloud' and not Anthropic's "
+            "Claude; they are unrelated things.",
     },
 }
 

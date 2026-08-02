@@ -155,6 +155,18 @@ if command -v rustc >/dev/null 2>&1; then
   else bad "rustc build"; fi
 else say "  - rust toolchain absent, skipped"; fi
 
+say "── Sicherheit ───────────────────────────────────────"
+if command -v node >/dev/null 2>&1 && [ -d demo/node_modules/playwright ]; then
+  if (cd demo && CHROMIUM_PATH="${CHROMIUM_PATH:-/opt/pw-browsers/chromium}" \
+        node xss_check.mjs "$BASE" >/dev/null 2>&1); then
+    ok "importiertes Workflow-JSON kann kein Skript ausführen (DOM-XSS)"
+  else
+    bad "DOM-XSS über importiertes Workflow-JSON möglich"
+  fi
+else
+  say "  - playwright fehlt (cd demo && npm install playwright), XSS-Test übersprungen"
+fi
+
 say "─────────────────────────────────────────────────────"
 say "PASS=$PASS FAIL=$FAIL"
 [ "$FAIL" -eq 0 ]
