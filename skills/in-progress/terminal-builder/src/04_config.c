@@ -196,6 +196,7 @@ static const char *screen_name(void) {
         case SC_FILES: return L("Datei-Navigator", "File navigator");
         case SC_CHAT: return L("KI-Chat", "AI chat");
         case SC_MONITOR: return L("Dienst-Monitor", "Service monitor");
+        case SC_GITVIZ: return L("Git-Repo-Visualizer", "Git repo visualizer");
     }
     return "?";
 }

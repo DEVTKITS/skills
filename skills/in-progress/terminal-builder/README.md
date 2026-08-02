@@ -23,6 +23,20 @@ Odysseus/Ollama/NanoChat/OpenCode/ChromaDB/Voicebox), **Cosmo-Profil-Presets**
 YouTube-URL → Skill-/Workflow-Extraktion per SERUM), und ein **Setup-
 Modul-Toggle** für das Matrix-Regen-Intro.
 
+## Git-Repo-Visualizer (`z` → 8)
+
+Wählt per Fuzzy-Picker ein lokales Git-Repo (Scan unter `$HOME`/cwd) und
+zeigt es im DkZ-Look: Kopf mit **Branch · HEAD · dirty · Remote**, Zähl-
+Kacheln (Commits/Branches/Tags/Contributors) und **ASCII-Balken-
+Visualisierung** (Blockzeichen, theme-farbig) für **Top-Autoren** und
+**Datei-Endungen**. Tasten: `2` Commit-Graph · `3` Branches · `4` Dateien ·
+`5` letzte Commits (jeweils im scrollbaren Pager) · `c` = **Claude/SERUM
+zum Repo fragen** (schickt Branch + letzte Commits + Änderungen ans aktive
+Chat-Ziel, Antwort im Pager) · `r` = anderes Repo. Bei `github.com`-Remotes
+werden Sterne/Beschreibung best-effort aus der GitHub-API geholt
+(`GITHUB_TOKEN` optional). Alles offline-first — nur `c` und die GitHub-
+Anreicherung brauchen Netz.
+
 ---
 
 

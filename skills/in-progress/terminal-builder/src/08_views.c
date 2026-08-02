@@ -232,7 +232,7 @@ static void draw_list_screen(void) {
            L("Terminal-Werkzeuge — von SSH über zsh bis fzf/navi",
              "Terminal tools — from SSH to zsh to fzf/navi"));
         ln("");
-        const char *tools[7] = {
+        const char *tools[8] = {
             L("SSH-Profile (verbinden per Enter)", "SSH profiles (connect with Enter)"),
             L("Shell-Launcher (Ausgabe im Pager, ! am Ende = interaktiv)",
               "Shell launcher (output in pager, append ! for interactive)"),
@@ -244,8 +244,10 @@ static void draw_list_screen(void) {
             L("Cheat-Sheets mit Platzhaltern (navi-Stil)",
               "Cheat sheets with placeholders (navi style)"),
             L("Dienst-Monitor (Odysseus/Ollama/… Healthcheck)",
-              "Service monitor (Odysseus/Ollama/… healthcheck)") };
-        for (int i = 0; i < 7; i++) {
+              "Service monitor (Odysseus/Ollama/… healthcheck)"),
+            L("Git-Repo-Visualizer (Graph/Stats + Claude/SERUM fragen)",
+              "Git repo visualizer (graph/stats + ask Claude/SERUM)") };
+        for (int i = 0; i < 8; i++) {
             char k[16]; snprintf(k, sizeof k, "%d.", i + 1);
             draw_item(i, f->sel == i, k, tools[i], "");
         }
@@ -287,6 +289,46 @@ static void draw_list_screen(void) {
             else snprintf(suf, sizeof suf, "  %s · %s", st, svc[i].url);
             char nm[64]; snprintf(nm, sizeof nm, "%s", svc[i].name);
             draw_item(i, f->sel == i, kk, nm, suf);
+        }
+        break;
+    }
+    case SC_GITVIZ: {
+        if (!grepo[0]) { ln("%s %s", th.dim,
+            L("Kein Repo geladen – r = wählen.", "No repo loaded — r = pick.")); break; }
+        const char *rn = strrchr(grepo, '/'); rn = rn ? rn + 1 : grepo;
+        ln("%s ▚ %s %s· %s%s%s  HEAD %s  %s", th.head, rn, th.dim, th.hi, gbranch, th.dim,
+           ghead, gdirty ? L("● geändert", "● dirty") : L("○ sauber", "○ clean"));
+        if (gremote[0]) ln("%s %s", th.dim, gremote);
+        if (ggh_info[0]) ln("%s %s", th.hi, ggh_info);
+        ln("%s %s: %d  ·  %s: %d  ·  %s: %d  ·  %s: %d", th.fg,
+           L("Commits", "Commits"), gcommits, L("Branches", "Branches"), gbranches,
+           L("Tags", "Tags"), gtags, L("Contributors", "Contributors"), ngauth);
+        ln("%s %s", th.dim,
+           L("2=Graph · 3=Branches · 4=Dateien · 5=Commits · c=Claude/SERUM fragen · r=Repo · Esc",
+             "2=graph · 3=branches · 4=files · 5=commits · c=ask Claude/SERUM · r=repo · Esc"));
+        int bw = A.cols > 34 ? A.cols - 30 : 12; if (bw > 40) bw = 40;
+        static const char *blk[] = {"","▏","▎","▍","▌","▋","▊","▉"};
+        ln("");
+        ln("%s %s", th.head, L("Top-Autoren (Commits)", "Top authors (commits)"));
+        int amax = ngauth ? gauth[0].n : 1;
+        for (int i = 0; i < ngauth; i++) {
+            int full = amax ? gauth[i].n * bw * 8 / amax : 0;
+            char barbuf[400] = ""; size_t d = 0;
+            for (int c = 0; c < full / 8 && d + 4 < sizeof barbuf; c++) d += (size_t)snprintf(barbuf+d, sizeof barbuf-d, "█");
+            if (full % 8 && d + 4 < sizeof barbuf) snprintf(barbuf+d, sizeof barbuf-d, "%s", blk[full % 8]);
+            char nm[26]; fitpad(nm, sizeof nm, gauth[i].name, 18);
+            ln("  %s%s %s%s %s%d", th.fg, nm, th.hi, barbuf, th.dim, gauth[i].n);
+        }
+        ln("");
+        ln("%s %s", th.head, L("Datei-Endungen", "File extensions"));
+        int emax = ngext ? gext[0].n : 1;
+        for (int i = 0; i < ngext; i++) {
+            int full = emax ? gext[i].n * bw * 8 / emax : 0;
+            char barbuf[400] = ""; size_t d = 0;
+            for (int c = 0; c < full / 8 && d + 4 < sizeof barbuf; c++) d += (size_t)snprintf(barbuf+d, sizeof barbuf-d, "█");
+            if (full % 8 && d + 4 < sizeof barbuf) snprintf(barbuf+d, sizeof barbuf-d, "%s", blk[full % 8]);
+            char nm[26]; fitpad(nm, sizeof nm, gext[i].name, 18);
+            ln("  %s%s %s%s %s%d", th.fg, nm, th.hi, barbuf, th.dim, gext[i].n);
         }
         break;
     }
@@ -398,7 +440,11 @@ static void draw_list_screen(void) {
            L("Terminal-Werkzeuge: SSH, Shell, fzf, navi, Dateien",
              "terminal tools: SSH, shell, fzf, navi, files"));
         ln("  %si%s         %s", th.hi, th.fg,
-           L("KI-Chat: OpenCode, Hermes oder Konnektor", "AI chat: OpenCode, Hermes or connector"));
+           L("KI-Chat: SERUM (Ollama/Claude/OpenAI), OpenCode, Hermes",
+             "AI chat: SERUM (Ollama/Claude/OpenAI), OpenCode, Hermes"));
+        ln("  %sz→8%s       %s", th.hi, th.fg,
+           L("Git-Repo-Visualizer (Graph/Stats + Claude/SERUM fragen)",
+             "Git repo visualizer (graph/stats + ask Claude/SERUM)"));
         ln("  %sq%s         %s", th.hi, th.fg, L("beenden", "quit"));
         break;
     default: break;

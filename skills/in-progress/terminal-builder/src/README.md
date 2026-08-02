@@ -14,7 +14,8 @@ Fallen, alle `static` behalten Unit-Scope.
 | `04_config.c` | Persistenz (config/profiles/skills/ssh …), Navigation, Texteingabe |
 | `05_net.c` | TTS, Konnektoren, LLM-Adapter (SERUM: Ollama/Anthropic/OpenAI, Matrix, Bridge) |
 | `06_domain.c` | Planerzeugung, ComfyUI-Workflow-Export, Nanobot, Vorlesen |
-| `07_tools.c` | Fuzzy-Picker (fzf), Pager, Shell, navi-Cheats, KI-Chat |
+| `07_tools.c` | Fuzzy-Picker (fzf), Pager, Shell, navi-Cheats, KI-Chat, Skill-Import |
+| `07b_gitviz.c` | Git-Repo-Visualizer (Picker, Stats, Balken, SERUM-Analyse, GitHub-API) |
 | `08_views.c` | Rendering aller Screens, Matrix-Rain, Ersteinrichtung |
 | `09_input.c` | Freestyle-Parser, Tastenrouting, `main()` |
 

@@ -41,11 +41,14 @@ enum { K_UP = 1000, K_DN, K_RT, K_LT, K_PGUP, K_PGDN,
 enum {
     SC_HOME, SC_SUB, SC_EVAL, SC_PLAN, SC_PICK, SC_WORKFLOWS,
     SC_SKILLS, SC_PROFILES, SC_CONNECT, SC_SETTINGS, SC_FREESTYLE, SC_HELP,
-    SC_TOOLS, SC_SSH, SC_PAGER, SC_FILES, SC_CHAT, SC_MONITOR
+    SC_TOOLS, SC_SSH, SC_PAGER, SC_FILES, SC_CHAT, SC_MONITOR, SC_GITVIZ
 };
 
 #define MAXSVC 16
 typedef struct { char name[40]; char url[160]; char start[160]; int up; long ms; } Service;
+
+/* Git-Repo-Visualizer: Zählung für Autoren/Datei-Endungen */
+typedef struct { char name[64]; int n; } Tally;
 
 enum { CONN_NONE, CONN_MCP, CONN_WEBHOOK, CONN_GATEWAY, CONN_DISCORD,
        CONN_MATRIX, CONN_BRIDGE, NCONN };

@@ -30,5 +30,6 @@
 #include "06_domain.c"
 #include "06b_monitor.c"
 #include "07_tools.c"
+#include "07b_gitviz.c"
 #include "08_views.c"
 #include "09_input.c"

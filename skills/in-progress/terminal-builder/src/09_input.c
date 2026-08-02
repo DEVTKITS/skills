@@ -39,8 +39,9 @@ static int list_len(void) {
         case SC_PROFILES: return A.nprof;
         case SC_CONNECT: return NCONN;
         case SC_SETTINGS: return 6;
-        case SC_TOOLS: return 7;
+        case SC_TOOLS: return 8;
         case SC_MONITOR: return nsvc;
+        case SC_GITVIZ: return 0;
         case SC_SSH: return A.nssh;
         case SC_FILES: return nfent;
         case SC_WORKFLOWS: {
@@ -160,7 +161,8 @@ static void handle_enter(void) {
         else if (f->sel == 3) open_shell();
         else if (f->sel == 4) history_pick();
         else if (f->sel == 5) cheat_run();
-        else { services_load(); push(SC_MONITOR); }
+        else if (f->sel == 6) { services_load(); push(SC_MONITOR); }
+        else gitviz_pick();
         break;
     case SC_CHAT:
         chat_send();
@@ -318,6 +320,18 @@ static void handle_key(int k) {
             setmsg("%s", L("Trio fertig.", "Trio done."));
             return;
         }
+    }
+
+    /* Git-Repo-Visualizer: 2-5 = git-Views im Pager, c = SERUM, r = Repo */
+    if (f->sc == SC_GITVIZ && grepo[0]) {
+        char cmd[700] = "";
+        if (k == '2') snprintf(cmd, sizeof cmd, "git -C '%s' log --graph --oneline --all --decorate -n 200", grepo);
+        else if (k == '3') snprintf(cmd, sizeof cmd, "git -C '%s' branch -avv", grepo);
+        else if (k == '4') snprintf(cmd, sizeof cmd, "git -C '%s' ls-files | head -400", grepo);
+        else if (k == '5') snprintf(cmd, sizeof cmd, "git -C '%s' log -n 30 --pretty=format:'%%h %%an %%ar %%s'", grepo);
+        if (cmd[0]) { run_capture_to_pager(cmd); return; }
+        if (k == 'c') { gitviz_ask(); return; }
+        if (k == 'r') { gitviz_pick(); return; }
     }
 
     /* Dienst-Monitor: h = alle prüfen, a = neu, d = löschen */

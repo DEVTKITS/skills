@@ -199,6 +199,15 @@ static void nano_answer(const char *q) {
                          "file navigator (Enter = in, Esc = up)."));
         return;
     }
+    if (contains(lo, "git") || contains(lo, "repo") || contains(lo, "commit")) {
+        nano_add("🤖", L("Git-Repo-Visualizer: Werkzeuge z → 8. Wählt ein lokales Repo, "
+                         "zeigt Branch/HEAD, Autor- und Datei-Endungs-Balken; 2=Graph, "
+                         "3=Branches, 4=Dateien, 5=Commits, c = Claude/SERUM zum Repo fragen.",
+                         "Git repo visualizer: tools z → 8. Picks a local repo, shows "
+                         "branch/HEAD, author and file-extension bars; 2=graph, 3=branches, "
+                         "4=files, 5=commits, c = ask Claude/SERUM about the repo."));
+        return;
+    }
     if (contains(lo, "verbind") || contains(lo, "connect") || contains(lo, "mcp")
         || contains(lo, "discord") || contains(lo, "webhook") || contains(lo, "gateway")) {
         nano_add("🤖", L("Verbindungen (c): MCP-Outbox, Webhook, Gateway-API oder Discord. "
