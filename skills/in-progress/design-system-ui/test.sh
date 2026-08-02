@@ -155,6 +155,16 @@ if command -v rustc >/dev/null 2>&1; then
   else bad "rustc build"; fi
 else say "  - rust toolchain absent, skipped"; fi
 
+say "── OpenCLAW On-Demand-Adapter ───────────────────────"
+CLAW=$(BASE_URL="$BASE" python3 adapters/openclaw_runner.py \
+         "Baue einen RAG-Workflow und optimiere ihn" 2>&1)
+assert_contains "runner erreicht ein Urteil"      '"verdict"'      "$CLAW"
+assert_contains "runner waehlt Muster aus Auftrag" 'rag-pipeline'  "$CLAW"
+assert_contains "runner laeuft ohne Shell weiter"  '"fallback"'    "$CLAW"
+FEED=$(curl -s "$BASE/api/agent/activity?since=0")
+assert_contains "runner meldet sich als openclaw"  '"openclaw"'    "$FEED"
+assert_contains "runner meldet Sitzungsstart"      'session-start' "$FEED"
+
 say "── Sicherheit ───────────────────────────────────────"
 if command -v node >/dev/null 2>&1 && [ -d demo/node_modules/playwright ]; then
   if (cd demo && CHROMIUM_PATH="${CHROMIUM_PATH:-/opt/pw-browsers/chromium}" \

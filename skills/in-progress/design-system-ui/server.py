@@ -544,20 +544,25 @@ INTEGRATIONS = {
         "llms-txt": "Extra-detailed agent surface at /llms.txt",
     },
     "adapter_ready": {
+        "openclaw": "adapters/openclaw_runner.py — on-demand runner for the "
+                    "OpenCLAW agent shell (spelling: OpenCLAW, NOT 'OpenCloud' "
+                    "and not Anthropic's Claude). Stays off until a task "
+                    "arrives, starts the shell via OPENCLAW_CMD, drives this "
+                    "API, broadcasts every step, shuts down. Runs the full "
+                    "execute→evaluate→iterate loop itself when the shell is "
+                    "absent, so it is useful today.",
         "playwright": "demo/agent_demo.mjs drives the real UI via the activity protocol (chromium preinstalled in this env)",
         "browser-use": "Any browser-use agent can drive the UI; broadcast steps via the activity protocol",
         "openmanus": "Point an OpenManus tool at the HTTP API in /llms.txt; on-demand, not resident",
-        "openhands": "Same HTTP surface; run only when a task is queued (on-demand pattern documented in README)",
+        "openhands": "Same HTTP surface; reuse adapters/openclaw_runner.py by pointing OPENCLAW_CMD at the OpenHands binary",
         "github-cli": "Design/skill import-export via git; any agent with gh/git credentials can sync the repo",
         "claude|gpt|deepseek|opencode|pi-agent": "All drive the same /llms.txt HTTP surface — no SDK needed",
     },
     "unverified_roadmap": {
-        "openmontage / openstream / openclaw / odysseus / nanobot":
+        "openmontage / openstream / odysseus / nanobot":
             "Could not verify these as existing installable projects; the "
             "activity protocol + HTTP API are the stable interfaces such "
-            "tools would plug into once identified. Note the spelling: "
-            "OpenCLAW (the agent shell) — not 'OpenCloud' and not Anthropic's "
-            "Claude; they are unrelated things.",
+            "tools would plug into once identified.",
     },
 }
 
