@@ -1,0 +1,14 @@
+{
+  "id": "text-classifier-demo",
+  "nodes": [
+    {"id": "in1",  "type": "text-input",  "x": 100, "y": 100, "params": {}},
+    {"id": "llm1", "type": "llm-node",    "x": 300, "y": 100,
+       "params": {"model": "gemma-4", "temperature": 0.7, "prompt": "Classify the text"}},
+    {"id": "out1", "type": "text-output", "x": 500, "y": 100, "params": {}}
+  ],
+  "edges": [
+    {"from": "in1", "to": "llm1"},
+    {"from": "llm1", "to": "out1"}
+  ],
+  "parameters": {}
+}

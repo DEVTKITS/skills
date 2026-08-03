@@ -41,6 +41,18 @@ PROVIDERS: dict[str, dict] = {
         "docs": "https://openrouter.ai/docs",
         "note": "Gateway to 200+ models incl. free tiers",
     },
+    "openai": {
+        "name": "OpenAI / GPT",
+        "kind": "llm",
+        "env": "OPENAI_API_KEY",
+        "base_url": os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+        "chat_path": "/chat/completions",
+        "auth": "bearer",
+        "default_model": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
+        "docs": "https://platform.openai.com/docs",
+        "note": ("API-Schlüssel aus dem OpenAI-Konto. Ein ChatGPT-Abo allein "
+                 "genügt nicht — die API wird separat abgerechnet."),
+    },
     "nvidia": {
         "name": "NVIDIA NIM Cloud",
         "kind": "llm",

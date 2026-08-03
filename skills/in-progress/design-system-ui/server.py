@@ -278,7 +278,39 @@ class ActivityFeed:
 # Chat — routes to Ollama when live, helpful fallback otherwise               #
 # --------------------------------------------------------------------------- #
 class ChatService:
-    """Chat that understands the prefix syntax and routes to any provider."""
+    """
+    Nanobot — der ansässige Assistent dieser Oberfläche.
+
+    Klein gehalten (daher "nano"): er beantwortet Fragen zum Builder, versteht
+    die Präfix-Syntax und übersetzt sie in echte Aktionen, und er ist über das
+    Agent-zu-Agent-Protokoll auch für andere Agenten ansprechbar. Für freie
+    Konversation reicht er die Anfrage an den gewählten Provider durch —
+    lokal via Ollama oder in die Cloud (OpenAI/GPT, OpenRouter, NVIDIA, HF).
+    """
+
+    NAME = os.environ.get("NANOBOT_NAME", "nanobot")
+    ROLE = ("Assistent im Design System UI: hilft beim Bauen, Ausführen und "
+            "Optimieren von Node-Workflows.")
+
+    def card(self) -> dict:
+        """Selbstauskunft — was dieser Bot ist und kann (für Mensch und Agent)."""
+        return {
+            "name": self.NAME,
+            "role": self.ROLE,
+            "kind": "nanobot",
+            "speaks": ["de", "en"],
+            "skills": [
+                "workflow-design", "pattern-loading", "execution",
+                "evaluation-explanation", "provider-routing",
+            ],
+            "prefixes": list(helpdata.PREFIXES),
+            "endpoints": {
+                "chat": "POST /api/chat",
+                "a2a": "POST /api/a2a/message",
+                "card": "GET /api/a2a/card",
+            },
+            "a2a_protocol": "design-system-ui/1",
+        }
 
     def reply(self, message: str, history: list[dict],
               provider: str | None = None) -> dict:
@@ -604,6 +636,72 @@ class OpenClawService:
         return {"ok": True, "started": True, "task": task}
 
 
+# --------------------------------------------------------------------------- #
+# Agent-zu-Agent: Agenten sprechen mit dem Nanobot und untereinander           #
+# --------------------------------------------------------------------------- #
+class A2AService:
+    """
+    Ein schlankes Agent-zu-Agent-Protokoll über HTTP.
+
+    Ein Agent schickt eine Nachricht mit Absender, Empfänger und Absicht.
+    Ist der Empfänger der Nanobot, antwortet dieser sofort. Ist es ein anderer
+    Agent, wird die Nachricht in dessen Posteingang gelegt und beim nächsten
+    Abruf zugestellt — so können sich zwei Terminal-Agenten über diese
+    Oberfläche abstimmen, ohne einander direkt zu kennen.
+
+    Jede Nachricht erscheint zusätzlich im Aktivitäts-Feed, damit der Mensch
+    sieht, dass Agenten miteinander reden.
+    """
+
+    MAX_INBOX = 100
+
+    def __init__(self) -> None:
+        self.inboxes: dict[str, list[dict]] = {}
+        self.seq = 0
+
+    def send(self, msg: dict) -> dict:
+        frm = str(msg.get("from", "unknown"))[:64]
+        to = str(msg.get("to", "nanobot"))[:64]
+        intent = str(msg.get("intent", "message"))[:64]
+        body = str(msg.get("body", ""))[:4000]
+
+        self.seq += 1
+        envelope = {"seq": self.seq, "from": frm, "to": to, "intent": intent,
+                    "body": body, "timestamp": now_iso()}
+
+        # Für den Menschen sichtbar machen.
+        ACTIVITY.post({"actor": frm, "action": "a2a",
+                       "detail": f"→ {to}: {intent}", "state": "working"})
+
+        if to == CHAT.NAME:
+            reply = CHAT.reply(body, msg.get("history", []), msg.get("provider"))
+            return {"ok": True, "delivered": "direct", "envelope": envelope,
+                    "reply": {"from": CHAT.NAME, "to": frm,
+                              "body": reply.get("reply", ""),
+                              "action": reply.get("action"),
+                              "model": reply.get("model")}}
+
+        box = self.inboxes.setdefault(to, [])
+        box.append(envelope)
+        del box[:-self.MAX_INBOX]
+        return {"ok": True, "delivered": "queued", "envelope": envelope,
+                "inbox_size": len(box)}
+
+    def poll(self, agent: str, clear: bool = True) -> dict:
+        box = self.inboxes.get(agent, [])
+        messages = list(box)
+        if clear:
+            self.inboxes[agent] = []
+        return {"agent": agent, "messages": messages, "count": len(messages)}
+
+    def directory(self) -> dict:
+        """Wer ist erreichbar — der Nanobot plus alle Agenten mit Posteingang."""
+        return {"agents": [CHAT.card()] +
+                          [{"name": a, "kind": "queued-agent",
+                            "pending": len(m)} for a, m in self.inboxes.items()],
+                "protocol": "design-system-ui/1"}
+
+
 CURRENT_PORT = int(os.environ.get("PORT", "8000"))
 
 # --------------------------------------------------------------------------- #
@@ -641,6 +739,7 @@ OPENCLAW = OpenClawService()
 ACTIVITY = ActivityFeed()
 CHAT = ChatService()
 STOCK = StockProviders()
+A2A = A2AService()
 REPO = RepoService()
 DEBUG = DebugService()
 
@@ -775,6 +874,14 @@ class Handler(BaseHTTPRequestHandler):
             self._json(REPO.skills())
         elif path == "/api/debug/selftest":
             self._json(DEBUG.selftest())
+        elif path == "/api/a2a/card":
+            self._json(CHAT.card())
+        elif path == "/api/a2a/directory":
+            self._json(A2A.directory())
+        elif path == "/api/a2a/poll":
+            qs = parse_qs(urlparse(self.path).query)
+            self._json(A2A.poll(qs.get("agent", ["unknown"])[0],
+                                qs.get("clear", ["1"])[0] != "0"))
         elif path == "/api/edition":
             self._json({"edition": current_edition(),
                         "available": list(EDITIONS)})
@@ -833,6 +940,8 @@ class Handler(BaseHTTPRequestHandler):
                                         payload.get("formats")))
         elif path == "/api/debug/stress":
             self._json(DEBUG.stress(int(payload.get("runs", 25))))
+        elif path == "/api/a2a/message":
+            self._json(A2A.send(payload))
         elif path == "/api/openclaw/run":
             if not current_edition()["features"]["openclaw"]:
                 self._json({"ok": False,

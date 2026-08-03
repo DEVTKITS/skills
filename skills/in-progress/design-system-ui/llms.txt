@@ -94,8 +94,14 @@ GET  /api/patterns                Template-Katalog
 GET  /api/agent/activity?since=N  Aktivitäts-Feed lesen
 POST /api/agent/activity          eigenen Schritt melden
 
-### Chat
+### Chat / Nanobot
 POST /api/chat                    {message, history[], provider?} → {reply, model, live, action?}
+
+### Agent-zu-Agent (A2A)
+GET  /api/a2a/card                Selbstauskunft des Nanobots (Name, Faehigkeiten, Protokoll)
+GET  /api/a2a/directory           wer ist erreichbar: Nanobot + Agenten mit Posteingang
+GET  /api/a2a/poll?agent=<name>   eigenen Posteingang abholen (&clear=0 zum Behalten)
+POST /api/a2a/message             {from, to, intent, body, provider?, history?}
 
 ### Provider
 GET  /api/providers               alle Anbieter + Ampel + Verbindungshinweis
@@ -162,7 +168,33 @@ suggestions[].action ist maschinenlesbar:
   CONNECT_NODES(fromId, toId)   → erstes unverbundenes Paar verbinden
 
 ────────────────────────────────────────────────────────────────────────
-## 6. PRÄFIX-SYNTAX (Chat, Parameter, Agentenbefehle)
+## 5b. NANOBOT UND AGENT-ZU-AGENT
+────────────────────────────────────────────────────────────────────────
+Der Chatbot dieser Oberflaeche ist ein NANOBOT: bewusst klein, kennt den
+Builder, versteht die Praefix-Syntax und uebersetzt sie in echte Aktionen.
+Fuer freie Konversation reicht er an den gewaehlten Provider durch (Ollama
+lokal, oder OpenAI/GPT, OpenRouter, NVIDIA, Hugging Face).
+
+Selbstauskunft holen, bevor du ihn ansprichst:
+  GET /api/a2a/card
+  → {name, role, kind:"nanobot", skills[], prefixes[], endpoints{}, a2a_protocol}
+
+Nachricht senden:
+  POST /api/a2a/message
+  {"from":"<dein name>","to":"nanobot"|"<anderer agent>",
+   "intent":"<kurzes verb, z.B. load-pattern|handoff|ask>",
+   "body":"<text, darf Praefixe enthalten>"}
+
+Zwei Zustellwege:
+  to == "nanobot"  → delivered:"direct", Antwort kommt sofort im selben
+                     Aufruf zurueck, inklusive action-Objekt bei Praefixen.
+  to == etwas and. → delivered:"queued", landet im Posteingang dieses Agenten.
+                     Der holt sie mit GET /api/a2a/poll?agent=<name> ab.
+                     So koennen sich zwei Terminal-Agenten ueber diese
+                     Oberflaeche abstimmen, ohne einander zu kennen.
+
+JEDE A2A-Nachricht erscheint im Aktivitaets-Feed (action="a2a"), damit der
+Mensch sieht, dass Agenten miteinander reden. Das ist Absicht, nicht Beiwerk. (Chat, Parameter, Agentenbefehle)
 ────────────────────────────────────────────────────────────────────────
   /  Kommando        /execute /validate /clear /iterate /selftest
   #  Pattern         #text-classifier #rag-pipeline #agent-loop #eval-loop
@@ -288,9 +320,28 @@ Browser-Sprachausgabe vor (erneuter Doppelklick stoppt). Die Sprache wird aus
 dem Text erkannt. Abschaltbar im Menü. Läuft lokal im Browser, ohne Cloud.
 
 ────────────────────────────────────────────────────────────────────────
+## 10b. LAUFZEIT-GERUESTE UND VERSIONEN
+────────────────────────────────────────────────────────────────────────
+Zwei Backends bedienen dieselben Kernendpunkte:
+  server.py   Python, Standardbibliothek. Vollausbau: Provider, Chat, A2A,
+              OpenCLAW, Hilfe, Stock, GitHub, Debug.
+  c/server.c  C99 + pthreads, keine Bibliotheken. Gerueest fuer Umgebungen
+              ohne Python: liefert die Oberflaeche aus und bedient /health,
+              /api/edition, /api/patterns, /api/workflow/execute,
+              /api/workflow/evaluate und /api/agent/activity.
+              Bauen: cc -O2 -std=c99 -pthread -o dsui-c c/server.c
+              Antworten tragen "engine":"c"; Ergebnisse sind mit Python
+              abgeglichen (gleiche Punktzahl, gleiches Urteil).
+Clients: main.go (Go) und client.rs (Rust), beide ohne externe Abhaengigkeiten.
+
+Frühere Staende liegen als eigenstaendig lauffaehige Versionen unter
+versions/ (v1-minimal … v5-editionen). Jede bringt ihr komplettes Backend,
+ihre Oberflaeche und ihre Tests mit — Ordner kopieren genuegt.
+
+────────────────────────────────────────────────────────────────────────
 ## 11. SELBSTTEST
 ────────────────────────────────────────────────────────────────────────
-  ./test.sh                  75 Prüfungen: Endpunkte, Iterationsschleife,
+  ./test.sh                  90 Prüfungen: Endpunkte, Iterationsschleife,
                              Provider, Hilfe, Debug, Repo, UI-Oberflächen,
                              Go- und Rust-Clients
   GET  /api/debug/selftest   interne Prüfungen zur Laufzeit

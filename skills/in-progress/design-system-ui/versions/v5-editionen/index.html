@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design System UI — Workflow & Skill Builder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Roter Monitorrand, sichtbar solange eine KI arbeitet -->
+    <div id="agentGlow" aria-hidden="true"></div>
+
+    <!-- Info-Popover (wandert zum jeweiligen Info-Button) -->
+    <div id="infoPopover" class="info-popover hidden" role="dialog" aria-live="polite">
+        <div class="info-popover-head">
+            <strong id="infoTitle">Hilfe</strong>
+            <button class="info-close" aria-label="Schließen">×</button>
+        </div>
+        <p id="infoGuide" class="info-guide"></p>
+        <div class="info-tip-row">
+            <span class="info-tip-icon">💡</span>
+            <span id="infoTip" class="info-tip"></span>
+        </div>
+        <div id="infoPatterns" class="info-patterns"></div>
+        <div class="info-popover-foot">
+            <button id="infoPrevTip" class="btn btn-small btn-secondary">‹ Tipp</button>
+            <span id="infoTipCount" class="text-muted"></span>
+            <button id="infoNextTip" class="btn btn-small btn-secondary">Tipp ›</button>
+        </div>
+    </div>
+
+    <!-- Hamburger-Drawer: alle Oberflächen -->
+    <div id="drawerScrim" class="drawer-scrim"></div>
+    <nav id="drawer" class="drawer" aria-label="Hauptmenü">
+        <div class="drawer-head">
+            <h2>Oberflächen</h2>
+            <button class="info-btn" data-help="menu" aria-label="Hilfe zum Menü">i</button>
+            <button id="drawerClose" class="btn-icon" aria-label="Menü schließen">×</button>
+        </div>
+        <div class="drawer-ampel">
+            <span class="ampel" id="drawerAmpel" data-state="red"></span>
+            <span id="drawerAmpelText" class="text-muted">Provider werden geprüft…</span>
+        </div>
+        <ul class="drawer-list">
+            <li><button class="drawer-item active" data-view="builder"><span>🧩</span> Workflow Builder</button></li>
+            <li><button class="drawer-item" data-view="chat"><span>💬</span> Chat &amp; Canvas</button></li>
+            <li><button class="drawer-item" data-view="skills"><span>🧠</span> Skill Builder</button></li>
+            <li><button class="drawer-item" data-view="providers"><span>🔌</span> Provider &amp; APIs</button></li>
+            <li><button class="drawer-item" data-view="stock"><span>🖼️</span> Stock Medien</button></li>
+            <li><button class="drawer-item" data-view="github"><span>🐙</span> GitHub &amp; Skills</button></li>
+            <li><button class="drawer-item" data-view="agents"><span>🤖</span> Agenten &amp; Sichtbarkeit</button></li>
+            <li><button class="drawer-item" data-view="debug"><span>🧪</span> Debug &amp; Stresstest</button></li>
+            <li><button class="drawer-item" data-view="docs"><span>📋</span> Docs / llms.txt</button></li>
+        </ul>
+        <div class="drawer-foot">
+            <label class="toggle-row">
+                <input type="checkbox" id="ttsToggle" checked>
+                <span>Vorlesen aktiv (2× Klick auf Text)</span>
+                <button class="info-btn" data-help="tts" aria-label="Hilfe zu Vorlesen">i</button>
+            </label>
+        </div>
+    </nav>
+
+    <div class="app-container">
+        <header class="app-header">
+            <button id="hamburger" class="hamburger" aria-label="Menü öffnen">
+                <span></span><span></span><span></span>
+            </button>
+            <h1>🎨 Design System <span class="text-muted" id="viewName">Workflow Builder</span></h1>
+            <div class="header-controls">
+                <span class="edition-chip" id="editionChip" title="Edition">–</span>
+                <span class="ampel-chip" title="Provider-Status">
+                    <span class="ampel" id="headerAmpel" data-state="red"></span>
+                    <span id="headerAmpelText">0</span>
+                </span>
+                <button id="newWorkflow" class="btn btn-primary">+ Neu</button>
+                <button id="llmsButton" class="btn btn-secondary">📋 llms.txt</button>
+            </div>
+        </header>
+
+        <!-- Live-Ticker während eine KI arbeitet -->
+        <div class="activity-bar" id="activityBar">
+            <span class="activity-dot"></span>
+            <strong>KI arbeitet:</strong>
+            <span id="activityText">–</span>
+            <button class="info-btn" data-help="agent" aria-label="Hilfe zur Agentensichtbarkeit">i</button>
+        </div>
+
+        <!-- ═══════════ VIEW: BUILDER ═══════════ -->
+        <main class="app-main view" id="view-builder">
+            <section class="panel panel-left">
+                <div class="panel-header">
+                    <h2>Workflow Canvas</h2>
+                    <div class="panel-controls">
+                        <button class="info-btn" data-help="canvas" aria-label="Hilfe zum Canvas">i</button>
+                        <button id="zoomIn" class="btn-icon" title="Vergrößern">+</button>
+                        <button id="zoomOut" class="btn-icon" title="Verkleinern">−</button>
+                        <button id="fitView" class="btn-icon" title="Ansicht zurücksetzen">⊡</button>
+                    </div>
+                </div>
+                <div id="canvas" class="canvas-area">
+                    <svg id="canvasSvg" class="canvas-svg"></svg>
+                    <div class="canvas-placeholder">
+                        <p>📦 Nodes aus dem Nodes-Tab ziehen oder Template laden</p>
+                        <p><small>Klick wählt aus · Shift+Klick verbindet</small></p>
+                        <button id="importWorkflow" class="btn btn-small">JSON importieren</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel panel-center">
+                <div class="panel-header">
+                    <h2>Konfiguration</h2>
+                    <span class="badge" id="workflowStatus">Bereit</span>
+                </div>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="nodes">Nodes</button>
+                    <button class="tab-btn" data-tab="params">Parameter</button>
+                    <button class="tab-btn" data-tab="patterns">Templates</button>
+                    <button class="tab-btn" data-tab="syntax">Syntax</button>
+                </div>
+
+                <div id="nodes" class="tab-content active">
+                    <div class="tab-help-row">
+                        <button class="info-btn" data-help="nodes" aria-label="Hilfe zu Nodes">i</button>
+                        <span class="text-muted">Bausteine per Drag &amp; Drop</span>
+                    </div>
+                    <div class="node-library">
+                        <div class="node-category">
+                            <h3>Input</h3>
+                            <div class="node-list">
+                                <div class="node-item draggable" draggable="true" data-node-type="text-input">📝 Text Input</div>
+                                <div class="node-item draggable" draggable="true" data-node-type="file-input">📁 File Input</div>
+                                <div class="node-item draggable" draggable="true" data-node-type="image-input">🖼️ Image Input</div>
+                            </div>
+                        </div>
+                        <div class="node-category">
+                            <h3>Processing</h3>
+                            <div class="node-list">
+                                <div class="node-item draggable" draggable="true" data-node-type="llm-node">🤖 LLM Call</div>
+                                <div class="node-item draggable" draggable="true" data-node-type="transform">⚡ Transform</div>
+                                <div class="node-item draggable" draggable="true" data-node-type="filter">🔍 Filter</div>
+                            </div>
+                        </div>
+                        <div class="node-category">
+                            <h3>Output</h3>
+                            <div class="node-list">
+                                <div class="node-item draggable" draggable="true" data-node-type="text-output">📤 Text Output</div>
+                                <div class="node-item draggable" draggable="true" data-node-type="file-output">💾 File Output</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="params" class="tab-content">
+                    <div class="tab-help-row">
+                        <button class="info-btn" data-help="params" aria-label="Hilfe zu Parametern">i</button>
+                        <span class="text-muted">Feineinstellung des Nodes</span>
+                    </div>
+                    <div class="params-list"><div id="selectedNodeParams">
+                        <p class="text-muted">Node im Canvas auswählen</p>
+                    </div></div>
+                    <button id="suggestParams" class="btn btn-secondary full-width">🎯 AI Parameter vorschlagen</button>
+                </div>
+
+                <div id="patterns" class="tab-content">
+                    <div class="tab-help-row">
+                        <button class="info-btn" data-help="patterns" aria-label="Hilfe zu Templates">i</button>
+                        <span class="text-muted">Fertige Muster laden</span>
+                    </div>
+                    <div class="patterns-grid">
+                        <div class="pattern-item" data-pattern="text-classifier">
+                            <h4>Text Classifier</h4><p>Input → LLM → Kategorie</p>
+                            <button class="btn btn-small">Laden</button>
+                        </div>
+                        <div class="pattern-item" data-pattern="rag-pipeline">
+                            <h4>RAG Pipeline</h4><p>Query → Retrieve → Generate</p>
+                            <button class="btn btn-small">Laden</button>
+                        </div>
+                        <div class="pattern-item" data-pattern="agent-loop">
+                            <h4>Agent Loop</h4><p>Think → Act → Observe</p>
+                            <button class="btn btn-small">Laden</button>
+                        </div>
+                        <div class="pattern-item" data-pattern="eval-loop">
+                            <h4>Eval Loop</h4><p>Execute → Score → Iterate</p>
+                            <button class="btn btn-small">Laden</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="syntax" class="tab-content">
+                    <div class="tab-help-row">
+                        <button class="info-btn" data-help="chat" aria-label="Hilfe zur Syntax">i</button>
+                        <span class="text-muted">Präfixe für Menschen und Bots</span>
+                    </div>
+                    <div id="prefixList" class="prefix-list"></div>
+                </div>
+            </section>
+
+            <section class="panel panel-right">
+                <div class="panel-header">
+                    <h2>Ausführung</h2>
+                    <button class="info-btn" data-help="execution" aria-label="Hilfe zur Ausführung">i</button>
+                </div>
+                <div class="execution-controls">
+                    <button id="executeWorkflow" class="btn btn-primary full-width">▶️ Workflow ausführen</button>
+                    <button id="validateWorkflow" class="btn btn-secondary full-width">✓ Validieren</button>
+                </div>
+                <div class="terminal-container">
+                    <div class="terminal-header">
+                        <h3>Terminal</h3>
+                        <button id="clearTerminal" class="btn-icon">×</button>
+                    </div>
+                    <div id="terminal" class="terminal"><div class="terminal-line">Bereit…</div></div>
+                </div>
+                <div class="eval-container hidden">
+                    <div class="eval-header">
+                        <h3>Bewertung (Gemma)</h3>
+                        <button class="info-btn" data-help="evaluation" aria-label="Hilfe zur Bewertung">i</button>
+                        <span class="eval-status" id="evalStatus">–</span>
+                    </div>
+                    <div id="evalResults" class="eval-results"></div>
+                    <button id="iterateWorkflow" class="btn btn-secondary full-width">🔄 Iterieren</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- ═══════════ VIEW: CHAT & CANVAS (Split) ═══════════ -->
+        <main class="app-main split view hidden" id="view-chat">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Chat</h2>
+                    <div class="panel-controls">
+                        <select id="chatProvider" class="mini-select" title="Provider wählen">
+                            <option value="auto">auto (lokal)</option>
+                        </select>
+                        <button class="info-btn" data-help="chat" aria-label="Hilfe zum Chat">i</button>
+                    </div>
+                </div>
+                <div class="chat-panel">
+                    <div id="chatLog" class="chat-log">
+                        <div class="chat-msg assistant">Hi! Ich bin der Builder-Assistent. Präfixe: <code>/execute</code>, <code>#rag-pipeline</code>, <code>@node</code>, <code>!firecrawl &lt;url&gt;</code>, <code>~skill</code>.</div>
+                    </div>
+                    <div class="chat-input-row">
+                        <input id="chatInput" type="text" placeholder="Nachricht oder Präfix… (Enter)">
+                        <button id="chatSend" class="btn btn-primary">Senden</button>
+                    </div>
+                </div>
+            </section>
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Canvas (live)</h2>
+                    <button class="info-btn" data-help="canvas" aria-label="Hilfe zum Canvas">i</button>
+                </div>
+                <div id="canvasMirror" class="canvas-area canvas-mirror">
+                    <svg id="canvasMirrorSvg" class="canvas-svg"></svg>
+                </div>
+                <div class="mirror-foot">
+                    <button id="chatExecute" class="btn btn-primary full-width">▶️ Ausführen &amp; bewerten</button>
+                    <div id="chatEval" class="eval-results text-muted">Noch keine Bewertung.</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ═══════════ VIEW: SKILL BUILDER ═══════════ -->
+        <main class="app-main single view hidden" id="view-skills">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Skill Builder</h2>
+                    <button class="info-btn" data-help="skills" aria-label="Hilfe zum Skill Builder">i</button>
+                </div>
+                <div class="panel-body">
+                    <p class="text-muted">Aus dem aktuellen Workflow einen wiederverwendbaren Skill erzeugen.</p>
+                    <div class="form-grid">
+                        <label>Skill-Name<input id="skillName" type="text" placeholder="classify-tickets"></label>
+                        <label>Beschreibung<textarea id="skillDesc" rows="3" placeholder="Wann soll ein Agent diesen Skill wählen?"></textarea></label>
+                        <label>Trigger / Stichworte<input id="skillTriggers" type="text" placeholder="ticket, triage, klassifizieren"></label>
+                    </div>
+                    <div class="btn-row">
+                        <button id="skillPreview" class="btn btn-secondary">Vorschau</button>
+                        <button id="skillExport" class="btn btn-primary">SKILL.md exportieren</button>
+                    </div>
+                    <pre id="skillOutput" class="code-block">Noch keine Vorschau.</pre>
+                </div>
+            </section>
+        </main>
+
+        <!-- ═══════════ VIEW: PROVIDER ═══════════ -->
+        <main class="app-main single view hidden" id="view-providers">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Provider &amp; API-Verbindungen</h2>
+                    <div class="panel-controls">
+                        <button class="info-btn" data-help="providers" aria-label="Hilfe zu Providern">i</button>
+                        <button id="refreshProviders" class="btn btn-small btn-secondary">Aktualisieren</button>
+                    </div>
+                </div>
+                <div class="panel-body"><div id="providerGrid" class="provider-grid">Lade…</div></div>
+            </section>
+        </main>
+
+        <!-- ═══════════ VIEW: STOCK ═══════════ -->
+        <main class="app-main single view hidden" id="view-stock">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Stock Medien</h2>
+                    <button class="info-btn" data-help="stock" aria-label="Hilfe zu Stock">i</button>
+                </div>
+                <div class="panel-body">
+                    <div class="btn-row">
+                        <select id="stockProvider" class="mini-select">
+                            <option value="pexels">Pexels</option>
+                            <option value="unsplash">Unsplash</option>
+                            <option value="pixabay">Pixabay</option>
+                        </select>
+                        <select id="stockMedia" class="mini-select">
+                            <option value="photos">Fotos</option>
+                            <option value="videos">Videos</option>
+                        </select>
+                        <input id="stockQuery" type="text" placeholder="Suchbegriff…">
+                        <button id="stockSearch" class="btn btn-primary">Suchen</button>
+                    </div>
+                    <div id="stockResults" class="stock-results text-muted">Noch keine Suche.</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ═══════════ VIEW: GITHUB ═══════════ -->
+        <main class="app-main single view hidden" id="view-github">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>GitHub &amp; Skills</h2>
+                    <div class="panel-controls">
+                        <button class="info-btn" data-help="github" aria-label="Hilfe zu GitHub">i</button>
+                        <button id="refreshRepo" class="btn btn-small btn-secondary">Aktualisieren</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div id="repoStatus" class="code-block">Lade…</div>
+                    <h3>Skills im Repo <small class="text-muted">— <code>~name</code> fügt sie ein</small></h3>
+                    <div id="repoSkills" class="skill-grid text-muted">Lade…</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ═══════════ VIEW: AGENTEN ═══════════ -->
+        <main class="app-main single view hidden" id="view-agents">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Agenten &amp; Sichtbarkeit</h2>
+                    <button class="info-btn" data-help="agent" aria-label="Hilfe zu Agenten">i</button>
+                </div>
+                <div class="panel-body">
+                    <p class="text-muted">Jede KI, die diese Oberfläche bedient, meldet ihre Schritte — der Monitorrand leuchtet rot, geklickte Elemente blinken.</p>
+                    <div class="btn-row">
+                        <button id="agentDemo" class="btn btn-secondary">Sichtbarkeit testen (3 Schritte)</button>
+                    </div>
+
+                    <div data-edition="openclaw">
+                    <h3>Mit OpenCLAW designen
+                        <button class="info-btn" data-help="openclaw" aria-label="Hilfe zu OpenCLAW">i</button>
+                    </h3>
+                    <p class="text-muted">
+                        <strong>OpenCLAW</strong> — die Agenten-Shell. Nicht „OpenCloud", nicht
+                        „opencloude", nicht Anthropics Claude. Beschreibe den Auftrag, OpenCLAW
+                        baut und optimiert den Workflow, während du zusiehst.
+                    </p>
+                    <div class="claw-status-row">
+                        <span class="ampel" id="clawAmpel" data-state="red"></span>
+                        <span id="clawStatusText" class="text-muted">Status wird geladen…</span>
+                    </div>
+                    <div class="btn-row">
+                        <input id="clawTask" type="text"
+                               placeholder="z. B. Baue einen RAG-Workflow und optimiere ihn">
+                        <select id="clawPattern" class="mini-select">
+                            <option value="">Muster automatisch</option>
+                            <option value="text-classifier">text-classifier</option>
+                            <option value="rag-pipeline">rag-pipeline</option>
+                            <option value="agent-loop">agent-loop</option>
+                            <option value="eval-loop">eval-loop</option>
+                        </select>
+                        <button id="clawRun" class="btn btn-primary">▶️ OpenCLAW starten</button>
+                    </div>
+                    <div id="clawOutput" class="code-block">Noch kein Lauf.</div>
+                    </div><!-- /data-edition="openclaw" -->
+                    <h3>Aktivitätsprotokoll</h3>
+                    <div id="agentLog" class="code-block">Noch keine Ereignisse.</div>
+                    <h3>Integrationen</h3>
+                    <div id="integrationList" class="text-muted">Lade…</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ═══════════ VIEW: DEBUG ═══════════ -->
+        <main class="app-main single view hidden" id="view-debug">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Debug &amp; Stresstest</h2>
+                    <button class="info-btn" data-help="debug" aria-label="Hilfe zu Debug">i</button>
+                </div>
+                <div class="panel-body">
+                    <div class="btn-row">
+                        <button id="runSelftest" class="btn btn-primary">Selbsttest</button>
+                        <input id="stressRuns" type="number" value="50" min="1" max="500" class="mini-input">
+                        <button id="runStress" class="btn btn-secondary">Stresstest</button>
+                    </div>
+                    <div id="debugOutput" class="code-block">Noch kein Lauf.</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ═══════════ VIEW: DOCS ═══════════ -->
+        <main class="app-main single view hidden" id="view-docs">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Docs — llms.txt</h2>
+                    <span class="text-muted">Dieselbe Anleitung, die Agenten lesen</span>
+                </div>
+                <div class="panel-body"><pre id="docsContent" class="code-block">Lade…</pre></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="llmsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>llms.txt — Agenten-Anleitung</h2>
+                <button class="modal-close">×</button>
+            </div>
+            <div id="llmsContent" class="modal-body"></div>
+            <div class="modal-footer">
+                <button id="copyLlms" class="btn btn-secondary">📋 Kopieren</button>
+                <button id="downloadLlms" class="btn btn-secondary">⬇️ Download</button>
+                <button class="btn btn-primary modal-close">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="iterationModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Optimierungsvorschläge</h2>
+                <button class="modal-close">×</button>
+            </div>
+            <div id="suggestionsList" class="modal-body"></div>
+            <div class="modal-footer">
+                <button id="applyAllSuggestions" class="btn btn-primary">Alle anwenden &amp; neu ausführen</button>
+                <button class="btn btn-secondary modal-close">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

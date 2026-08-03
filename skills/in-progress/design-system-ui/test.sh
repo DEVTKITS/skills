@@ -165,6 +165,56 @@ FEED=$(curl -s "$BASE/api/agent/activity?since=0")
 assert_contains "runner meldet sich als openclaw"  '"openclaw"'    "$FEED"
 assert_contains "runner meldet Sitzungsstart"      'session-start' "$FEED"
 
+say "── Nanobot & Agent-zu-Agent ─────────────────────────"
+CARD=$(curl -s "$BASE/api/a2a/card")
+assert_contains "nanobot stellt sich vor"     '"kind": "nanobot"'   "$CARD"
+assert_contains "nennt sein protokoll"        'design-system-ui/1'  "$CARD"
+A2A1=$(curl -s -X POST "$BASE/api/a2a/message" -H 'Content-Type: application/json' \
+  -d '{"from":"claude","to":"nanobot","intent":"load-pattern","body":"#rag-pipeline"}')
+assert_contains "nanobot antwortet direkt"    '"delivered": "direct"' "$A2A1"
+assert_contains "praefix wird zur aktion"     'load_pattern'          "$A2A1"
+A2A2=$(curl -s -X POST "$BASE/api/a2a/message" -H 'Content-Type: application/json' \
+  -d '{"from":"claude","to":"opencode","intent":"handoff","body":"uebernimm bitte"}')
+assert_contains "nachricht wird zugestellt"   '"delivered": "queued"' "$A2A2"
+POLL=$(curl -s "$BASE/api/a2a/poll?agent=opencode")
+assert_contains "posteingang wird geleert"    'uebernimm bitte'       "$POLL"
+DIR=$(curl -s "$BASE/api/a2a/directory")
+assert_contains "verzeichnis kennt nanobot"   'nanobot'               "$DIR"
+FEED2=$(curl -s "$BASE/api/agent/activity?since=0")
+assert_contains "a2a ist fuer menschen sichtbar" '"a2a"'              "$FEED2"
+OAI=$(curl -s "$BASE/api/providers")
+assert_contains "openai/gpt als provider"     'OPENAI_API_KEY'        "$OAI"
+
+say "── C-Gerüst ─────────────────────────────────────────"
+if command -v cc >/dev/null 2>&1; then
+  if (cd c && cc -O2 -std=c99 -pthread -o /tmp/dsui-c-test server.c 2>>"$LOG"); then
+    ok "c backend kompiliert"
+    ( cd c && PORT=$((PORT + 2)) /tmp/dsui-c-test >/dev/null 2>&1 & echo $! > /tmp/dsui-c.pid )
+    CBASE="http://localhost:$((PORT + 2))"
+    for _ in $(seq 1 40); do
+      curl -sf "$CBASE/health" >/dev/null 2>&1 && break
+      python3 -c 'import time; time.sleep(0.1)'
+    done
+    assert_contains "c health"        '"engine":"c"'   "$(curl -s "$CBASE/health")"
+    CEX=$(curl -s -X POST "$CBASE/api/workflow/execute" -H 'Content-Type: application/json' \
+      -d @examples/text-classifier.json)
+    assert_contains "c fuehrt workflow aus"  '"status":"success"'  "$CEX"
+    CEV=$(curl -s -X POST "$CBASE/api/workflow/evaluate" -H 'Content-Type: application/json' \
+      -d "{\"workflow\":$(cat examples/text-classifier.json),\"results\":{}}")
+    assert_contains "c bewertet mit urteil"  '"verdict":"done"'    "$CEV"
+    kill "$(cat /tmp/dsui-c.pid)" 2>/dev/null
+  else bad "c backend kompiliert nicht"; fi
+else say "  - kein C-Compiler, uebersprungen"; fi
+
+say "── Versionen ────────────────────────────────────────"
+VCOUNT=$(ls -d versions/v*/ 2>/dev/null | wc -l)
+[ "$VCOUNT" -ge 5 ] && ok "eigenstaendige Versionen archiviert ($VCOUNT)" \
+                    || bad "nur $VCOUNT Versionen archiviert"
+for v in versions/v*/; do
+  [ -f "$v/server.py" ] || bad "$(basename $v) ist nicht eigenstaendig lauffaehig"
+done
+ok "jede Version bringt ihr eigenes Backend mit"
+
 say "── Editionen ────────────────────────────────────────"
 # Der Testserver läuft in der Normal-Edition: OpenCLAW muss dort inaktiv sein.
 ED=$(curl -s "$BASE/api/edition")

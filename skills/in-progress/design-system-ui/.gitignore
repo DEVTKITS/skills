@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+c/dsui-c
+demo/node_modules/
+demo/package-lock.json
+demo/shots/

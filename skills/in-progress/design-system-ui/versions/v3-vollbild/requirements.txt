@@ -1,0 +1,13 @@
+# The default backend (server.py) uses ONLY the Python standard library.
+# You need nothing here to run it:  python3 server.py
+#
+# The packages below are OPTIONAL — only needed if you swap the mock evaluator
+# (GemmaEvaluator.infer) for a real local model backend.
+#
+# Ollama route (recommended, lightest): no Python packages needed, just run
+#   ollama pull gemma:12b && ollama serve
+# and point GemmaEvaluator.infer at http://localhost:11434/api/generate.
+#
+# Hugging Face route (heavy — pulls torch): uncomment to use.
+# transformers>=4.36.0
+# torch>=2.1.0
