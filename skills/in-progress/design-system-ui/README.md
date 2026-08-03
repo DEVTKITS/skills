@@ -6,7 +6,7 @@ score the result and decide *iterate* or *done*. Every page exposes `/llms.txt`
 so terminal agents can drive the whole thing without a browser.
 
 > **Status: in-progress draft.** The core loop runs and is verified by an
-> automated 67-check test suite (`./test.sh`) plus a Playwright tour through
+> automated 75-check test suite (`./test.sh`) plus a Playwright tour through
 > all nine surfaces. Gemma inference goes **live automatically** when an
 > Ollama server is running; otherwise a deterministic heuristic evaluator
 > answers with the same response schema.
@@ -22,7 +22,7 @@ so terminal agents can drive the whole thing without a browser.
 | Gemma 4 12B via Ollama | ✅ Auto-detected (`gemma_live: true`); heuristic fallback when absent |
 | Go client (`main.go`) | ✅ Builds with stdlib only, talks to backend |
 | Rust client (`client.rs`) | ✅ Builds with `rustc`, no crates, talks to backend |
-| Hamburger-Menü mit 9 Oberflächen | ✅ Builder, Chat+Canvas, Skills, Provider, Stock, GitHub, Agenten, Debug, Docs |
+| Hamburger-Menü mit 9 Oberflächen (beide Editionen) | ✅ Builder, Chat+Canvas, Skills, Provider, Stock, GitHub, Agenten, Debug, Docs |
 | Info-Buttons mit wechselnden Tipps | ✅ Blinken dezent, Popover rotiert Tipps alle 4,5 s, blätterbar |
 | Ampelsystem | ✅ Grün/Gelb/Rot je Provider, Summe in Kopfzeile und Menü |
 | Vorlesen (TTS) | ✅ 1× Klick markiert, 2× Klick liest per Browser-Sprachausgabe vor |
@@ -35,15 +35,37 @@ so terminal agents can drive the whole thing without a browser.
 | Chat tab | ✅ Live via Ollama when running; offline help otherwise |
 | Stock media 1-click connect | ✅ Pexels/Unsplash/Pixabay — set the env API key, done |
 | Integrations manifest (`/api/integrations`) | ✅ Honest builtin / adapter-ready / unverified split |
-| **Mit OpenCLAW designen** | ✅ Direkt aus der Agenten-Ansicht starten: Auftrag eintippen, zusehen (roter Rand), Ergebnis lesen — `adapters/openclaw_runner.py` fährt die Schleife auch ohne installierte Shell |
+| **Mit OpenCLAW designen** (nur OpenCLAW-Edition) | ✅ Direkt aus der Agenten-Ansicht starten: Auftrag eintippen, zusehen (roter Rand), Ergebnis lesen — `adapters/openclaw_runner.py` fährt die Schleife auch ohne installierte Shell |
 | Sicherheit | ✅ Importiertes Workflow-JSON wird nie als Markup interpretiert — DOM-XSS-Regressionstest (`demo/xss_check.mjs`) |
-| Test suite (`test.sh`) | ✅ 67 Prüfungen inkl. polyglotter Clients und XSS-Test — CI-ready |
+| Test suite (`test.sh`) | ✅ 75 Prüfungen inkl. polyglotter Clients und XSS-Test — CI-ready |
 | Mojo agent layer (`agents.mojo`) | 📐 Design sketch — not required to run |
+
+## Zwei Editionen, eine Codebasis
+
+| Edition | Start | Was drin ist |
+|---|---|---|
+| **Normal** | `./start.sh` | Hamburger-Menü, Kacheln, alle neun Oberflächen. Du baust, Gemma bewertet. |
+| **OpenCLAW** | `./start.sh --openclaw` | Alles aus Normal **plus** „Mit OpenCLAW designen": die Agenten-Shell baut und optimiert auf Zuruf. |
+
+Menü, Kacheln, Ampel, Info-Tipps, TTS, Provider, Stock, GitHub, Debug — das
+ist in **beiden** Editionen identisch. Der einzige Unterschied ist der
+OpenCLAW-Bereich in der Agenten-Ansicht. Die aktive Edition steht als
+Kennzeichen oben rechts in der Kopfzeile.
+
+Beide lassen sich parallel betreiben:
+
+```bash
+PORT=8000 ./start.sh &              # Normal
+PORT=8001 ./start.sh --openclaw &   # OpenCLAW
+```
+
+In der Normal-Edition antworten die `/api/openclaw/*`-Endpunkte bewusst mit
+404 und nennen den Umschaltbefehl — kein toter Knopf, keine Attrappe.
 
 ## Quick start (zero dependencies)
 
 ```bash
-./start.sh                 # or: python3 server.py
+./start.sh                 # Normal-Edition, oder: python3 server.py
 # UI:     http://localhost:8000/
 # agents: http://localhost:8000/llms.txt
 ```
@@ -117,7 +139,7 @@ Configuration via environment: `OLLAMA_URL` (default `http://localhost:11434`),
 ## Testing
 
 ```bash
-./test.sh                    # 67 Prüfungen: Endpunkte, Iterationsschleife, Provider,
+./test.sh                    # 75 Prüfungen: Endpunkte, Iterationsschleife, Provider,
                              # Hilfe, Debug, Repo, UI-Oberflächen, Go- und Rust-Clients
 cd demo && npm install playwright
 CHROMIUM_PATH=/opt/pw-browsers/chromium node ui_tour.mjs http://localhost:8000 ./shots
@@ -214,7 +236,7 @@ design-system-ui/
 - [x] stdlib Go + Rust clients that talk to the backend
 - [x] `/llms.txt` served on every deployment
 - [x] Real Gemma 4 12B via Ollama with automatic heuristic fallback
-- [x] Automated smoke-test suite (`test.sh`, 67 checks inkl. DOM-XSS-Regression)
+- [x] Automated smoke-test suite (`test.sh`, 75 checks inkl. DOM-XSS-Regression)
 - [x] UI iterate loop: real suggestions, Apply All → auto re-execute
 - [ ] Live terminal streaming (Server-Sent Events / WebSocket)
 - [ ] ComfyUI JSON import/export round-trip

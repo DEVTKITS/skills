@@ -17,6 +17,14 @@ Bibliothek — reines HTTP+JSON. Diese Datei ist die vollständige Schnittstelle
 
 Basis-URL (Standard): http://localhost:8000
 
+EDITIONEN — zwei Ausbaustufen aus einer Codebasis:
+  normal    Hamburger-Menü, Kacheln, alle neun Oberflächen. Kein Agenten-Shell.
+  openclaw  Alles aus normal PLUS "Mit OpenCLAW designen" (Agenten-Shell).
+Abfragen mit GET /api/edition → {edition:{id,name,tagline,features},available[]}.
+Starten mit ./start.sh bzw. ./start.sh --openclaw (oder EDITION=openclaw).
+In der Edition "normal" antworten /api/openclaw/* mit 404 plus Umschalthinweis.
+Prüfe die Edition, BEVOR du OpenCLAW-Endpunkte aufrufst.
+
 ────────────────────────────────────────────────────────────────────────
 ## 2. OBERFLÄCHEN (alle über das Hamburger-Menü, alle auf derselben Seite)
 ────────────────────────────────────────────────────────────────────────
@@ -282,7 +290,7 @@ dem Text erkannt. Abschaltbar im Menü. Läuft lokal im Browser, ohne Cloud.
 ────────────────────────────────────────────────────────────────────────
 ## 11. SELBSTTEST
 ────────────────────────────────────────────────────────────────────────
-  ./test.sh                  67 Prüfungen: Endpunkte, Iterationsschleife,
+  ./test.sh                  75 Prüfungen: Endpunkte, Iterationsschleife,
                              Provider, Hilfe, Debug, Repo, UI-Oberflächen,
                              Go- und Rust-Clients
   GET  /api/debug/selftest   interne Prüfungen zur Laufzeit

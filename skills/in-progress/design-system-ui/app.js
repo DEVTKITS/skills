@@ -867,7 +867,10 @@ DesignSystemApp.prototype.showView = function (view) {
     // Lazy-load pro Oberfläche
     if (view === 'providers') this.loadProviders();
     if (view === 'github') this.loadRepo();
-    if (view === 'agents') { this.loadIntegrations(); this.refreshOpenClawStatus(); }
+    if (view === 'agents') {
+        this.loadIntegrations();
+        if (this.edition?.features?.openclaw) this.refreshOpenClawStatus();
+    }
     if (view === 'docs') this.loadDocs();
     if (view === 'chat') this.mirrorCanvas();
 };
@@ -1210,6 +1213,32 @@ DesignSystemApp.prototype.loadIntegrations = async function () {
     }, { once: true });
 };
 
+// ── Editionen: "normal" (Hamburger + Kacheln) und "openclaw" (plus Shell) ──
+// Bereiche mit data-edition="<id>" erscheinen nur in der passenden Edition.
+DesignSystemApp.prototype.applyEdition = async function () {
+    let edition = { id: 'normal', name: 'Normal', features: { openclaw: false } };
+    try {
+        const data = await (await fetch('/api/edition')).json();
+        edition = data.edition || edition;
+    } catch (_) { /* Offline: bei "normal" bleiben */ }
+
+    this.edition = edition;
+    document.body.dataset.edition = edition.id;
+
+    document.querySelectorAll('[data-edition]').forEach(el => {
+        const wanted = el.dataset.edition;
+        el.classList.toggle('hidden', wanted !== edition.id);
+    });
+
+    const chip = document.getElementById('editionChip');
+    if (chip) {
+        chip.textContent = edition.name;
+        chip.title = edition.tagline || edition.name;
+        chip.dataset.edition = edition.id;
+    }
+    return edition;
+};
+
 // ── OpenCLAW: Agenten-Shell aus der Oberfläche heraus starten ──────────
 // Schreibweise: OpenCLAW. Nicht "OpenCloud"/"opencloude", nicht Claude.
 DesignSystemApp.prototype.initOpenClaw = function () {
@@ -1332,8 +1361,10 @@ document.addEventListener('DOMContentLoaded', () => {
     app.initStock();
     app.initDebug();
     app.initSkillBuilder();
-    app.initOpenClaw();
     app.loadProviders();
+    app.applyEdition().then(ed => {
+        if (ed.features && ed.features.openclaw) app.initOpenClaw();
+    });
 
     document.getElementById('refreshProviders')?.addEventListener('click', () => app.loadProviders());
     document.getElementById('refreshRepo')?.addEventListener('click', () => app.loadRepo());

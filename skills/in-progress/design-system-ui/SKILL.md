@@ -8,6 +8,11 @@ disable-model-invocation: true
 
 Interactive web UI for designing, executing, and evaluating AI workflows with integrated ComfyUI, terminal execution, and local model evaluation — all without leaving the page.
 
+> **Zwei Editionen:** `./start.sh` startet die **Normal**-Edition
+> (Hamburger-Menü, Kacheln, neun Oberflächen), `./start.sh --openclaw` die
+> **OpenCLAW**-Edition (dasselbe plus Agenten-Shell). Beide parallel
+> betreibbar.
+>
 > **Status: in-progress draft.** The Python backend runs with zero dependencies
 > (stdlib only) and the execute/evaluate/iterate loop works end-to-end with a
 > **mock** Gemma 4 12B. The Go and Rust clients build against stdlib only. Mojo

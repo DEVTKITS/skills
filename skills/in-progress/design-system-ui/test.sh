@@ -24,7 +24,7 @@ assert_contains() {
 say "── boot ─────────────────────────────────────────────"
 PORT="$PORT" python3 server.py >"$LOG" 2>&1 &
 SRV=$!
-trap 'kill "$SRV" 2>/dev/null' EXIT
+trap 'kill "$SRV" ${CLAW_SRV:-} 2>/dev/null' EXIT
 
 ready=""
 for _ in $(seq 1 50); do
@@ -165,7 +165,35 @@ FEED=$(curl -s "$BASE/api/agent/activity?since=0")
 assert_contains "runner meldet sich als openclaw"  '"openclaw"'    "$FEED"
 assert_contains "runner meldet Sitzungsstart"      'session-start' "$FEED"
 
+say "── Editionen ────────────────────────────────────────"
+# Der Testserver läuft in der Normal-Edition: OpenCLAW muss dort inaktiv sein.
+ED=$(curl -s "$BASE/api/edition")
+assert_contains "edition endpoint"              '"edition"'      "$ED"
+assert_contains "normal ist die Voreinstellung" '"id": "normal"' "$ED"
+assert_contains "beide Editionen gelistet"      'openclaw'       "$ED"
+N404=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/api/openclaw/status")
+[ "$N404" = "404" ] && ok "openclaw in Normal-Edition abgeschaltet" \
+                    || bad "openclaw antwortet in Normal-Edition ($N404)"
+# Zweite Instanz in der OpenCLAW-Edition hochfahren
+CLAW_PORT=$((PORT + 1))
+PORT="$CLAW_PORT" EDITION=openclaw python3 server.py >/dev/null 2>&1 &
+CLAW_SRV=$!
+CLAW_BASE="http://localhost:${CLAW_PORT}"
+for _ in $(seq 1 50); do
+  curl -sf "$CLAW_BASE/health" >/dev/null 2>&1 && break
+  python3 -c 'import time; time.sleep(0.1)'
+done
+CED=$(curl -s "$CLAW_BASE/api/edition")
+assert_contains "openclaw-edition meldet sich"  '"id": "openclaw"' "$CED"
+C200=$(curl -s -o /dev/null -w "%{http_code}" "$CLAW_BASE/api/openclaw/status")
+[ "$C200" = "200" ] && ok "openclaw in OpenCLAW-Edition aktiv" \
+                    || bad "openclaw fehlt in OpenCLAW-Edition ($C200)"
+CHTML=$(curl -s "$CLAW_BASE/")
+assert_contains "menue in beiden Editionen"     'id="hamburger"'   "$CHTML"
+assert_contains "kacheln in beiden Editionen"   'id="providerGrid"' "$CHTML"
+
 say "── OpenCLAW aus der Oberfläche ──────────────────────"
+BASE="$CLAW_BASE"   # die folgenden Prüfungen brauchen die OpenCLAW-Edition
 CS=$(curl -s "$BASE/api/openclaw/status")
 assert_contains "openclaw status endpoint"     '"mode"'          "$CS"
 assert_contains "meldet Fallback ohne Shell"   '"fallback"'      "$CS"
@@ -184,6 +212,7 @@ assert_contains "hilfe kennt die Schreibweise" 'opencloude'      "$HELP_CLAW"
 UIHTML=$(curl -s "$BASE/")
 assert_contains "steuerung in der Oberflaeche" 'id="clawRun"'    "$UIHTML"
 
+BASE="http://localhost:${PORT}"   # zurück zur Normal-Edition
 say "── Sicherheit ───────────────────────────────────────"
 if command -v node >/dev/null 2>&1 && [ -d demo/node_modules/playwright ]; then
   if (cd demo && CHROMIUM_PATH="${CHROMIUM_PATH:-/opt/pw-browsers/chromium}" \

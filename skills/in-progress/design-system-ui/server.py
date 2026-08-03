@@ -606,6 +606,35 @@ class OpenClawService:
 
 CURRENT_PORT = int(os.environ.get("PORT", "8000"))
 
+# --------------------------------------------------------------------------- #
+# Editionen                                                                    #
+# --------------------------------------------------------------------------- #
+# "normal"   — Hamburger-Menü, Kacheln, alle neun Oberflächen. Ohne Agenten-
+#              Shell: der Mensch baut, Gemma bewertet.
+# "openclaw" — dasselbe PLUS "Mit OpenCLAW designen": die Agenten-Shell baut
+#              und optimiert den Workflow auf Zuruf.
+# Umschalten mit EDITION=… oder ./start.sh --openclaw
+EDITIONS = {
+    "normal": {
+        "id": "normal",
+        "name": "Normal",
+        "tagline": "Hamburger-Menü, Kacheln, neun Oberflächen — du baust, Gemma bewertet.",
+        "features": {"openclaw": False},
+    },
+    "openclaw": {
+        "id": "openclaw",
+        "name": "OpenCLAW",
+        "tagline": ("Alles aus Normal plus die OpenCLAW-Agenten-Shell, die den "
+                    "Workflow auf Zuruf baut und optimiert."),
+        "features": {"openclaw": True},
+    },
+}
+
+
+def current_edition() -> dict:
+    key = os.environ.get("EDITION", "normal").strip().lower()
+    return EDITIONS.get(key, EDITIONS["normal"])
+
 EXECUTOR = WorkflowExecutor()
 EVALUATOR = GemmaEvaluator()
 OPENCLAW = OpenClawService()
@@ -746,7 +775,16 @@ class Handler(BaseHTTPRequestHandler):
             self._json(REPO.skills())
         elif path == "/api/debug/selftest":
             self._json(DEBUG.selftest())
+        elif path == "/api/edition":
+            self._json({"edition": current_edition(),
+                        "available": list(EDITIONS)})
         elif path == "/api/openclaw/status":
+            if not current_edition()["features"]["openclaw"]:
+                self._json({"error": "OpenCLAW ist in der Edition 'normal' "
+                                     "nicht aktiv",
+                            "hint": "Mit EDITION=openclaw starten "
+                                    "(oder ./start.sh --openclaw)"}, 404)
+                return
             self._json(OPENCLAW.status())
         elif path == "/favicon.ico":
             svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
@@ -796,6 +834,13 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/api/debug/stress":
             self._json(DEBUG.stress(int(payload.get("runs", 25))))
         elif path == "/api/openclaw/run":
+            if not current_edition()["features"]["openclaw"]:
+                self._json({"ok": False,
+                            "error": "OpenCLAW ist in der Edition 'normal' "
+                                     "nicht aktiv",
+                            "hint": "Mit EDITION=openclaw starten "
+                                    "(oder ./start.sh --openclaw)"}, 404)
+                return
             self._json(OPENCLAW.run(str(payload.get("task", ""))[:2000],
                                     payload.get("pattern")))
         else:

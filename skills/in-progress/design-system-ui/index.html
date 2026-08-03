@@ -68,6 +68,7 @@
             </button>
             <h1>🎨 Design System <span class="text-muted" id="viewName">Workflow Builder</span></h1>
             <div class="header-controls">
+                <span class="edition-chip" id="editionChip" title="Edition">–</span>
                 <span class="ampel-chip" title="Provider-Status">
                     <span class="ampel" id="headerAmpel" data-state="red"></span>
                     <span id="headerAmpelText">0</span>
@@ -355,6 +356,7 @@
                         <button id="agentDemo" class="btn btn-secondary">Sichtbarkeit testen (3 Schritte)</button>
                     </div>
 
+                    <div data-edition="openclaw">
                     <h3>Mit OpenCLAW designen
                         <button class="info-btn" data-help="openclaw" aria-label="Hilfe zu OpenCLAW">i</button>
                     </h3>
@@ -380,6 +382,7 @@
                         <button id="clawRun" class="btn btn-primary">▶️ OpenCLAW starten</button>
                     </div>
                     <div id="clawOutput" class="code-block">Noch kein Lauf.</div>
+                    </div><!-- /data-edition="openclaw" -->
                     <h3>Aktivitätsprotokoll</h3>
                     <div id="agentLog" class="code-block">Noch keine Ereignisse.</div>
                     <h3>Integrationen</h3>
