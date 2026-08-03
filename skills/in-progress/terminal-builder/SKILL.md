@@ -1,0 +1,63 @@
+---
+name: terminal-builder
+description: Build and run "baukasten"/SERUM — a dependency-free, modular C terminal builder hub (arrow/number-key TUI, Unity-build under src/) that plans creation work fully offline and routes AI-flagged steps through connectors WITH a return channel (Matrix client API, DkZ nanochat bridge, MCP outbox, webhook, gateway API, Discord). SERUM adds direct LLM targets — Ollama (localhost:11434, /api/tags model picker, transparent alias translation), Anthropic (Claude, ANTHROPIC_API_KEY), and OpenAI-compatible (OPENAI_API_KEY) — with retry/backoff, healthchecks, an in-console AI chat, and a serial A2A trio (architect/security/integration). Also: a git-repo visualizer (fuzzy repo picker, branch/HEAD/dirty/remote header, commit/branch/tag/contributor counts, ASCII bar charts for top authors and file extensions, git graph/branches/files/commits in a pager, "ask Claude/SERUM about this repo", best-effort GitHub API enrichment), service monitor (Odysseus/Ollama/NanoChat/OpenCode/ChromaDB/Voicebox healthcheck), Cosmo profile presets (desktop/vps/agent/builder/monitor), skill import (repo URL → git clone + FLOWS.md, or YouTube URL → SERUM extraction), terminal tools (SSH, shell launcher + pager, read-only file navigator with fzf-style fuzzy filter, zsh/$SHELL launcher, fuzzy shell-history search, navi-style cheat sheets), 4 DkZ-palette themes incl. Matrix green and Cosmo, matrix-rain intro (toggleable module), first-run setup, ComfyUI workflow export, DE/EN, contrast mode, read-aloud, nanobot.
+disable-model-invocation: true
+---
+
+# Terminal Builder (baukasten)
+
+`baukasten` is a single-file C program (`baukasten.c`, libc only) — a pure
+frontend that works offline-first: every planning step happens locally, and
+only steps explicitly marked as AI go out through the connector the user
+configured. It is **not** a clone of any hosted design builder; it is a
+keyboard-driven terminal hub.
+
+## Build & run
+
+```sh
+cd skills/in-progress/terminal-builder
+make            # cc -O2 -Wall -Wextra -o baukasten baukasten.c
+./baukasten
+```
+
+Optional runtime helpers (both degrade gracefully when missing):
+
+- `curl` — only needed to POST AI steps to webhook/gateway/Discord connectors
+- `espeak` / `espeak-ng` / `say` / `spd-say` — only needed for the read-aloud button
+
+## What it does
+
+- **Home hub** — menu on top, 8 tiles at the bottom (Präsentation, Folien,
+  Apps, Sites, Dashboards, Hubs, Dokumente, Grafik). Tiles fan out into
+  subtypes, then a 4-question needs check (audience, scope, style, AI share)
+  so the generated plan matches what is actually needed.
+- **Work-step plan** — each step references a skillbuilder template and a
+  skill; both are swappable per step. Steps are tagged `local` or `AI ⚡`.
+- **Skills** — 10 prebuilt skills plus user-defined ones (name, description,
+  local/AI), persisted in `~/.config/baukasten/skills.txt`.
+- **Profiles** — creatable/selectable, stamped into every export and send.
+- **Connectors** — MCP (outbox file `outbox.jsonl`), webhook, gateway API
+  (Bearer key), Discord webhook. Only AI steps use them.
+- **Workflows** — every plan exports as a ComfyUI-style node graph
+  (`~/.config/baukasten/workflows/*.json`), nodes = prebuilt skills, AI nodes
+  flagged.
+- **Freestyle** — no code: type a free description, it maps to a tile and
+  starts the needs check.
+- **Nanobot** — press `n` anywhere: ask about the current page, steer the
+  builder ("erstelle präsentation"), or prefix `!` to send the question to
+  the AI connector.
+- **Accessibility** — light/dark theme, DE/EN, contrast mode (always deep
+  black, gray text, neon-red headings/highlights), read-aloud button `[v]`
+  on every page.
+
+## Keys
+
+Arrows move (also across tiles), `1–9` select, `Enter` opens, `Esc` back,
+`v` read aloud, `n` nanobot, `t` theme, `k` contrast, `l` language,
+`?` help, `q` quit.
+
+## Status
+
+Draft. Candidate next steps: incoming-message handling (poll connector
+responses into the nanobot), MCP stdio transport instead of the outbox file,
+per-category template packs.
