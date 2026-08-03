@@ -190,6 +190,34 @@ TOPICS: dict[str, dict] = {
         ],
         "patterns": ["POST /api/openclaw/run", "GET /api/openclaw/status"],
     },
+    "studio": {
+        "title": "Content Studio",
+        "guide": ("Aus einem Playwright-Lauf einen Bericht oder ein "
+                  "Podcast-Skript machen und als fertigen Block in Seiten, "
+                  "Designs oder Videos einbetten. Ein DkZ-Projekt."),
+        "tips": [
+            "Der Inhalt kommt aus dem Aktivitätsprotokoll — nichts wird hinzugedichtet.",
+            "Vier Formate: Laufbericht, Testzusammenfassung, Änderungsnotiz, Durchgang.",
+            "Ohne verbundenes Modell entsteht der Bericht direkt aus den Ereignissen.",
+            "„Video im Video“ legt einen Einspieler über die Bildschirmaufnahme — Position und Größe stufenlos.",
+            "Erst einen Agenten laufen lassen, dann erzeugen: leeres Protokoll ergibt leeren Bericht.",
+        ],
+        "patterns": ["POST /api/content/report", "POST /api/content/embed"],
+    },
+    "settings": {
+        "title": "Einstellungen",
+        "guide": ("Die Oberfläche stufenlos anpassen: Farbe, Form, Schrift, "
+                  "Verhalten und Arbeitsfläche. Änderungen wirken sofort und "
+                  "werden gesichert."),
+        "tips": [
+            "Alle Regler wirken sofort — kein Speichern, kein Neuladen nötig.",
+            "Der Farbton bestimmt die Akzentfarbe der gesamten Oberfläche.",
+            "Dichte verkleinert oder vergrößert alle Abstände auf einmal.",
+            "Animationen und blinkende Info-Buttons lassen sich ganz abschalten.",
+            "„Zurücksetzen“ stellt alle 22 Einstellungen auf die Standardwerte.",
+        ],
+        "patterns": ["GET /api/settings/schema", "POST /api/settings"],
+    },
     "debug": {
         "title": "Debug & Stresstest",
         "guide": ("Selbsttest prüft alle Endpunkte, der Stresstest fährt viele "

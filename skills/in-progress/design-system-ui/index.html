@@ -44,12 +44,14 @@
         <ul class="drawer-list">
             <li><button class="drawer-item active" data-view="builder"><span>🧩</span> Workflow Builder</button></li>
             <li><button class="drawer-item" data-view="chat"><span>💬</span> Chat &amp; Canvas</button></li>
+            <li><button class="drawer-item" data-view="studio"><span>🎙️</span> Content Studio</button></li>
             <li><button class="drawer-item" data-view="skills"><span>🧠</span> Skill Builder</button></li>
             <li><button class="drawer-item" data-view="providers"><span>🔌</span> Provider &amp; APIs</button></li>
             <li><button class="drawer-item" data-view="stock"><span>🖼️</span> Stock Medien</button></li>
             <li><button class="drawer-item" data-view="github"><span>🐙</span> GitHub &amp; Skills</button></li>
             <li><button class="drawer-item" data-view="agents"><span>🤖</span> Agenten &amp; Sichtbarkeit</button></li>
             <li><button class="drawer-item" data-view="debug"><span>🧪</span> Debug &amp; Stresstest</button></li>
+            <li><button class="drawer-item" data-view="settings"><span>🎛️</span> Einstellungen</button></li>
             <li><button class="drawer-item" data-view="docs"><span>📋</span> Docs / llms.txt</button></li>
         </ul>
         <div class="drawer-foot">
@@ -337,6 +339,13 @@
                 </div>
                 <div class="panel-body">
                     <div id="repoStatus" class="code-block">Lade…</div>
+                    <h3>Eigenen Skill aus Git einbinden</h3>
+                    <div class="btn-row">
+                        <input id="skillUrl" type="text" placeholder="https://github.com/owner/repo (oder direkte SKILL.md-URL)">
+                        <button id="skillImport" class="btn btn-primary">Importieren</button>
+                    </div>
+                    <div id="importedSkills" class="skill-grid text-muted">Noch keine importiert.</div>
+
                     <h3>Skills im Repo <small class="text-muted">— <code>~name</code> fügt sie ein</small></h3>
                     <div id="repoSkills" class="skill-grid text-muted">Lade…</div>
                 </div>
@@ -406,6 +415,68 @@
                     </div>
                     <div id="debugOutput" class="code-block">Noch kein Lauf.</div>
                 </div>
+            </section>
+        </main>
+
+        <!-- ═══════════ VIEW: CONTENT STUDIO ═══════════ -->
+        <main class="app-main single view hidden" id="view-studio">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Content Studio — Playwright-Läufe erzählen</h2>
+                    <button class="info-btn" data-help="studio" aria-label="Hilfe zum Studio">i</button>
+                </div>
+                <div class="panel-body">
+                    <p class="text-muted">Aus einem <strong>Playwright-Lauf</strong> einen Bericht oder ein Podcast-Skript machen und als fertigen Block in Seiten, Designs oder Videos einbetten. Der Inhalt kommt aus dem Aktivitätsprotokoll — nichts wird hinzugedichtet. <span class="project-chip">DkZ</span></p>
+                    <div class="btn-row">
+                        <select id="studioFormat" class="mini-select"></select>
+                        <select id="studioKind" class="mini-select">
+                            <option value="report">Bericht</option>
+                            <option value="podcast">Podcast</option>
+                        </select>
+                        <span id="studioRunInfo" class="text-muted">Protokoll wird gelesen…</span>
+                    </div>
+                    <div class="btn-row">
+                        <label class="slider-label">Länge <output id="studioLenOut">8</output>
+                            <input id="studioLen" type="range" min="1" max="30" value="8"></label>
+                        <input id="studioHosts" type="text" placeholder="Sprecher: Anna, Ben" value="Anna, Ben">
+                        <input id="studioStyle" type="text" placeholder="Ton: sachlich, neugierig" value="sachlich, neugierig">
+                        <button id="studioMake" class="btn btn-primary">Erzeugen</button>
+                    </div>
+                    <div id="studioResult" class="code-block">Noch nichts erzeugt.</div>
+                    <h3>Einbetten</h3>
+                    <div class="btn-row">
+                        <select id="embedForm" class="mini-select">
+                            <option value="article">Artikel-Block</option>
+                            <option value="player">Audio-Player mit Kapiteln</option>
+                            <option value="pip">Video im Video</option>
+                            <option value="json">Rohdaten (JSON)</option>
+                        </select>
+                        <select id="embedPos" class="mini-select">
+                            <option value="bottom-right">Einspieler unten rechts</option>
+                            <option value="bottom-left">unten links</option>
+                            <option value="top-right">oben rechts</option>
+                            <option value="top-left">oben links</option>
+                        </select>
+                        <label class="slider-label">Größe <output id="embedSizeOut">28</output>%
+                            <input id="embedSize" type="range" min="10" max="60" value="28"></label>
+                        <button id="embedMake" class="btn btn-secondary">Schnipsel bauen</button>
+                    </div>
+                    <div id="embedResult" class="code-block">Erst einen Beitrag erzeugen.</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ═══════════ VIEW: EINSTELLUNGEN ═══════════ -->
+        <main class="app-main single view hidden" id="view-settings">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Einstellungen — stufenlos</h2>
+                    <div class="panel-controls">
+                        <button class="info-btn" data-help="settings" aria-label="Hilfe zu Einstellungen">i</button>
+                        <button id="settingsReset" class="btn btn-small btn-secondary">Zurücksetzen</button>
+                    </div>
+                </div>
+                <div class="panel-body"><div id="settingsGroups">Lade…</div></div>
             </section>
         </main>
 

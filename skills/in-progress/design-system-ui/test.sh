@@ -165,6 +165,57 @@ FEED=$(curl -s "$BASE/api/agent/activity?since=0")
 assert_contains "runner meldet sich als openclaw"  '"openclaw"'    "$FEED"
 assert_contains "runner meldet Sitzungsstart"      'session-start' "$FEED"
 
+say "── Content Studio (Playwright-Läufe) ────────────────"
+FMT=$(curl -s "$BASE/api/content/formats")
+assert_contains "formate verfuegbar"          'run-report'         "$FMT"
+assert_contains "als DkZ-projekt markiert"    '"DkZ"'              "$FMT"
+# Lauf erzeugen, ueber den berichtet wird
+curl -s -X POST "$BASE/api/agent/activity" -H 'Content-Type: application/json' \
+  -d '{"actor":"playwright","action":"session-start","state":"working"}' >/dev/null
+curl -s -X POST "$BASE/api/agent/activity" -H 'Content-Type: application/json' \
+  -d '{"actor":"playwright","action":"click","target":"#executeWorkflow","detail":"Lauf starten","state":"working"}' >/dev/null
+curl -s -X POST "$BASE/api/agent/activity" -H 'Content-Type: application/json' \
+  -d '{"actor":"playwright","action":"session-end","detail":"fertig","state":"done"}' >/dev/null
+POD=$(curl -s -X POST "$BASE/api/content/podcast" -H 'Content-Type: application/json' \
+  -d '{"format":"walkthrough","minutes":8,"hosts":["Anna","Ben"]}')
+assert_contains "podcast wird erzeugt"        '"kind": "podcast"'  "$POD"
+assert_contains "berichtet vom echten lauf"   'playwright'         "$POD"
+assert_contains "meldet ehrlich die quelle"   '"live"'             "$POD"
+REP=$(curl -s -X POST "$BASE/api/content/report" -H 'Content-Type: application/json' \
+  -d '{"format":"run-report"}')
+assert_contains "bericht wird erzeugt"        '"kind": "report"'   "$REP"
+assert_contains "zaehlt die schritte"         'step_count'         "$REP"
+EMB=$(curl -s -X POST "$BASE/api/content/embed" -H 'Content-Type: application/json' \
+  -d "{\"piece\":$POD,\"form\":\"article\"}")
+assert_contains "artikel-block einbettbar"    'dsui-beitrag'       "$EMB"
+PIP=$(curl -s -X POST "$BASE/api/content/embed" -H 'Content-Type: application/json' \
+  -d "{\"piece\":$POD,\"form\":\"pip\",\"media\":{\"inset_percent\":32}}")
+assert_contains "video im video einbettbar"   'dsui-pip'           "$PIP"
+PLR=$(curl -s -X POST "$BASE/api/content/embed" -H 'Content-Type: application/json' \
+  -d "{\"piece\":$POD,\"form\":\"player\"}")
+assert_contains "audio-player mit kapiteln"   'dsui-chapters'      "$PLR"
+
+say "── Einstellungen (stufenlos) ────────────────────────"
+SCH=$(curl -s "$BASE/api/settings/schema")
+assert_contains "schema mit gruppen"          '"groups"'           "$SCH"
+assert_contains "farbe ist einstellbar"       'accent_hue'         "$SCH"
+SET=$(curl -s -X POST "$BASE/api/settings" -H 'Content-Type: application/json' \
+  -d '{"accent_hue":275,"radius":18,"unbekannt":1}')
+assert_contains "werte werden uebernommen"    '"accent_hue": 275'  "$SET"
+assert_contains "unbekanntes wird ignoriert"  '"ignored"'          "$SET"
+CLAMP=$(curl -s -X POST "$BASE/api/settings" -H 'Content-Type: application/json' -d '{"radius":999}')
+assert_contains "grenzen werden gehalten"     '"radius": 28'       "$CLAMP"
+curl -s -X POST "$BASE/api/settings/reset" >/dev/null
+
+say "── Skill-Import aus Git ─────────────────────────────"
+IMP=$(curl -s -X POST "$BASE/api/skills/import" -H 'Content-Type: application/json' -d '{"url":""}')
+assert_contains "leere url wird abgelehnt"    '"ok": false'        "$IMP"
+IMP2=$(curl -s -X POST "$BASE/api/skills/import" -H 'Content-Type: application/json' \
+  -d '{"url":"ftp://example.com/x"}')
+assert_contains "nur http(s) wird geholt"     'http'               "$IMP2"
+LST=$(curl -s "$BASE/api/skills/imported")
+assert_contains "importliste abrufbar"        '"skills"'           "$LST"
+
 say "── Nanobot & Agent-zu-Agent ─────────────────────────"
 CARD=$(curl -s "$BASE/api/a2a/card")
 assert_contains "nanobot stellt sich vor"     '"kind": "nanobot"'   "$CARD"

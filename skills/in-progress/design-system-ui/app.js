@@ -830,7 +830,8 @@ DesignSystemApp.prototype.appendChat = function (role, content) {
 // Hamburger-Menü & Oberflächen-Routing
 // ══════════════════════════════════════════════════════════════════════
 const VIEW_NAMES = {
-    builder: 'Workflow Builder', chat: 'Chat & Canvas', skills: 'Skill Builder',
+    builder: 'Workflow Builder', chat: 'Chat & Canvas', studio: 'Content Studio',
+    settings: 'Einstellungen', skills: 'Skill Builder',
     providers: 'Provider & APIs', stock: 'Stock Medien', github: 'GitHub & Skills',
     agents: 'Agenten & Sichtbarkeit', debug: 'Debug & Stresstest', docs: 'Docs'
 };
@@ -1361,6 +1362,9 @@ document.addEventListener('DOMContentLoaded', () => {
     app.initStock();
     app.initDebug();
     app.initSkillBuilder();
+    app.initStudio();
+    app.initSettings();
+    app.initSkillImport();
     app.loadProviders();
     app.applyEdition().then(ed => {
         if (ed.features && ed.features.openclaw) app.initOpenClaw();
@@ -1377,3 +1381,239 @@ document.addEventListener('DOMContentLoaded', () => {
     app.showView('builder');
     console.log('Design System UI initialised');
 });
+
+// ══════════════════════════════════════════════════════════════════════
+// Content Studio — Podcast/Bericht erzeugen und einbetten
+// ══════════════════════════════════════════════════════════════════════
+DesignSystemApp.prototype.initStudio = async function () {
+    const make = document.getElementById('studioMake');
+    if (!make) return;
+
+    try {
+        const { formats } = await (await fetch('/api/content/formats')).json();
+        document.getElementById('studioFormat').innerHTML =
+            Object.entries(formats).map(([k, f]) =>
+                `<option value="${this.escapeHtml(k)}">${this.escapeHtml(f.title)}</option>`).join('');
+    } catch (_) { /* Formatliste optional */ }
+    this.refreshRunInfo();
+
+    const lenIn = document.getElementById('studioLen');
+    const lenOut = document.getElementById('studioLenOut');
+    lenIn.addEventListener('input', () => { lenOut.textContent = lenIn.value; });
+
+    const szIn = document.getElementById('embedSize');
+    const szOut = document.getElementById('embedSizeOut');
+    szIn.addEventListener('input', () => { szOut.textContent = szIn.value; });
+
+    make.addEventListener('click', async () => {
+        const format = document.getElementById('studioFormat').value;
+        const kind = document.getElementById('studioKind').value;
+        const out = document.getElementById('studioResult');
+        out.textContent = 'Wird erzeugt…';
+        make.disabled = true;
+        try {
+            const body = kind === 'podcast'
+                ? { format, minutes: +lenIn.value, style: document.getElementById('studioStyle').value,
+                    hosts: document.getElementById('studioHosts').value.split(',').map(h => h.trim()).filter(Boolean) }
+                : { format, style: document.getElementById('studioStyle').value };
+            const piece = await (await fetch(`/api/content/${kind}`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            })).json();
+            this.lastPiece = piece;
+
+            const parts = piece.segments || piece.sections || [];
+            out.textContent =
+                `${piece.kind === 'podcast' ? 'Podcast' : 'Bericht'}: ${piece.title}\n` +
+                `Lauf: ${piece.run.step_count} Schritte, ${piece.run.error_count} Fehler\n` +
+                (piece.estimated_minutes ? `Länge: ~${piece.estimated_minutes} min  ` : '') +
+                `Wörter: ${piece.word_count}  Quelle: ${piece.live ? 'Modell' : 'Gerüst'}\n` +
+                `${piece.note}\n\n` +
+                parts.map(p => `── ${p.title || p.heading}${p.speaker ? ' [' + p.speaker + ']' : ''}\n${p.text}`).join('\n\n') +
+                '';
+        } catch (err) {
+            out.textContent = `Fehler: ${err.message}`;
+        } finally { make.disabled = false; this.refreshRunInfo(); }
+    });
+
+    document.getElementById('embedMake').addEventListener('click', async () => {
+        const out = document.getElementById('embedResult');
+        if (!this.lastPiece) { out.textContent = 'Erst einen Beitrag erzeugen.'; return; }
+        try {
+            const res = await (await fetch('/api/content/embed', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    piece: this.lastPiece,
+                    form: document.getElementById('embedForm').value,
+                    media: { inset_position: document.getElementById('embedPos').value,
+                             inset_percent: +szIn.value }
+                })
+            })).json();
+            out.textContent = res.code;
+        } catch (err) { out.textContent = `Fehler: ${err.message}`; }
+    });
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// Einstellungen — stufenlos, sofort wirksam
+// ══════════════════════════════════════════════════════════════════════
+DesignSystemApp.prototype.initSettings = async function () {
+    const host = document.getElementById('settingsGroups');
+    if (!host) return;
+
+    const [schema, current] = await Promise.all([
+        (await fetch('/api/settings/schema')).json(),
+        (await fetch('/api/settings')).json()
+    ]);
+    this.settings = current.settings;
+    this.applySettings();
+
+    host.innerHTML = Object.entries(schema.groups).map(([group, items]) => `
+        <div class="settings-group">
+            <h3>${this.escapeHtml(group)}</h3>
+            ${items.map(it => this.settingControl(it)).join('')}
+        </div>`).join('');
+
+    host.querySelectorAll('[data-setting]').forEach(el => {
+        const name = el.dataset.setting;
+        const evt = el.type === 'range' ? 'input' : 'change';
+        el.addEventListener(evt, () => {
+            const value = el.type === 'checkbox' ? el.checked
+                        : el.type === 'range' ? +el.value : el.value;
+            this.settings[name] = value;
+            const out = host.querySelector(`output[data-for="${name}"]`);
+            if (out) out.textContent = value;
+            this.applySettings();
+            clearTimeout(this._saveTimer);
+            this._saveTimer = setTimeout(() => this.saveSettings(), 350);
+        });
+    });
+
+    document.getElementById('settingsReset').addEventListener('click', async () => {
+        const d = await (await fetch('/api/settings/reset', { method: 'POST' })).json();
+        this.settings = d.settings;
+        this.applySettings();
+        this.initSettings();
+    });
+};
+
+DesignSystemApp.prototype.settingControl = function (it) {
+    const v = this.settings[it.name];
+    const label = this.escapeHtml(it.label || it.name);
+    if (it.type === 'range') {
+        return `<label class="setting-row"><span>${label}</span>
+            <input type="range" data-setting="${it.name}" min="${it.min}" max="${it.max}"
+                   step="${it.step}" value="${v}">
+            <output data-for="${it.name}">${v}</output><small>${this.escapeHtml(it.unit || '')}</small></label>`;
+    }
+    if (it.type === 'bool') {
+        return `<label class="setting-row"><span>${label}</span>
+            <input type="checkbox" data-setting="${it.name}" ${v ? 'checked' : ''}></label>`;
+    }
+    if (it.type === 'choice') {
+        return `<label class="setting-row"><span>${label}</span>
+            <select data-setting="${it.name}" class="mini-select">
+            ${it.choices.map(c => `<option value="${this.escapeHtml(c)}"${c === v ? ' selected' : ''}>${this.escapeHtml(c)}</option>`).join('')}
+            </select></label>`;
+    }
+    return '';
+};
+
+// Einstellungen in CSS-Variablen übersetzen — sofort sichtbar, ohne Neuladen.
+DesignSystemApp.prototype.applySettings = function () {
+    const s = this.settings || {};
+    const r = document.documentElement.style;
+    const h = s.accent_hue ?? 199, sa = s.accent_saturation ?? 89, l = s.accent_lightness ?? 48;
+    r.setProperty('--color-primary', `hsl(${h} ${sa}% ${l}%)`);
+    r.setProperty('--color-primary-hover', `hsl(${h} ${sa}% ${Math.max(10, l - 8)}%)`);
+    r.setProperty('--radius-sm', `${(s.radius ?? 8) * 0.5}px`);
+    r.setProperty('--radius-md', `${s.radius ?? 8}px`);
+    r.setProperty('--radius-lg', `${(s.radius ?? 8) * 1.4}px`);
+    const d = (s.density ?? 100) / 100;
+    r.setProperty('--space-xs', `${0.25 * d}rem`);
+    r.setProperty('--space-sm', `${0.5 * d}rem`);
+    r.setProperty('--space-md', `${1 * d}rem`);
+    r.setProperty('--space-lg', `${1.5 * d}rem`);
+    document.body.style.fontSize = `${s.font_size ?? 14}px`;
+    document.body.style.lineHeight = `${(s.line_height ?? 150) / 100}`;
+    document.body.style.filter = (s.contrast ?? 100) !== 100 ? `contrast(${s.contrast}%)` : '';
+    const fam = { serif: 'Georgia, "Times New Roman", serif',
+                  mono: '"Monaco","Menlo",monospace' }[s.font_family];
+    document.body.style.fontFamily = fam || '';
+    document.body.classList.toggle('no-animations', s.animations === false);
+    document.body.classList.toggle('no-info-blink', s.info_blink === false);
+    if (s.theme && s.theme !== 'auto') document.documentElement.dataset.theme = s.theme;
+    else delete document.documentElement.dataset.theme;
+    r.setProperty('--glow-strength', `${(s.glow_intensity ?? 100) / 100}`);
+    if (typeof s.tts_enabled === 'boolean') {
+        this.ttsEnabled = s.tts_enabled;
+        const t = document.getElementById('ttsToggle');
+        if (t) t.checked = s.tts_enabled;
+    }
+};
+
+DesignSystemApp.prototype.saveSettings = async function () {
+    try {
+        await fetch('/api/settings', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ settings: this.settings })
+        });
+    } catch (_) { /* lokal weiterarbeiten */ }
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// Skill-Import aus Git
+// ══════════════════════════════════════════════════════════════════════
+DesignSystemApp.prototype.initSkillImport = function () {
+    const btn = document.getElementById('skillImport');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+        const url = document.getElementById('skillUrl').value.trim();
+        const out = document.getElementById('importedSkills');
+        if (!url) { out.textContent = 'Bitte eine Git-URL angeben.'; return; }
+        btn.disabled = true;
+        out.textContent = 'Wird geholt…';
+        try {
+            const d = await (await fetch('/api/skills/import', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            })).json();
+            if (!d.ok) {
+                out.innerHTML = `<p class="text-muted">${this.escapeHtml(d.error)}` +
+                    `${d.hint ? '<br>' + this.escapeHtml(d.hint) : ''}</p>`;
+            } else {
+                this.logTerminal(`✓ Skill importiert: ${d.skill.ref}`, 'success');
+                this.loadImportedSkills();
+            }
+        } catch (err) { out.textContent = `Fehler: ${err.message}`; }
+        finally { btn.disabled = false; }
+    });
+    this.loadImportedSkills();
+};
+
+DesignSystemApp.prototype.loadImportedSkills = async function () {
+    const out = document.getElementById('importedSkills');
+    if (!out) return;
+    try {
+        const d = await (await fetch('/api/skills/imported')).json();
+        out.innerHTML = d.skills.length ? d.skills.map(s => `
+            <div class="skill-chip" data-ref="${this.escapeHtml(s.ref)}">
+                <strong>${this.escapeHtml(s.name)}</strong>
+                ${s.user_invoked ? '<span class="text-muted">(user-invoked)</span>' : ''}<br>
+                <span class="text-muted">${this.escapeHtml((s.description || '').slice(0, 100))}</span>
+            </div>`).join('') : '<p class="text-muted">Noch keine importiert.</p>';
+    } catch (_) { /* still */ }
+};
+
+// Wie viel Protokoll liegt vor? Ein leerer Lauf ergibt einen leeren Bericht.
+DesignSystemApp.prototype.refreshRunInfo = async function () {
+    const el = document.getElementById('studioRunInfo');
+    if (!el) return;
+    try {
+        const d = await (await fetch('/api/agent/activity?since=0')).json();
+        const n = (d.events || []).length;
+        el.textContent = n
+            ? `${n} Ereignisse im Protokoll`
+            : 'Protokoll leer — erst einen Agenten laufen lassen';
+    } catch (_) { el.textContent = 'Protokoll nicht lesbar'; }
+};

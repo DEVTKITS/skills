@@ -1,12 +1,14 @@
 # Design System UI — Workflow Builder
 
+*Ein DkZ-Projekt.*
+
 Open-source, single-page workflow builder where **humans and agents** co-design
 ComfyUI-style node graphs, execute them, and let a **Gemma 4 12B** evaluator
 score the result and decide *iterate* or *done*. Every page exposes `/llms.txt`
 so terminal agents can drive the whole thing without a browser.
 
 > **Status: in-progress draft.** The core loop runs and is verified by an
-> automated 90-check test suite (`./test.sh`) plus a Playwright tour through
+> automated 108-check test suite (`./test.sh`) plus a Playwright tour through
 > all nine surfaces. Gemma inference goes **live automatically** when an
 > Ollama server is running; otherwise a deterministic heuristic evaluator
 > answers with the same response schema.
@@ -37,12 +39,29 @@ so terminal agents can drive the whole thing without a browser.
 | Integrations manifest (`/api/integrations`) | ✅ Honest builtin / adapter-ready / unverified split |
 | **Mit OpenCLAW designen** (nur OpenCLAW-Edition) | ✅ Direkt aus der Agenten-Ansicht starten: Auftrag eintippen, zusehen (roter Rand), Ergebnis lesen — `adapters/openclaw_runner.py` fährt die Schleife auch ohne installierte Shell |
 | Sicherheit | ✅ Importiertes Workflow-JSON wird nie als Markup interpretiert — DOM-XSS-Regressionstest (`demo/xss_check.mjs`) |
-| Test suite (`test.sh`) | ✅ 90 Prüfungen inkl. polyglotter Clients und XSS-Test — CI-ready |
+| Test suite (`test.sh`) | ✅ 108 Prüfungen inkl. polyglotter Clients und XSS-Test — CI-ready |
 | **Nanobot + Agent-zu-Agent** | ✅ Chatbot mit Selbstauskunft; Agenten sprechen ihn und einander an (`/api/a2a/*`), sichtbar im Feed |
 | **C-Gerüst** (`c/server.c`) | ✅ C99 + pthreads, keine Bibliotheken; Ergebnisse mit Python abgeglichen |
 | **OpenAI / GPT** | ✅ Als Provider neben Ollama, OpenRouter, NVIDIA, HuggingFace |
 | **Eigenständige Versionen** | ✅ `versions/v1…v5`, jede für sich lauffähig; `./save-version.sh` friert neue ein |
+| **Content Studio (DkZ)** | ✅ Playwright-Läufe als Bericht oder Podcast, einbettbar als Artikel, Player oder Video-im-Video |
+| **Einstellungen stufenlos** | ✅ 22 Optionen in 5 Gruppen, wirken sofort, werden gesichert |
+| **Eigene Skills aus Git** | ✅ GitHub/GitLab/Raw-URL → SKILL.md, nur lesend |
 | Mojo agent layer (`agents.mojo`) | 📐 Design sketch — not required to run |
+
+## Bilder
+
+| | |
+|---|---|
+| ![Menü](docs/screenshots/02-menue.png) | ![Provider](docs/screenshots/05-provider-kacheln.png) |
+| Hamburger-Menü mit allen Oberflächen | Provider-Kacheln mit Ampelstatus |
+| ![Studio](docs/screenshots/03-studio-playwright.png) | ![Einstellungen](docs/screenshots/04-einstellungen.png) |
+| Content Studio: Playwright-Lauf als Bericht | Einstellungen, stufenlos |
+| ![Agenten](docs/screenshots/07-agenten.png) | ![Debug](docs/screenshots/08-debug.png) |
+| Agenten-Sichtbarkeit und OpenCLAW | Selbsttest und Stresstest |
+
+Alle Bilder stammen aus `demo/showcase.mjs` — dem Playwright-Durchgang, der
+bei jedem Lauf prüft, dass diese Oberflächen wirklich funktionieren.
 
 ## Zwei Editionen, eine Codebasis
 
@@ -143,7 +162,7 @@ Configuration via environment: `OLLAMA_URL` (default `http://localhost:11434`),
 ## Testing
 
 ```bash
-./test.sh                    # 90 Prüfungen: Endpunkte, Iterationsschleife, Provider,
+./test.sh                    # 108 Prüfungen: Endpunkte, Iterationsschleife, Provider,
                              # Hilfe, Debug, Repo, UI-Oberflächen, Go- und Rust-Clients
 cd demo && npm install playwright
 CHROMIUM_PATH=/opt/pw-browsers/chromium node ui_tour.mjs http://localhost:8000 ./shots
@@ -240,7 +259,7 @@ design-system-ui/
 - [x] stdlib Go + Rust clients that talk to the backend
 - [x] `/llms.txt` served on every deployment
 - [x] Real Gemma 4 12B via Ollama with automatic heuristic fallback
-- [x] Automated smoke-test suite (`test.sh`, 90 checks inkl. DOM-XSS-Regression)
+- [x] Automated smoke-test suite (`test.sh`, 108 checks inkl. DOM-XSS-Regression)
 - [x] UI iterate loop: real suggestions, Apply All → auto re-execute
 - [ ] Live terminal streaming (Server-Sent Events / WebSocket)
 - [ ] ComfyUI JSON import/export round-trip

@@ -16,6 +16,7 @@ python3 server.py          # läuft sofort, nur Standardbibliothek
 | **v3-vollbild** | Vollintegration: Hamburger-Menü, neun Oberflächen, Info-Buttons mit Wechseltipps, Ampelsystem, Vorlesen, Provider, Debug. Inklusive DOM-XSS-Fix. |
 | **v4-openclaw** | „Mit OpenCLAW designen": die Agenten-Shell baut und optimiert den Workflow auf Zuruf, direkt aus der Oberfläche. |
 | **v5-editionen** | Zwei Editionen aus einer Codebasis: Normal und OpenCLAW. |
+| **v6-ultimate** | Alles zusammen: Content Studio (Playwright-Läufe als Bericht oder Podcast, einbettbar bis Video-im-Video), stufenlos einstellbare Oberfläche (22 Optionen), Skill-Import aus Git, C-Gerüst, Nanobot mit Agent-zu-Agent, OpenAI/GPT als Provider. |
 
 Der jeweils aktuelle Stand liegt eine Ebene höher im Skill-Ordner und ist
 immer die neueste Version.

@@ -1,0 +1,391 @@
+# Design System UI — llms.txt
+# Agenten-Anleitung. Wird unter /llms.txt auf jeder Seite ausgeliefert, damit
+# Terminal-Agenten und In-Page-Bots das System ohne Menschen bedienen können.
+# Sprache: Deutsch/Englisch gemischt — Endpunkte und Felder sind englisch.
+
+────────────────────────────────────────────────────────────────────────
+## 1. WAS DAS IST
+────────────────────────────────────────────────────────────────────────
+Ein Single-Page Workflow- und Skill-Builder. Menschen und Agenten entwerfen
+gemeinsam einen ComfyUI-artigen Node-Graphen, führen ihn aus, ein
+Gemma-Evaluator bewertet das Ergebnis und entscheidet "iterate" oder "done".
+Alles läuft auf EINER Seite — kein Navigieren, keine Seitenwechsel.
+
+Zielgruppen: Claude, GPT, DeepSeek, opencode, pi-agent, OpenManus, OpenHands,
+browser-use, Playwright-Skripte, Terminal-Agenten. Es gibt kein SDK und keine
+Bibliothek — reines HTTP+JSON. Diese Datei ist die vollständige Schnittstelle.
+
+Basis-URL (Standard): http://localhost:8000
+
+EDITIONEN — zwei Ausbaustufen aus einer Codebasis:
+  normal    Hamburger-Menü, Kacheln, alle neun Oberflächen. Kein Agenten-Shell.
+  openclaw  Alles aus normal PLUS "Mit OpenCLAW designen" (Agenten-Shell).
+Abfragen mit GET /api/edition → {edition:{id,name,tagline,features},available[]}.
+Starten mit ./start.sh bzw. ./start.sh --openclaw (oder EDITION=openclaw).
+In der Edition "normal" antworten /api/openclaw/* mit 404 plus Umschalthinweis.
+Prüfe die Edition, BEVOR du OpenCLAW-Endpunkte aufrufst.
+
+────────────────────────────────────────────────────────────────────────
+## 2. OBERFLÄCHEN (alle über das Hamburger-Menü, alle auf derselben Seite)
+────────────────────────────────────────────────────────────────────────
+builder    Workflow Canvas + Nodes + Parameter + Templates + Syntax + Terminal
+chat       Split-Ansicht: Chat links, gespiegelter Canvas rechts
+skills     Skill Builder — Workflow zu SKILL.md exportieren
+providers  Alle API-Anbieter mit Ampelstatus
+stock      Freie Bild-/Videodatenbanken durchsuchen
+github     Repo-Status und alle Skills im Repository
+agents     Agenten-Sichtbarkeit und Integrationsmanifest
+debug      Selbsttest und Stresstest
+docs       Diese Datei im UI
+
+Agenten brauchen die Oberflächen nicht — jede Funktion ist ein HTTP-Endpunkt
+(Abschnitt 4). Die Oberflächen existieren, damit ein Mensch zusehen kann.
+
+────────────────────────────────────────────────────────────────────────
+## 3. AGENTEN-SICHTBARKEIT — PFLICHT
+────────────────────────────────────────────────────────────────────────
+Menschen MÜSSEN sehen können, wenn eine KI am Rechner arbeitet. Während du
+das System bedienst, melde jeden Schritt:
+
+  POST /api/agent/activity
+  {"actor":  "<dein Name, z.B. claude|gpt|deepseek|opencode|pi|playwright>",
+   "action": "click|type|execute|evaluate|session-start|session-end|work",
+   "target": "<CSS-Selektor oder Node-ID, auf die du wirkst>",
+   "detail": "<kurze menschenlesbare Beschreibung>",
+   "state":  "working|done|error"}
+  → {"ok": true, "seq": <n>}
+
+Wirkung in der Oberfläche (wird jede Sekunde abgefragt):
+  • state=working innerhalb der letzten ~6 s → pulsierender ROTER RAND um den
+    gesamten Monitor (body.agent-active) + Ticker "KI arbeitet: …"
+  • target trifft einen DOM-Selektor → dieses Element BLINKT zweimal rot auf
+  • target trifft eine Workflow-Node-ID → der Canvas blinkt
+  • state=done auf deinem letzten Event → der Rand verblasst
+
+Regeln:
+  1. Vor der ersten Aktion: action=session-start
+  2. Ein Event pro sinnvollem Schritt (Klick, Ausführung, Lesevorgang)
+  3. Zum Schluss state=done (action=session-end); bei Abbruch state=error
+  4. In-Page-Agenten: window.agentActivity.click(sel, detail) / .start() / .stop()
+
+Feed lesen: GET /api/agent/activity?since=<seq>
+  → {"active": bool, "events": [...], "latest_seq": n}
+
+Referenzimplementierung: demo/agent_demo.mjs (Playwright, mit Screenshots).
+UI-Regressionstest: demo/ui_tour.mjs (klickt jede Oberfläche durch).
+
+────────────────────────────────────────────────────────────────────────
+## 4. VOLLSTÄNDIGE API
+────────────────────────────────────────────────────────────────────────
+### Statisch / Meta
+GET  /                        Single-Page-UI (HTML)
+GET  /llms.txt                diese Datei
+GET  /health                  {status, service, timestamp}
+GET  /favicon.ico             SVG-Icon
+GET  /api/integrations        ehrliches Fähigkeitsmanifest (siehe §8)
+
+### Workflow
+POST /api/workflow/execute        Workflow ausführen
+POST /api/workflow/evaluate       Gemma-Bewertung anfordern
+POST /api/workflow/suggest-params Parametervorschläge je Node-Typ
+GET  /api/patterns                Template-Katalog
+
+### Agenten
+GET  /api/agent/activity?since=N  Aktivitäts-Feed lesen
+POST /api/agent/activity          eigenen Schritt melden
+
+### Chat / Nanobot
+POST /api/chat                    {message, history[], provider?} → {reply, model, live, action?}
+
+### Agent-zu-Agent (A2A)
+GET  /api/a2a/card                Selbstauskunft des Nanobots (Name, Faehigkeiten, Protokoll)
+GET  /api/a2a/directory           wer ist erreichbar: Nanobot + Agenten mit Posteingang
+GET  /api/a2a/poll?agent=<name>   eigenen Posteingang abholen (&clear=0 zum Behalten)
+POST /api/a2a/message             {from, to, intent, body, provider?, history?}
+
+### Content Studio (DkZ) — Playwright-Läufe erzählen
+GET  /api/content/formats     run-report | test-summary | changelog | walkthrough
+POST /api/content/report      {format, style, events?} → gegliederter Bericht
+POST /api/content/podcast     {format, minutes, style, hosts[], events?} → Skript
+POST /api/content/embed       {piece, form, media?} → fertiger HTML-Schnipsel
+                              form: article | player | pip | json
+Ohne "events" nimmt der Server den aktuellen Aktivitäts-Feed. Der Inhalt
+stammt AUSSCHLIESSLICH aus den aufgezeichneten Schritten — ohne Modell wird
+direkt daraus formuliert, mit Modell ausformuliert, aber nie hinzugedichtet.
+"live" sagt, welcher Weg genommen wurde.
+
+### Einstellungen (stufenlos)
+GET  /api/settings            aktuelle Werte
+GET  /api/settings/schema     alle Regler mit Typ, Grenzen, Schritt, Gruppe
+POST /api/settings            {settings:{…}} → setzt, begrenzt, sichert
+POST /api/settings/reset      auf Standardwerte zurück
+
+### Eigene Skills aus Git
+GET  /api/skills/imported     bereits importierte Skills
+POST /api/skills/import       {url} → holt SKILL.md (GitHub/GitLab/Raw)
+POST /api/skills/remove       {ref}
+Nur lesend: es wird nichts geklont, nichts ausgeführt, nichts installiert.
+
+### Provider
+GET  /api/providers               alle Anbieter + Ampel + Verbindungshinweis
+POST /api/providers/chat          {provider, message, history[], model?} direkt
+POST /api/scrape                  {url, formats?} via Firecrawl
+POST /api/stock/search            {provider, query, per_page?, media?}
+GET  /api/stock/status            Kurzstatus der Stock-Anbieter
+
+### Hilfe / Syntax
+GET  /api/help                    alle Hilfethemen + Präfixe
+GET  /api/help?topic=<key>        ein Thema: {title, guide, tips[], patterns[]}
+GET  /api/prefixes                Präfix-Syntax (siehe §6)
+
+### Repository
+GET  /api/github/status           Branch, letzter Commit, geänderte Dateien
+GET  /api/github/skills           alle Skills im Repo mit Beschreibung + ~ref
+
+### Debug
+GET  /api/debug/selftest          interne Prüfungen → {checks[], passed, failed, ampel}
+POST /api/debug/stress            {runs} → {ms:{min,avg,p95,max}, throughput_per_s, ampel}
+
+────────────────────────────────────────────────────────────────────────
+## 5. WORKFLOW-OBJEKT
+────────────────────────────────────────────────────────────────────────
+{
+  "id": "workflow-123",
+  "nodes": [
+    {"id":"in1",  "type":"text-input",  "x":100, "y":100, "params":{}},
+    {"id":"llm1", "type":"llm-node",    "x":300, "y":100,
+       "params":{"model":"gemma-4","temperature":0.7,"prompt":"..."}},
+    {"id":"out1", "type":"text-output", "x":500, "y":100, "params":{}}
+  ],
+  "edges": [{"from":"in1","to":"llm1"}, {"from":"llm1","to":"out1"}],
+  "parameters": {}
+}
+
+Node-Typen:
+  Input      text-input, file-input, image-input   (Typ endet auf "input")
+  Processing llm-node, transform, filter
+  Output     text-output, file-output              (Typ endet auf "output")
+
+Gültigkeit: mindestens EIN Input- und EIN Output-Node. Die Ausführung folgt
+der topologischen Reihenfolge der Kanten; Zyklen werden ans Ende gehängt statt
+verworfen.
+
+### Bewertung und Iterationsschleife
+POST /api/workflow/evaluate {workflow, results} →
+  {"score": 0-100, "feedback": "...", "suggestions": [{title, description, action}],
+   "verdict": "iterate"|"done", "model": "gemma:12b", "gemma_live": true|false}
+
+gemma_live=true → echtes Modell (Ollama) hat die Kritik geschrieben.
+gemma_live=false → deterministische Heuristik. GLEICHES SCHEMA — Agenten
+brauchen keine Sonderbehandlung.
+
+Empfohlene Agentenschleife:
+  1. Template laden (GET /api/patterns) oder Graph selbst bauen
+  2. POST /api/workflow/execute
+  3. POST /api/workflow/evaluate mit {workflow, results}
+  4. verdict=="iterate" → suggestions[].action anwenden, zurück zu 2
+     verdict=="done"    → fertig, score + feedback melden
+
+suggestions[].action ist maschinenlesbar:
+  ADD_NODE(type='llm-node')     → Node dieses Typs anhängen
+  CONNECT_NODES(fromId, toId)   → erstes unverbundenes Paar verbinden
+
+────────────────────────────────────────────────────────────────────────
+## 5b. NANOBOT UND AGENT-ZU-AGENT
+────────────────────────────────────────────────────────────────────────
+Der Chatbot dieser Oberflaeche ist ein NANOBOT: bewusst klein, kennt den
+Builder, versteht die Praefix-Syntax und uebersetzt sie in echte Aktionen.
+Fuer freie Konversation reicht er an den gewaehlten Provider durch (Ollama
+lokal, oder OpenAI/GPT, OpenRouter, NVIDIA, Hugging Face).
+
+Selbstauskunft holen, bevor du ihn ansprichst:
+  GET /api/a2a/card
+  → {name, role, kind:"nanobot", skills[], prefixes[], endpoints{}, a2a_protocol}
+
+Nachricht senden:
+  POST /api/a2a/message
+  {"from":"<dein name>","to":"nanobot"|"<anderer agent>",
+   "intent":"<kurzes verb, z.B. load-pattern|handoff|ask>",
+   "body":"<text, darf Praefixe enthalten>"}
+
+Zwei Zustellwege:
+  to == "nanobot"  → delivered:"direct", Antwort kommt sofort im selben
+                     Aufruf zurueck, inklusive action-Objekt bei Praefixen.
+  to == etwas and. → delivered:"queued", landet im Posteingang dieses Agenten.
+                     Der holt sie mit GET /api/a2a/poll?agent=<name> ab.
+                     So koennen sich zwei Terminal-Agenten ueber diese
+                     Oberflaeche abstimmen, ohne einander zu kennen.
+
+JEDE A2A-Nachricht erscheint im Aktivitaets-Feed (action="a2a"), damit der
+Mensch sieht, dass Agenten miteinander reden. Das ist Absicht, nicht Beiwerk. (Chat, Parameter, Agentenbefehle)
+────────────────────────────────────────────────────────────────────────
+  /  Kommando        /execute /validate /clear /iterate /selftest
+  #  Pattern         #text-classifier #rag-pipeline #agent-loop #eval-loop
+  @  Node-Referenz   @llm1
+  !  Provider-Aufruf !firecrawl <url>  !pexels <query>  !openrouter <text>
+  $  Variable        $INPUT
+  ~  Skill           ~design-system-ui
+
+POST /api/chat mit einem Präfix liefert zusätzlich ein "action"-Objekt, das
+den Builder steuert:
+  {"type":"load_pattern","pattern":"rag-pipeline"}
+  {"type":"command","command":"execute"}
+  {"type":"stock_results","data":{...}}
+Ein Agent kann dasselbe direkt über die REST-Endpunkte tun — Präfixe sind die
+bequeme Kurzform, nicht der einzige Weg.
+
+────────────────────────────────────────────────────────────────────────
+## 7. PROVIDER — 1-KLICK-VERBINDUNG
+────────────────────────────────────────────────────────────────────────
+Ein Anbieter gilt als verbunden, sobald seine Umgebungsvariable gesetzt ist.
+Mehr ist nicht nötig. GET /api/providers liefert für jeden Anbieter
+{id, name, kind, ampel, state, env_var, connect_hint, docs, note}.
+
+Ampel:  green = verbunden/erreichbar · yellow = eingeschränkt · red = kein Key
+
+  LLM / Inferenz
+    openrouter   OPENROUTER_API_KEY   200+ Modelle, auch kostenlose
+    nvidia       NVIDIA_API_KEY       NIM Cloud, OpenAI-kompatibel
+    huggingface  HF_TOKEN             Inference-Router, OpenAI-kompatibel
+    ollama       (kein Key)           lokal; wird live geprüft
+  Scraping
+    firecrawl    FIRECRAWL_API_KEY    URL → sauberes Markdown
+  Stock (frei)
+    pexels       PEXELS_API_KEY       Fotos + Videos
+    unsplash     UNSPLASH_ACCESS_KEY  Fotos
+    pixabay      PIXABAY_API_KEY      Fotos + Videos
+  Bildgenerierung
+    stability    STABILITY_API_KEY
+    replicate    REPLICATE_API_TOKEN
+
+Eigene Anbieter ohne Codeänderung:
+  CUSTOM_PROVIDERS='[{"id":"my-llm","name":"My LLM","kind":"llm",
+                      "env":"MY_LLM_KEY","base_url":"https://…",
+                      "chat_path":"/chat/completions","default_model":"…"}]'
+
+Gemma live schalten (keine Codeänderung):
+  ollama pull gemma:12b && ollama serve
+  Overrides: OLLAMA_URL, GEMMA_MODEL, GEMMA_TIMEOUT
+
+────────────────────────────────────────────────────────────────────────
+## 8. INTEGRATIONEN — EHRLICHER STATUS
+────────────────────────────────────────────────────────────────────────
+GET /api/integrations teilt in drei Töpfe:
+
+builtin            läuft wirklich (Ollama-Gemma, Aktivitätsprotokoll,
+                   Provider-Registry, Stock, Hilfesystem, llms.txt)
+adapter_ready      dokumentiertes Muster, keine Extra-Software nötig
+                   (Playwright, browser-use, OpenManus, OpenHands, GitHub CLI,
+                   Claude/GPT/DeepSeek/opencode/pi über reines HTTP)
+unverified_roadmap Namen, die NICHT als installierbare Projekte verifiziert
+                   werden konnten (openmontage, openstream, openclaw,
+                   odysseus, nanobot). Das Aktivitätsprotokoll und diese API
+                   sind die stabilen Schnittstellen, an die solche Werkzeuge
+                   andocken, sobald sie identifiziert sind.
+
+Muster für schwere Agenten-Frameworks (on-demand statt dauerhaft):
+  Framework AUS lassen → Aufgabe kommt herein → Framework starten → gegen
+  diese API arbeiten lassen → Schritte über das Aktivitätsprotokoll melden →
+  bei state=done herunterfahren.
+
+### OpenCLAW — aus der Oberfläche ODER per API startbar
+Aus der UI: Menü → "Agenten & Sichtbarkeit" → "Mit OpenCLAW designen".
+Per API:
+  POST /api/openclaw/run    {"task": "...", "pattern": "rag-pipeline"|null}
+                            -> {"ok": true, "started": true}
+  GET  /api/openclaw/status -> {running, task, mode, shell_available,
+                                result:{mode,pattern,verdict,final_score,rounds},
+                                log[]}
+  Es läuft bewusst nur EIN Auftrag gleichzeitig — die Shell ist on-demand.
+
+Auf der Kommandozeile — fertiger On-Demand-Runner
+SCHREIBWEISE: OpenCLAW (die Agenten-Shell). NICHT "OpenCloud", nicht
+"opencloude", und nicht Anthropics Claude — das sind verschiedene Dinge.
+
+  python3 adapters/openclaw_runner.py "Baue einen RAG-Workflow und bewerte ihn"
+  python3 adapters/openclaw_runner.py --pattern eval-loop
+
+Ablauf: meldet session-start → wählt anhand des Auftragstexts ein Muster →
+führt aus → lässt bewerten → wendet suggestions[].action an → wiederholt bis
+verdict=done oder MAX_ROUNDS → meldet session-end. Jeder Schritt erscheint im
+Aktivitätsfeed, der Monitorrand leuchtet die ganze Zeit rot.
+
+Umgebung:
+  OPENCLAW_CMD      Startbefehl der Shell, z. B. "openclaw run --headless".
+                    Fehlt er oder ist das Programm nicht installiert, fährt
+                    der Runner die Schleife SELBST — er ist also sofort
+                    nutzbar und wird automatisch echt, sobald die Shell da ist.
+  OPENCLAW_TIMEOUT  harter Abbruch in Sekunden (Standard 300)
+  MAX_ROUNDS        Iterationsgrenze (Standard 5)
+  BASE_URL          Ziel-UI (Standard http://localhost:8000)
+
+Für OpenHands oder OpenManus genügt es, OPENCLAW_CMD auf deren Binary zu
+zeigen — der Runner ist frameworkneutral.
+
+────────────────────────────────────────────────────────────────────────
+## 9. HILFE- UND TIPPSYSTEM
+────────────────────────────────────────────────────────────────────────
+Jede Oberfläche hat einen Info-Button (blinkt dezent). Er öffnet ein Popover
+mit Titel, Kurzanleitung, wechselnden Tipps (alle 4,5 s, manuell blätterbar)
+und den passenden Präfix-Mustern.
+
+Agenten lesen exakt denselben Inhalt über GET /api/help?topic=<key>.
+Themen: canvas nodes params patterns chat execution evaluation providers
+        stock github agent debug tts menu skills
+
+Nutze das, bevor du rätst: die Tipps beschreiben die tatsächliche Bedienung.
+
+────────────────────────────────────────────────────────────────────────
+## 10. BARRIEREFREIHEIT / VORLESEN
+────────────────────────────────────────────────────────────────────────
+Ein Klick auf einen Textblock markiert ihn, ein Doppelklick liest ihn per
+Browser-Sprachausgabe vor (erneuter Doppelklick stoppt). Die Sprache wird aus
+dem Text erkannt. Abschaltbar im Menü. Läuft lokal im Browser, ohne Cloud.
+
+────────────────────────────────────────────────────────────────────────
+## 10b. LAUFZEIT-GERUESTE UND VERSIONEN
+────────────────────────────────────────────────────────────────────────
+Zwei Backends bedienen dieselben Kernendpunkte:
+  server.py   Python, Standardbibliothek. Vollausbau: Provider, Chat, A2A,
+              OpenCLAW, Hilfe, Stock, GitHub, Debug.
+  c/server.c  C99 + pthreads, keine Bibliotheken. Gerueest fuer Umgebungen
+              ohne Python: liefert die Oberflaeche aus und bedient /health,
+              /api/edition, /api/patterns, /api/workflow/execute,
+              /api/workflow/evaluate und /api/agent/activity.
+              Bauen: cc -O2 -std=c99 -pthread -o dsui-c c/server.c
+              Antworten tragen "engine":"c"; Ergebnisse sind mit Python
+              abgeglichen (gleiche Punktzahl, gleiches Urteil).
+Clients: main.go (Go) und client.rs (Rust), beide ohne externe Abhaengigkeiten.
+
+Frühere Staende liegen als eigenstaendig lauffaehige Versionen unter
+versions/ (v1-minimal … v5-editionen). Jede bringt ihr komplettes Backend,
+ihre Oberflaeche und ihre Tests mit — Ordner kopieren genuegt.
+
+────────────────────────────────────────────────────────────────────────
+## 11. SELBSTTEST
+────────────────────────────────────────────────────────────────────────
+  ./test.sh                  90 Prüfungen: Endpunkte, Iterationsschleife,
+                             Provider, Hilfe, Debug, Repo, UI-Oberflächen,
+                             Go- und Rust-Clients
+  GET  /api/debug/selftest   interne Prüfungen zur Laufzeit
+  POST /api/debug/stress     Lasttest mit Latenzverteilung
+  node demo/ui_tour.mjs      Playwright-Rundgang durch alle Oberflächen
+
+────────────────────────────────────────────────────────────────────────
+## 12. CURL-BEISPIELE
+────────────────────────────────────────────────────────────────────────
+curl http://localhost:8000/api/patterns
+curl http://localhost:8000/api/providers
+curl "http://localhost:8000/api/help?topic=canvas"
+
+curl -X POST http://localhost:8000/api/agent/activity \
+  -H 'Content-Type: application/json' \
+  -d '{"actor":"my-agent","action":"session-start","state":"working"}'
+
+curl -X POST http://localhost:8000/api/workflow/execute \
+  -H 'Content-Type: application/json' \
+  -d '{"id":"wf1","nodes":[{"id":"in1","type":"text-input","x":0,"y":0,"params":{}},{"id":"out1","type":"text-output","x":100,"y":0,"params":{}}],"edges":[{"from":"in1","to":"out1"}]}'
+
+curl -X POST http://localhost:8000/api/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"#rag-pipeline","history":[]}'

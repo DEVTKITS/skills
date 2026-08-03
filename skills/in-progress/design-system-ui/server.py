@@ -25,8 +25,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+import content
 import helpdata
 import providers
+import settings as settings_mod
+import skillimport
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("design-system-ui")
@@ -874,6 +877,14 @@ class Handler(BaseHTTPRequestHandler):
             self._json(REPO.skills())
         elif path == "/api/debug/selftest":
             self._json(DEBUG.selftest())
+        elif path == "/api/settings":
+            self._json({"settings": settings_mod.load()})
+        elif path == "/api/settings/schema":
+            self._json(settings_mod.schema())
+        elif path == "/api/content/formats":
+            self._json(content.list_formats())
+        elif path == "/api/skills/imported":
+            self._json(skillimport.load_imported())
         elif path == "/api/a2a/card":
             self._json(CHAT.card())
         elif path == "/api/a2a/directory":
@@ -940,6 +951,34 @@ class Handler(BaseHTTPRequestHandler):
                                         payload.get("formats")))
         elif path == "/api/debug/stress":
             self._json(DEBUG.stress(int(payload.get("runs", 25))))
+        elif path == "/api/settings":
+            self._json(settings_mod.save(payload.get("settings", payload)))
+        elif path == "/api/settings/reset":
+            self._json(settings_mod.reset())
+        elif path == "/api/content/podcast":
+            events = payload.get("events") or ACTIVITY.snapshot(0)["events"]
+            self._json(content.make_podcast(
+                events,
+                payload.get("format", "walkthrough"),
+                payload.get("minutes", 8),
+                payload.get("style", "sachlich, neugierig"),
+                payload.get("hosts", ["Anna", "Ben"]),
+                EVALUATOR.infer))
+        elif path == "/api/content/report":
+            events = payload.get("events") or ACTIVITY.snapshot(0)["events"]
+            self._json(content.make_report(
+                events,
+                payload.get("format", "run-report"),
+                payload.get("style", "sachlich"),
+                EVALUATOR.infer))
+        elif path == "/api/content/embed":
+            self._json(content.embed(payload.get("piece", {}),
+                                     payload.get("form", "article"),
+                                     payload.get("media")))
+        elif path == "/api/skills/import":
+            self._json(skillimport.import_skill(payload.get("url", "")))
+        elif path == "/api/skills/remove":
+            self._json(skillimport.remove_skill(payload.get("ref", "")))
         elif path == "/api/a2a/message":
             self._json(A2A.send(payload))
         elif path == "/api/openclaw/run":

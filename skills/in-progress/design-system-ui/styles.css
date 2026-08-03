@@ -852,3 +852,40 @@ body.drawer-open .drawer { transform: translateX(0); visibility: visible; }
 .edition-chip[data-edition="openclaw"] {
     background: var(--color-accent); color: #fff; border-color: var(--color-accent);
 }
+
+/* Einstellungen und Studio */
+.settings-group { margin-bottom: var(--space-lg); }
+.settings-group h3 {
+    font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--color-text-muted); margin-bottom: var(--space-sm);
+}
+.setting-row {
+    display: grid; grid-template-columns: 14rem 1fr auto auto;
+    align-items: center; gap: var(--space-sm);
+    padding: var(--space-xs) 0; font-size: 0.82rem;
+}
+.setting-row input[type="range"] { width: 100%; accent-color: var(--color-primary); }
+.setting-row output { min-width: 3rem; text-align: right; font-variant-numeric: tabular-nums; }
+.slider-label { display: inline-flex; align-items: center; gap: var(--space-xs); font-size: 0.8rem; }
+.slider-label input[type="range"] { width: 8rem; accent-color: var(--color-primary); }
+
+/* Einstellbare Abschaltungen */
+body.no-animations *, body.no-animations *::before, body.no-animations *::after {
+    animation: none !important; transition: none !important;
+}
+body.no-info-blink .info-btn { animation: none !important; }
+:root[data-theme="hell"] {
+    --color-bg:#f8f9fa; --color-surface:#fff; --color-surface-light:#f3f4f6;
+    --color-border:#e5e7eb; --color-text:#1f2937; --color-text-muted:#6b7280;
+}
+:root[data-theme="dunkel"] {
+    --color-bg:#0f1419; --color-surface:#1a1f26; --color-surface-light:#252d38;
+    --color-border:#3a4452; --color-text:#e4e6eb; --color-text-muted:#8b92a1;
+}
+
+/* Projektkennzeichen */
+.project-chip {
+    display: inline-block; padding: 1px 7px; border-radius: var(--radius-sm);
+    background: var(--color-accent); color: #fff;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em;
+}

@@ -103,6 +103,29 @@ GET  /api/a2a/directory           wer ist erreichbar: Nanobot + Agenten mit Post
 GET  /api/a2a/poll?agent=<name>   eigenen Posteingang abholen (&clear=0 zum Behalten)
 POST /api/a2a/message             {from, to, intent, body, provider?, history?}
 
+### Content Studio (DkZ) — Playwright-Läufe erzählen
+GET  /api/content/formats     run-report | test-summary | changelog | walkthrough
+POST /api/content/report      {format, style, events?} → gegliederter Bericht
+POST /api/content/podcast     {format, minutes, style, hosts[], events?} → Skript
+POST /api/content/embed       {piece, form, media?} → fertiger HTML-Schnipsel
+                              form: article | player | pip | json
+Ohne "events" nimmt der Server den aktuellen Aktivitäts-Feed. Der Inhalt
+stammt AUSSCHLIESSLICH aus den aufgezeichneten Schritten — ohne Modell wird
+direkt daraus formuliert, mit Modell ausformuliert, aber nie hinzugedichtet.
+"live" sagt, welcher Weg genommen wurde.
+
+### Einstellungen (stufenlos)
+GET  /api/settings            aktuelle Werte
+GET  /api/settings/schema     alle Regler mit Typ, Grenzen, Schritt, Gruppe
+POST /api/settings            {settings:{…}} → setzt, begrenzt, sichert
+POST /api/settings/reset      auf Standardwerte zurück
+
+### Eigene Skills aus Git
+GET  /api/skills/imported     bereits importierte Skills
+POST /api/skills/import       {url} → holt SKILL.md (GitHub/GitLab/Raw)
+POST /api/skills/remove       {ref}
+Nur lesend: es wird nichts geklont, nichts ausgeführt, nichts installiert.
+
 ### Provider
 GET  /api/providers               alle Anbieter + Ampel + Verbindungshinweis
 POST /api/providers/chat          {provider, message, history[], model?} direkt
