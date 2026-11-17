@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="svgstudio.css">
     <link rel="stylesheet" href="designbot.css">
+    <link rel="stylesheet" href="artifacts.css">
+    <link rel="stylesheet" href="systems.css">
 </head>
 <body>
     <!-- Roter Monitorrand, sichtbar solange eine KI arbeitet -->
@@ -49,6 +51,8 @@
             <li><button class="drawer-item" data-view="chat"><span>💬</span> Chat &amp; Canvas</button></li>
             <li><button class="drawer-item" data-view="studio"><span>🎙️</span> Content Studio</button></li>
             <li><button class="drawer-item" data-view="svg"><span>🧬</span> SVG Studio</button></li>
+            <li><button class="drawer-item" data-view="templates"><span>🖼️</span> Vorlagen &amp; Artefakte</button></li>
+            <li><button class="drawer-item" data-view="systems"><span>📐</span> Design-Systeme</button></li>
             <li><button class="drawer-item" data-view="skills"><span>🧠</span> Skill Builder</button></li>
             <li><button class="drawer-item" data-view="providers"><span>🔌</span> Provider &amp; APIs</button></li>
             <li><button class="drawer-item" data-view="stock"><span>🖼️</span> Stock Medien</button></li>
@@ -487,6 +491,12 @@
         <!-- ═══════════ VIEW: SVG STUDIO (von svgstudio.js befüllt) ═══════════ -->
         <main class="app-main single view hidden" id="view-svg"></main>
 
+        <!-- ═══════════ VIEW: VORLAGEN & ARTEFAKTE (von artifacts.js befüllt) ═══════════ -->
+        <main class="app-main single view hidden" id="view-templates"></main>
+
+        <!-- ═══════════ VIEW: DESIGN-SYSTEME (von systems.js befüllt) ═══════════ -->
+        <main class="app-main single view hidden" id="view-systems"></main>
+
         <!-- ═══════════ VIEW: DOCS ═══════════ -->
         <main class="app-main single view hidden" id="view-docs">
             <section class="panel">
@@ -530,9 +540,12 @@
     </div>
 
     <script src="dkz.js"></script>
+    <script src="svgkit-safe.js"></script>
     <script src="svgkit.js"></script>
     <script src="app.js"></script>
     <script src="svgstudio.js"></script>
     <script src="designbot.js"></script>
+    <script src="artifacts.js"></script>
+    <script src="systems.js"></script>
 </body>
 </html>

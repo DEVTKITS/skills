@@ -830,7 +830,7 @@ DesignSystemApp.prototype.appendChat = function (role, content) {
 // Hamburger-Menü & Oberflächen-Routing
 // ══════════════════════════════════════════════════════════════════════
 const VIEW_NAMES = {
-    builder: 'Workflow Builder', chat: 'Chat & Canvas', studio: 'Content Studio', svg: 'SVG Studio',
+    builder: 'Workflow Builder', chat: 'Chat & Canvas', studio: 'Content Studio', svg: 'SVG Studio', templates: 'Vorlagen & Artefakte', systems: 'Design-Systeme',
     settings: 'Einstellungen', skills: 'Skill Builder',
     providers: 'Provider & APIs', stock: 'Stock Medien', github: 'GitHub & Skills',
     agents: 'Agenten & Sichtbarkeit', debug: 'Debug & Stresstest', docs: 'Docs'
@@ -875,6 +875,8 @@ DesignSystemApp.prototype.showView = function (view) {
     if (view === 'docs') this.loadDocs();
     if (view === 'chat') this.mirrorCanvas();
     if (view === 'svg' && window.SvgStudio) window.SvgStudio.show(this);
+    if (view === 'templates' && window.Artifacts) window.Artifacts.show(this);
+    if (view === 'systems' && window.DesignSystems) window.DesignSystems.show(this);
 };
 
 // ══════════════════════════════════════════════════════════════════════

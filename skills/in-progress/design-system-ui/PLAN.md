@@ -1,139 +1,155 @@
-# Plan — DkZ Design-Paket
+# Plan — DkZ Design-Paket (v7)
 
-*Ein DkZ-Projekt.* Stand der Planung: Grundlage für Version **v7**.
+*Ein DkZ-Projekt.* Überarbeitete Fassung nach Durchsicht und Abgleich mit
+[Open Design](https://github.com/nexu-io/open-design) (Apache-2.0).
 
 ## 1. Ziel
 
-Ein einziges, lokal laufendes Paket, in dem man **gestaltet, Bilder erzeugt, Videos
-rendert und Fragen stellt** — mit dem DkZ-Designsystem als durchgehender Basis:
+Ein lokal laufendes Paket, in dem man **gestaltet, Bilder und Seiten erzeugt, Videos
+rendert, Entwürfe prüfen lässt und Fragen stellt** — auf dem DkZ-Designsystem:
 
-- ein **SVG-Generator**, fest eingebaut, in vier Sprachen identisch umgesetzt
-- **HyperFrames** (HeyGen): aus HTML und SVG werden MP4-Videos
-- eine **intelligente Steuerung**: Sätze wie „Mach ein Donut-Diagramm mit 40, 30, 30"
-  oder „Wechsle ins Kontrast-Theme" werden zu Aktionen
-- ein **lokaler, fest integrierter Design-Assistent** auf jeder Oberfläche — für
-  alle Fragen, hauptsächlich zu Gestaltung
+- **SVG-Generator**, fest eingebaut, in vier Sprachen Byte für Byte identisch
+- **Vorlagen und Artefakte** (Landingpage, Dashboard, Mobile-App, Deck …) mit Sandbox-Vorschau
+- **Design-Systeme** im portablen `DESIGN.md`-Format, DkZ als Standard
+- **Lint und 5-Dimensionen-Kritik** — messbar, ohne erfundene Punktzahlen
+- **HyperFrames**: aus HTML und SVG werden MP4-Videos
+- **Intelligente Steuerung**: Sätze werden zu Aktionen, fehlende Angaben werden als Formular erfragt
+- **Lokaler, fest integrierter Design-Assistent** auf jeder Oberfläche
+- **Coding-Agenten** (Claude Code, opencode, pi, OpenClaw …) per MCP und Laufzeit-Register
 
-## 2. Wer macht was
+## 2. Was die Durchsicht am alten Plan gefunden hat
 
-| Technik | Aufgabe | Wie es belegt wird |
+| Befund | Änderung |
+|---|---|
+| Der erste Bau-Lauf scheiterte vollständig am Kontingent; alle 15 Agenten brachen sofort ab | Wellen mit Abhängigkeiten statt Massenstart; ein ausfallender Track stoppt nur seine Nachfolger, die Prüfung läuft trotzdem |
+| `svgkit.js` sollte neun Typen **und** den Sanitizer unter 18 KB halten — kaum machbar | Sanitizer als eigenes Modul `svgkit-safe.js`; beide halten die Grenze |
+| Der Test-Lader las `tests/run-one.sh` selbst als Test ein | behoben (`tests/[0-9]*.sh`) |
+| Kein Schutz gegen Anfragen an interne Adressen über eigene Provider-URLs (SSRF) | SSRF-Prüfung in `providers.py` |
+| Die erste Anforderung — „die UI befragt den User für den optimalen Workflow" — war nicht abgedeckt | Rückfragen als Formular (`form`-Aktion) |
+| „Für opencode und pi" war nur über HTTP gelöst | MCP-Server über stdio und ein Laufzeit-Register für Coding-Agenten |
+| Der ursprüngliche Wunsch war ein Claude-Design-Nachbau | Claude-Design-ZIP-Import, Vorlagen, Design-Systeme, Kritik — die Kernfunktionen von Open Design |
+| Kein Abschlussschritt für Hilfe, Doku, Bilder, Version | eigener Integrationsschritt nach der Prüfung (§11) |
+
+## 3. Aus Open Design übernommen — und was nicht
+
+| Open Design | Hier |
+|---|---|
+| `DESIGN.md`-Designsysteme | **übernommen** — Format, Import per Git/Upload, DkZ als `DESIGN.md`. Fremde Markenpakete werden nicht mitgeliefert, sind aber importierbar |
+| Design-Vorlagen mit Gerätrahmen | **übernommen** — neun Vorlagen, Desktop/Tablet/Telefon |
+| Sandbox-Vorschau (`srcdoc`-iframe) | **übernommen** — ohne `allow-same-origin` |
+| Export HTML · ZIP · Markdown · PDF (Druck) · MP4 | **übernommen** |
+| Artefakt-Lint + 5-Dimensionen-Kritik | **übernommen** — und an die Gemma-Bewertungsschleife gekoppelt |
+| Claude-Design-ZIP-Import | **übernommen** — mit Zip-Slip- und Zip-Bomben-Schutz |
+| Agent-Laufzeiten (27 CLIs) | **übernommen** als Register mit Erkennung; Start nur auf Zuruf |
+| MCP-Server | **übernommen** — stdio, Standardbibliothek |
+| BYOK-Proxy mit SSRF-Schutz | **übernommen** — Provider gab es schon, der Schutz fehlte |
+| Rückfrage-Formular | **übernommen** |
+| Next.js, React, Electron | **nicht** — DkZ verbietet Frameworks |
+| Cloud-Konto, Marktplatz, Telemetrie | **nicht** — das Paket ist lokal |
+| 151 Marken-Designsysteme mitliefern | **nicht** — Verwechslungsgefahr; Import ist möglich |
+
+## 4. Wer macht was
+
+| Technik | Aufgabe | Beleg |
 |---|---|---|
-| **Vanilla-JS** | Oberfläche, kanonischer SVG-Generator (`svgkit.js`), Assistent-Dock, SVG Studio | Playwright-Rundgang, keine Konsolenfehler |
+| **Vanilla-JS** | Oberfläche, kanonischer SVG-Generator, Dock, SVG Studio, Artefakt- und System-Ansicht | Playwright, keine Konsolenfehler |
 | **CSS3** | DkZ-Tokens, fünf Themes, alle Oberflächen | Rundgang in allen fünf Themes |
-| **Python** | Server, Plug-ins, Steuerung, Assistent, Designrechner, SVG-Fassung | `test.sh` |
-| **DuckDB** | Wissensbasis (Volltext per SQL), Chatverlauf, SVG-Bibliothek | echte Abfragen, nicht nur Ablage |
-| **Rust** | `dsui-svg`: vollständige Zweitfassung des Generators | Byte-Parität gegen `svg/golden/` |
-| **C** | `svgkit.c`: Teilmenge im C-Server, ohne Bibliotheken | Byte-Parität auf der Teilmenge |
-| **Bun** | Werkzeugkette: DkZ-Prüfer, Größenbudget, Generator-Tests | `bun test`, `bun run lint` |
-| **Node 22** | läuft nur für HyperFrames | echtes MP4, mit `ffprobe` geprüft |
+| **Python** | Server, Plug-ins, Steuerung, Assistent, Designrechner, Vorlagen, Lint, MCP | `test.sh` |
+| **DuckDB** | Wissensbasis (BM25 per SQL), Verlauf, SVG-Bibliothek, Artefakte | echte Abfragen |
+| **Rust** | `dsui-svg`: vollständige Zweitfassung des Generators | Byte-Parität |
+| **C** | `svgkit.c`: Teilmenge im C-Server | Byte-Parität auf der Teilmenge |
+| **Bun** | DkZ-Prüfer, Größenbudget, Generator-Tests, Bündeln | `bun test`, `bun run lint` |
+| **Node 22** | nur für HyperFrames | echtes MP4, mit `ffprobe` geprüft |
 
-Jede Sprache hat eine **echte, prüfbare Aufgabe** — keine bloße Namensnennung.
-
-## 3. Architektur
+## 5. Architektur
 
 ```
  Browser (Vanilla-JS + CSS3, DkZ-Tokens, 5 Themes)
- ├─ SVG Studio ── svgkit.js (kanonisch)      ├─ Design-Assistent-Dock (jede Oberfläche)
- └─ Builder · Chat · Studio · Provider · …   └─ führt actions[] aus
+ ├─ SVG Studio · Vorlagen & Artefakte · Design-Systeme · Builder · Chat · …
+ └─ Design-Assistent-Dock (jede Oberfläche, Alt+D) → führt actions[] aus
         │ HTTP/JSON
  server.py (Python, Standardbibliothek) ── Plug-in-Mechanismus
- ├─ plugins/svgapi.py     → svgkit.py (+ Rust-CLI, C-Server als Gegenprobe)
- ├─ plugins/botapi.py     → designlab.py · store.py (DuckDB) · kb/*.jsonl
- ├─ plugins/controlapi.py → control.py  (Absicht erkennen → Aktion)
- └─ plugins/videoapi.py   → video/ (HyperFrames, Node 22, FFmpeg, Chromium)
+ ├─ svgapi       → svgkit.py   (+ Rust-CLI, C-Server)
+ ├─ botapi       → designlab · store (DuckDB) · kb/*.jsonl
+ ├─ controlapi   → control.py  (Absicht → Aktion oder Rückfrage-Formular)
+ ├─ systemsapi   → designsystems.py (DESIGN.md)
+ ├─ artifactsapi → artifacts.py (Vorlagen, Export, Claude-Design-Import)
+ ├─ critiqueapi  → critique.py (Lint, 5 Dimensionen)
+ ├─ runtimesapi  → runtimes.py (Coding-Agenten)
+ └─ videoapi     → video/ (HyperFrames)
+ mcp_server.py (stdio) ── dieselben Fähigkeiten für Claude Code, opencode, pi, …
 ```
 
-Jede Fähigkeit ist ein **Plug-in**: eine eigene Datei, die ihre Routen selbst mitbringt.
-`server.py` bleibt klein, und mehrere Arbeiten laufen parallel, ohne sich zu stören.
+## 6. SVG-Generator
 
-## 4. SVG-Generator
+Neun Typen (`bar line donut pattern badge icon monogram gradient graph`), Farben aus den
+DkZ-Tokens, zwei Modi (`vars` folgt dem Seiten-Theme, `static` ist eigenständig). Kern ist
+die **Byte-Parität** über JS, Python, Rust und (Teilmenge) C, geprüft gegen
+Referenzdateien. Importierte SVGs laufen durch eine Allowlist.
 
-Neun Typen: `bar`, `line`, `donut`, `pattern`, `badge`, `icon`, `monogram`,
-`gradient`, `graph` (Workflow als Diagramm). Die Farben kommen aus den
-DkZ-Tokens und können zwei Wege gehen: **`vars`** folgt live dem Seiten-Theme,
-**`static`** erzeugt eine eigenständige Datei.
+## 7. Vorlagen, Design-Systeme, Kritik
 
-Der Kern ist die **Parität**: dieselbe Beschreibung ergibt in JS, Python, Rust und
-(Teilmenge) C **dasselbe Byte-für-Byte**. Das wird bei jedem Testlauf gegen
-Referenzdateien geprüft. Importierte SVGs laufen durch eine Allowlist
-(`sanitize`), weil SVG sonst Skripte einschleusen kann.
+- **Vorlagen** erzeugen ohne Modell ein vollständiges Artefakt aus Feldern; mit Modell
+  dürfen Texte vorgeschlagen werden. Vorschau im Sandbox-iframe mit Gerätrahmen.
+- **Design-Systeme**: `DESIGN.md` wird gelesen, die Tokens fließen in Vorlagen und
+  Assistent. Fremdes Markdown ist Fremdtext — CSS-Werte nur über eine Allowlist.
+- **Kritik**: Lint misst (Kontrast, Token-Treue, `alt`, Überschriften, Tippziele …). Die
+  fünf Dimensionen werden **ohne Modell nur dort bewertet, wo der Lint Belege liefert** —
+  sonst `— ausstehend —`. Mit Modell kommen die übrigen dazu, jeweils mit Belegen.
+- **Kopplung**: Die bisherige Bewertungsschleife (execute → evaluate → iterate) kann die
+  Kritik als zusätzliche Hürde nutzen.
 
-## 5. Intelligente Steuerung
+## 8. Steuerung und Assistent
 
-Regelbasiert und deterministisch, Deutsch und Englisch. Ein Modell darf beim
-Verstehen helfen, muss aber erklären, was es verstanden hat, und kann keine
-Absicht erfinden. Zehn Absichten: SVG erzeugen, Theme wechseln, Einstellung setzen,
-Template laden, Kommando ausführen, Oberfläche öffnen, Video rendern, Kontrast
-berechnen, Palette bilden, Typo-Skala bilden.
+Regelbasiert, deutsch und englisch, zehn Absichten. Fehlen Angaben, kommt ein
+**Formular** statt eines Ratens. Ein Modell darf beim Verstehen helfen, kann aber keine
+Absicht erfinden. Der Assistent antwortet aus der Wissensbasis mit Quelle, rechnet
+Rechenbares (WCAG, Paletten, Skalen) und sagt ehrlich, ob ein Modell geantwortet hat.
 
-Dieselbe Schnittstelle (`/api/control/route`) können **Terminal-Agenten** per
-`llms.txt` nutzen — der Mensch sieht dabei den roten Monitorrand.
+## 9. Coding-Agenten
 
-## 6. Design-Assistent
+Das Laufzeit-Register erkennt installierte CLIs und startet sie nur auf Zuruf in einem
+eigenen Projektordner. Der **MCP-Server** gibt Claude Code, opencode, pi und anderen die
+Werkzeuge direkt — samt Einbau-Anleitung, soweit belegbar.
 
-Fest eingebauter Dock, `Alt+D`, auf jeder Oberfläche. Antworten über Gestaltung
-kommen aus einer **Wissensbasis in DuckDB** und nennen ihre Quelle. Rechenbares
-(Kontrast nach WCAG, Paletten, Typo-Skalen) wird **berechnet**, nicht geraten.
+## 10. DkZ-Konformität
 
-- **Mit Modell** (Ollama, OpenAI/GPT, OpenRouter, NVIDIA, Hugging Face): das Modell
-  formuliert auf Basis der gefundenen Einträge. Anzeige: „live".
-- **Ohne Modell**: extraktive Antwort direkt aus den Einträgen. Anzeige: „lokal".
-- **Fragen außerhalb der Gestaltung**: nur mit Modell. Ohne eines sagt der
-  Assistent ehrlich, was er lokal kann — er erfindet nichts.
+Tokens statt Hex, `esc()`/DOM-APIs, fünf Themes, kein Framework, mobile-first,
+`— ausstehend —` statt erfundener Daten. **Bekannte Abweichung:** `app.js` verletzt die
+18-KB-Regel; neue Module halten sie ein, der Bun-Prüfer zeigt die Altlast an. Das
+Zerlegen von `app.js` ist ein eigener Schritt.
 
-## 7. HyperFrames
+**Skill → Workflow → Agent (DkZ R104):** Skills `dkz-svg-generator`, `dkz-design-bot`,
+`dkz-video-render`; der Bau-Workflow in Wellen; ein wiederkehrender Prüf-Agent
+`agents/design-qa.md` (Parität, Rundgang, Lint, Budget).
 
-Belegt vorhanden: npm `hyperframes` (HeyGen, Apache-2.0, Node ≥ 22; Headless-Chrome
-und FFmpeg). Aus einem SVG oder einem Lauf-Bericht wird eine HTML-Komposition und
-daraus ein MP4. Rendern läuft asynchron im Hintergrund; ist etwas nicht
-einsatzbereit, sagt die Schnittstelle genau, was fehlt — es gibt kein
-Platzhalter-Video.
+## 11. Ablauf
 
-## 8. DkZ-Konformität
-
-Eingehalten: Tokens statt Hex, `esc()`/`textContent`, fünf Themes, kein Framework,
-mobile-first, `— ausstehend —` statt erfundener Daten.
-
-**Bekannte Abweichung:** die DkZ-18-KB-Regel (Auslegung: je JS-Modul). Der Bestand
-`app.js` ist deutlich größer. Neue Module halten die Grenze ein, der Bun-Prüfer
-**zeigt die Abweichung an**, statt sie zu verschweigen. Das Aufteilen von
-`app.js` ist als eigener Schritt geplant (Phase 3), weil es ein riskanter Umbau ist,
-der ein Sicherheitsnetz aus Tests braucht.
-
-## 9. Skill → Workflow → Agent (DkZ R104)
-
-| Stufe | Hier |
-|---|---|
-| **Skill** | `dkz-svg-generator`, `dkz-design-bot`, `dkz-video-render` — je ein `SKILL.md` |
-| **Workflow** | Bau-Workflow in Wellen: Referenz → Portierungen → Oberfläche → Prüfung |
-| **Agent** | `agents/design-qa.md` — der wiederkehrende Prüfer (Parität, Rundgang, DkZ-Lint, Budget) |
-
-## 10. Phasen
-
-| Phase | Inhalt | Stand |
+| Welle | Tracks | hängt ab von |
 |---|---|---|
-| 0 | Plug-in-Mechanismus, Vertrag, Python-Umgebung mit DuckDB, Test-Schiene | **fertig** |
-| 1 | SVG-Generator in JS · Python · Rust · C, Parität | siehe Status |
-| 2 | Assistent, Wissensbasis, Steuerung, DuckDB-Speicher | siehe Status |
-| 3 | DkZ-Theme-Schicht, SVG Studio, Dock | siehe Status |
-| 4 | HyperFrames-Anbindung | siehe Status |
-| 5 | Bun-Werkzeugkette, DkZ-Prüfer | siehe Status |
-| 6 | Unabhängige Prüfung (Sicherheit, DkZ, Funktion, Ehrlichkeit) | siehe Status |
-| später | `app.js` in ≤18-KB-Module zerlegen · C-Teilmenge erweitern · A2A-Adresse für den Assistenten · Wissensbasis erweitern | offen |
+| **1** | `svgkit-js` · `designlab-kb-store` · `designbot-ui` · `video-hyperframes` · `dkz-theme` · `designsystems` | — |
+| **2** | `svgkit-py` · `svgkit-rs` · `svgkit-c` · `svg-studio-ui` · `bun-toolchain` | `svgkit-js` |
+| **2** | `templates-artifacts` | `designsystems`, `svgkit-js` |
+| **3** | `control-router` | `svgkit-py`, `designlab-kb-store` |
+| **3** | `critique-lint` | `svgkit-py`, `designlab-kb-store` |
+| **3** | `agent-runtimes-mcp` | `svgkit-py`, `designlab-kb-store`, `templates-artifacts` |
+| **Prüfung** | Sicherheit · DkZ · Funktion/Parität · Ehrlichkeit — ändern nichts | alle |
+| **Integration** | Hilfetexte, `llms.txt`, README, Demo-Bilder, Version **v7**, Commit | Prüfung |
 
-## 11. Ehrliche Grenzen
+Verträge, Dateibesitz und Ports: [`docs/CONTRACT.md`](docs/CONTRACT.md).
 
-- Der Assistent ist **lokal nur so gut wie seine Wissensbasis**. Sie ist
-  kuratiert, aber begrenzt; für freie Konversation braucht er ein Modell.
-  Ollama ist hier nicht installiert — der Modellweg ist dadurch gebaut und gegen
-  Attrappen getestet, **nicht gegen ein echtes Modell**.
-- Ein ChatGPT-Abo allein genügt nicht für den GPT-Weg: die API wird separat
-  abgerechnet.
-- Die C-Fassung des SVG-Generators deckt eine **Teilmenge** ab.
-- Videos rendern langsam; die Dauer hängt von CPU und Länge ab.
-- Dieser Plan wurde in einer Umgebung gebaut und geprüft; nichts davon wurde auf
-  anderer Hardware, anderen Betriebssystemen oder mit anderen Browsern gemessen.
+## 12. Ehrliche Grenzen
 
-## 12. Status
+- Ohne Modell beantwortet der Assistent nur Gestaltungsfragen aus der Wissensbasis.
+  **Ollama ist hier nicht installiert** — der Modellweg wird gegen einen Fake getestet.
+- Ein ChatGPT-Abo genügt nicht für den GPT-Weg; die API wird separat abgerechnet.
+- Die C-Fassung des Generators deckt eine Teilmenge ab.
+- Von den Coding-Agent-CLIs ist hier nur `claude` installiert; opencode, pi, Codex und
+  OpenClaw fehlen. Erkennung und Start werden gegen Attrappen getestet; der MCP-Server
+  lässt sich mit `claude` real einbinden und prüfen.
+- Die Kritik bewertet ohne Modell nur, was messbar ist.
+- Alles wurde in einer Umgebung gebaut und geprüft.
+
+## 13. Status
 
 *— wird nach dem Bau mit gemessenen Ergebnissen gefüllt —*

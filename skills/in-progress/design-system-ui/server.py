@@ -42,7 +42,9 @@ STATIC_FILES = {
     "index.html", "app.js", "styles.css", "llms.txt",
     # DkZ-Designsystem und neue Oberflächen
     "dkz.css", "dkz.js", "svgkit.js", "svgstudio.js", "svgstudio.css",
-    "designbot.js", "designbot.css",
+    "designbot.js", "designbot.css", "svgkit-safe.js",
+    # aus Open Design übernommene Fähigkeiten
+    "artifacts.js", "artifacts.css", "systems.js", "systems.css",
 }
 MEDIA_DIR = ROOT / "data" / "media"
 MEDIA_NAME = __import__("re").compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,99}\.(mp4|webm|svg|png|mp3)$")
@@ -821,7 +823,8 @@ PARAM_SUGGESTIONS = {
 #   (status, dict|list)    -> JSON mit Status
 #   (status, bytes, ctype) -> rohe Antwort (z. B. SVG, MP4)
 # So schreibt jede Fähigkeit nur in ihre eigene Datei; server.py bleibt klein.
-PLUGIN_NAMES = ["svgapi", "botapi", "controlapi", "videoapi"]
+PLUGIN_NAMES = ["svgapi", "botapi", "controlapi", "videoapi",
+                "systemsapi", "artifactsapi", "critiqueapi", "runtimesapi"]
 PLUGINS: dict[str, dict] = {}
 PLUGIN_ROUTES: dict[str, object] = {}
 

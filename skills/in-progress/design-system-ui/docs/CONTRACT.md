@@ -154,6 +154,10 @@ folgt dem Seiten-Theme; `"static"` = reines Hex, eigenständige Datei; Standard
 `javascript:`-URLs oder `<foreignObject>`. Dazu gibt es `sanitize(svgString)`
 (Allowlist von Elementen/Attributen) für importierte oder eingefügte SVGs —
 in JS (`DOMParser`) **und** Python (`html.parser`/`xml`, ohne externe Pakete).
+Der JS-Sanitizer darf ein eigenes Modul `svgkit-safe.js` sein (bereits im Server freigegeben
+und in `index.html` **vor** `svgkit.js` eingebunden), damit beide unter 18 KB bleiben.
+`SvgKit.sanitize` bleibt die öffentliche Schnittstelle; in Node lädt `svgkit.js` das Modul per
+`require('./svgkit-safe.js')`.
 
 **CLI-Verträge der Fassungen** (schreiben exakt das SVG nach stdout, ohne abschließenden
 Zeilenumbruch; Fehler: Exitcode 1, Meldung auf stderr):
@@ -213,6 +217,8 @@ Track `svgkit-py`. Beide liegen in **getrennten Plug-in-Dateien**:
 {"type":"open_view","view":"svg"}
 {"type":"video_request","source":{"spec":{…}},"preset":"svg-reveal"}   # die Oberfläche startet den Auftrag
 {"type":"video","job_id":"…"}                                          # läuft bereits
+{"type":"form",…}                                                     # Rückfrage als Formular (siehe unten)
+{"type":"open_artifact","id":"…"}                                      # Artefakt in der Vorschau öffnen
 ```
 
 **Antwortregeln des Assistenten (DkZ-Brainly):** Antworten über Gestaltung kommen
@@ -256,6 +262,101 @@ Rendern dauert; es läuft im Hintergrund wie der OpenCLAW-Runner. Ergebnisse
 landen in `data/media/`. Ist HyperFrames nicht einsatzbereit, antwortet
 `/api/video/render` mit `503` und dem genauen Grund — kein Platzhalter-Video.
 
+### Design-Systeme (`plugins/systemsapi.py`, Modul `designsystems.py`) — aus Open Design
+
+Format: **`DESIGN.md`** wie bei Open Design (Apache-2.0, `nexu-io/open-design`): eine
+Markdown-Datei mit den Abschnitten *Visual Theme & Atmosphere*, *Color Palette & Roles*,
+*Typography Rules*, *Component Stylings*, *Layout Principles*, *Depth & Elevation*,
+*Do's and Don'ts*, *Responsive Behavior*, *Agent Prompt Guide* (Überschriften englisch oder
+deutsch). Pakete liegen unter `design-systems/<id>/DESIGN.md` (+ optional `tokens.css`).
+Das DkZ-System wird als `design-systems/dkz/DESIGN.md` mitgeliefert, Inhalt **nur** aus §1.
+
+| Route | Zweck |
+|---|---|
+| `GET /api/design-systems` | `{"ok":true,"systems":[{"id","name","source","sections":[…],"tokens":n}],"active":"dkz"}` |
+| `GET /api/design-systems/*` | `rest`=id → `{"ok":true,"system":{"id","name","markdown","sections":{…},"tokens":{"--x":"…"}}}` |
+| `POST /api/design-systems/import` | `{url}` (Git/Raw, wie `skillimport.py`) **oder** `{markdown, name}` → `{"ok":true,"id"}` |
+| `POST /api/design-systems/activate` | `{id}` — aktives System; Vorlagen und Assistent nutzen es |
+| `POST /api/design-systems/delete` | `{id}` (das DkZ-System ist nicht löschbar) |
+
+`designsystems.active_tokens() -> dict` liefert die CSS-Variablen des aktiven Systems, mit
+DkZ-Tokens als Rückfall für alles, was fehlt. Markennamen fremder Systeme werden **nicht**
+mitgeliefert (Marken-/Verwechslungsgefahr); sie sind per Git-Import aus dem Open-Design-Repo
+holbar. Importiertes Markdown ist Fremdtext: nie als HTML ausgeben, CSS-Werte gegen eine
+strikte Allowlist prüfen (Farben, Längen, Schriftnamen), keine `url()`, kein `@import`.
+
+### Vorlagen und Artefakte (`plugins/artifactsapi.py`, Modul `artifacts.py`) — aus Open Design
+
+Vorlagen erzeugen **eigenständige HTML-Artefakte** im Stil des aktiven Design-Systems.
+Mindestens: `landing` (Hero/Features/Preise/CTA), `dashboard` (Seitenleiste, KPI-Karten,
+Diagramm per `svgkit`), `mobile-app` (im Gerätrahmen), `onboarding` (drei Schritte),
+`social-carousel` (3 × 1080×1080), `email` (tabellenbasiert, mailfest), `poster`
+(Magazin-Einseiter), `deck` (horizontale Folien mit Sprechernotizen), `spec` (Produktspezifikation
+mit Inhaltsverzeichnis und Entscheidungslog). Jede Vorlage hat ein Felder-Schema
+(Titel, Texte, Daten) und erzeugt ohne Modell ein vollständiges, gutes Artefakt aus diesen
+Feldern; mit Modell dürfen die Texte vorgeschlagen werden.
+
+| Route | Zweck |
+|---|---|
+| `GET /api/templates` | Katalog: `{"ok":true,"templates":[{"id","name","mode","fields":[…]}]}` |
+| `POST /api/artifacts/render` | `{template, fields, system?, device?}` → `{"ok":true,"id","html","bytes"}` und speichert |
+| `GET /api/artifacts` / `GET /api/artifacts/*` | Liste / einzelnes Artefakt (DuckDB, sonst Speicher) |
+| `POST /api/artifacts/export` | `{id, format:"html"\|"zip"\|"md"}` → Datei (rohe Antwort mit `Content-Disposition`) |
+| `POST /api/import/claude-design` | ZIP (Base64 im JSON `{name, zip_b64}`, ≤ 20 MB) → Einstiegsdatei erkennen, als Artefakt speichern |
+| `POST /api/artifacts/delete` | `{id}` |
+
+**Vorschau immer in einem Sandbox-iframe** (`srcdoc`, `sandbox="allow-scripts"` **ohne**
+`allow-same-origin`), mit Gerätrahmen (Desktop 1440, Tablet 834, Telefon 390). PDF-Export über
+den Druckdialog des Browsers. ZIP-Import: Zip-Slip-Schutz (keine absoluten Pfade, kein `..`,
+keine Symlinks), Grenzen für Dateianzahl/Größe/Entpackverhältnis (Zip-Bombe).
+
+### Lint und 5-Dimensionen-Kritik (`plugins/critiqueapi.py`, Modul `critique.py`) — aus Open Design
+
+| Route | Zweck |
+|---|---|
+| `POST /api/artifacts/lint` | `{html}` oder `{id}` → `{"ok":true,"issues":[{"rule","severity","where","message"}],"stats":{…}}` |
+| `POST /api/artifacts/critique` | `{html}` oder `{id}` → `{"ok":true,"dimensions":[{"key","label","score":0..10\|null,"band","evidence":[…]}],"keep":[…],"fix":[…],"quick_wins":[…],"radar_svg","live":bool}` |
+
+Lint ist **messbar**: Kontrast der Text/Hintergrund-Paare (WCAG über `designlab`), hart
+kodierte Farben gegenüber den Tokens des Systems, fehlende `alt`-Texte, Überschriften-
+Reihenfolge, `lang`/`viewport`, Anzahl Schriftfamilien, Abstände außerhalb der Skala, zu
+kleine Tippziele. Die fünf Dimensionen wie bei Open Design: **Philosophie, Hierarchie,
+Detail, Funktion, Innovation** (0–10, Bänder 0–4 *kaputt*, 5–6 *funktional*, 7–8 *stark*,
+9–10 *herausragend*). **Ohne Modell werden nur die aus dem Lint ableitbaren Dimensionen
+bewertet; die anderen bekommen `score:null` und `— ausstehend —`.** Nie eine Punktzahl
+erfinden. Jede Punktzahl nennt Belege. Das Radar kommt aus `svgkit` (neuer Typ ist nicht
+nötig: `graph`/`line` reichen nicht — der Track darf ein eigenes kleines Radar-SVG bauen,
+nach denselben Escaping- und Token-Regeln).
+
+### Agent-Laufzeiten und MCP (`plugins/runtimesapi.py`, Module `runtimes.py`, `mcp_server.py`)
+
+| Route | Zweck |
+|---|---|
+| `GET /api/runtimes` | erkannte Coding-Agent-CLIs: `claude`, `codex`, `opencode`, `pi`, `openclaw`, `gemini`, `cursor-agent` … je `{"id","installed":bool,"path","version"\|null,"how_to_install"}` |
+| `POST /api/runtimes/run` | `{runtime, task, project?}` → asynchroner Auftrag wie der OpenCLAW-Runner; Arbeitsordner `data/projects/<id>/`; nur EIN Lauf gleichzeitig |
+| `GET /api/runtimes/jobs/*` | Status und Ausgabe-Ende |
+
+`mcp_server.py`: ein **MCP-Server über stdio** (JSON-RPC 2.0, nur Standardbibliothek), den
+Claude Code, opencode, pi und andere einbinden. Werkzeuge: `svg_generate`, `svg_sanitize`,
+`design_contrast`, `design_palette`, `design_scale`, `kb_search`, `ask_design`,
+`template_list`, `template_render`, `artifact_lint`, `artifact_critique`, `control_route`.
+Fehlende Module ergeben eine saubere Werkzeug-Fehlermeldung, keinen Absturz. Dazu
+`docs/MCP.md` mit Einbau-Schnipseln für Claude Code (`.mcp.json`), opencode und pi —
+**nur** was du anhand der Dokumentation oder `--help` der Werkzeuge belegen kannst; sonst
+`— ausstehend —`.
+
+**SSRF-Schutz:** `providers.py` lässt `base_url` aus `CUSTOM_PROVIDERS` zu. Dieser Track
+ergänzt dort (einzige erlaubte Änderung an `providers.py`) eine Prüfung: nur `http(s)`, keine
+Zugangsdaten in der URL, Auflösung des Hosts und Ablehnung privater/Loopback/Link-Local-
+Adressen — außer für ausdrücklich lokale Anbieter (Ollama) über `ALLOW_LOCAL_PROVIDERS=1`.
+
+### Rückfragen als Formular — aus Open Design
+
+Neue Aktion: `{"type":"form","id":"…","title":"…","fields":[{"name","label","type":"text|choice|range|bool","choices"?,"min"?,"max"?,"default"?}],"submit_intent":"…"}`.
+Die Steuerung nutzt sie, wenn Angaben fehlen (z. B. „Bau mir eine Landingpage" → Zweck,
+Zielgruppe, Ton, Gerät, Design-System). Der Dock rendert das Formular per DOM-APIs und
+schickt die Antworten als `POST /api/bot/ask` mit `context.form = {id, values}` zurück.
+
 ## 5. Oberfläche
 
 - **SVG Studio** (`#view-svg`, `svgstudio.js` + `svgstudio.css`): Formular aus
@@ -293,6 +394,14 @@ in `helpdata.py` (Besitz: Orchestrator; schlage Texte im Ergebnis unter
 | `video-hyperframes` | `video/**`, `plugins/videoapi.py`, `kb/video.jsonl`, `tests/30-video.sh` |
 | `dkz-theme` | `dkz.css`, `dkz.js`, `styles.css`, die Kopfzeile und das `<html>`-Tag in `index.html`, in `app.js` **nur** Theme-/Farb-Code (`applySettings`, hartkodierte Farben in `redrawCanvas` u. ä. auf Tokens umstellen), in `settings.py` **nur** die Theme-Auswahl (die fünf DkZ-Themes statt `auto/hell/dunkel`) und ein Schalter `dkz_fonts`, `tests/50-dkz-theme.mjs` |
 | `bun-toolchain` | `bun/**` (inkl. `bun/baseline.json`), `package.json`, `tests/40-bun.sh` |
+| `designsystems` | `designsystems.py`, `design-systems/**`, `plugins/systemsapi.py`, `systems.js`, `systems.css`, `tests/60-systems.sh`, `tests/61-systems-ui.mjs` |
+| `templates-artifacts` | `artifacts.py`, `templates/**`, `plugins/artifactsapi.py`, `artifacts.js`, `artifacts.css`, `tests/62-artifacts.sh`, `tests/63-artifacts-ui.mjs` |
+| `critique-lint` | `critique.py`, `plugins/critiqueapi.py`, `tests/64-critique.sh` |
+| `agent-runtimes-mcp` | `runtimes.py`, `mcp_server.py`, `plugins/runtimesapi.py`, `docs/MCP.md`, in `providers.py` **nur** die SSRF-Prüfung, `tests/70-runtimes-mcp.sh` |
+
+Die Container `#view-templates` und `#view-systems`, die Menüeinträge und die Skript-Einbindung
+sind in `index.html` bereits vorhanden; Einstieg über `window.Artifacts.show(app)` und
+`window.DesignSystems.show(app)`.
 
 Gemeinsam und nur vom Orchestrator geändert: `server.py`, `helpdata.py`, `test.sh`,
 `llms.txt`, `README.md`, `PLAN.md`, `docs/**`, der Rest von `app.js` und `index.html`.
@@ -311,6 +420,10 @@ Ein Test darf `.sh` (nutzt `tests/run-one.sh`) oder `.mjs` (Playwright) sein.
 | video-hyperframes | 8870–8879 |
 | dkz-theme / bun-toolchain | 8880–8889 |
 | Prüfer (Review) | 8900–8949 |
+| designsystems | 8960–8969 |
+| templates-artifacts | 8970–8979 |
+| critique-lint | 8980–8989 |
+| agent-runtimes-mcp | 8990–8999 |
 
 ## 8. Ergebnisformat jedes Tracks
 

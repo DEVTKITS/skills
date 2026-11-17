@@ -320,7 +320,7 @@ BASE="http://localhost:${PORT}"   # zurück zur Normal-Edition
 
 # Tests der Fähigkeiten: jede Datei tests/NN-name.sh nutzt ok/bad/assert_contains,
 # $BASE, $PY, $PORT und $LOG. So schreibt jeder Track seine Prüfungen selbst.
-for t in tests/*.sh; do
+for t in tests/[0-9]*.sh; do
   [ -f "$t" ] || continue
   say "── $(basename "$t" .sh) ──────────────────────────────"
   # shellcheck disable=SC1090
