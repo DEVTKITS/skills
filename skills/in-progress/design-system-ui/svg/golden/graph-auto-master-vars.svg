@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="936" height="176" viewBox="0 0 936 176" role="img" aria-label="RAG-Pipeline" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>RAG-Pipeline</title>
+<rect x="0.5" y="0.5" width="935" height="175" rx="12" fill="var(--bg-card, #0e0e10)" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="var(--text, #f6f6f7)">RAG-Pipeline</text>
+<defs><marker id="sk-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="var(--text-muted, #8e8e8f)"/></marker></defs>
+<path d="M152 102C180 102 180 102 208 102" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 102C372 102 372 68 400 68" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 102C372 102 372 136 400 136" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 68C564 68 564 102 592 102" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 136C564 136 564 102 592 102" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M728 102C756 102 756 102 784 102" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<rect x="16" y="78" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="22" y="88" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="32" y="99" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">Frage</text>
+<text x="32" y="114" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="208" y="78" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--blue, #55acee)" stroke-opacity="0.45"/>
+<rect x="214" y="88" width="3" height="28" rx="1.5" fill="var(--blue, #55acee)"/>
+<text x="224" y="99" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">Embedding</text>
+<text x="224" y="114" font-size="10" fill="var(--text-muted, #8e8e8f)">embed</text>
+<rect x="400" y="44" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--blue, #55acee)" stroke-opacity="0.45"/>
+<rect x="406" y="54" width="3" height="28" rx="1.5" fill="var(--blue, #55acee)"/>
+<text x="416" y="65" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">Vektor-DB</text>
+<text x="416" y="80" font-size="10" fill="var(--text-muted, #8e8e8f)">store</text>
+<rect x="400" y="112" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="406" y="122" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="416" y="133" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">Stichwortsuche</text>
+<text x="416" y="148" font-size="10" fill="var(--text-muted, #8e8e8f)">search</text>
+<rect x="592" y="78" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="598" y="88" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="608" y="99" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">LLM</text>
+<text x="608" y="114" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="784" y="78" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="790" y="88" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="800" y="99" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">Antwort</text>
+<text x="800" y="114" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+</svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="-4 -4 32 32" role="img" aria-label="Symbol" font-family="Inter,system-ui,-apple-system,sans-serif">
+<title>Symbol</title>
+<rect x="-4" y="-4" width="32" height="32" rx="6" fill="#ffffff" stroke="#0e0e10" stroke-opacity="0.08" stroke-width="0.5"/>
+<path d="M12 20C12 20 4 15.5 4 9.5A4 4 0 0 1 12 7.5A4 4 0 0 1 20 9.5C20 15.5 12 20 12 20Z" fill="none" stroke="#0e0e10" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72.19" height="24" viewBox="0 0 72.19 24" role="img" aria-label="Badge" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>Badge</title>
+<rect x="0.5" y="0.5" width="71.19" height="23" rx="6" fill="var(--bg-elevated, #141418)" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<rect x="0" width="72.19" height="24" rx="6" fill="var(--accent, #fa1e4e)"/>
+<text x="36.1" y="15.86" font-size="11.04" font-weight="700" text-anchor="middle" fill="#ffffff">nur Wert</text>
+</svg>

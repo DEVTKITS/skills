@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="2400" viewBox="0 0 2400 2400" role="img" aria-label="Balkendiagramm" font-family="Inter,system-ui,-apple-system,sans-serif">
+<title>Balkendiagramm</title>
+<rect x="0.5" y="0.5" width="2399" height="2399" rx="12" fill="#ffffff" stroke="#0e0e10" stroke-opacity="0.08"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="#0e0e10">Balkendiagramm</text>
+<line x1="30.6" y1="2384" x2="2384" y2="2384" stroke="#0e0e10" stroke-opacity="0.08"/>
+<text x="22.6" y="2388" font-size="11" text-anchor="end" fill="#6a6a6b">0</text>
+<line x1="30.6" y1="1606" x2="2384" y2="1606" stroke="#0e0e10" stroke-opacity="0.08"/>
+<text x="22.6" y="1610" font-size="11" text-anchor="end" fill="#6a6a6b">2</text>
+<line x1="30.6" y1="828" x2="2384" y2="828" stroke="#0e0e10" stroke-opacity="0.08"/>
+<text x="22.6" y="832" font-size="11" text-anchor="end" fill="#6a6a6b">4</text>
+<line x1="30.6" y1="50" x2="2384" y2="50" stroke="#0e0e10" stroke-opacity="0.08"/>
+<text x="22.6" y="54" font-size="11" text-anchor="end" fill="#6a6a6b">6</text>
+<rect x="233.94" y="1995" width="64" height="389" rx="4" fill="#fa1e4e"/>
+<text x="265.94" y="1989" font-size="11" text-anchor="middle" fill="#0e0e10">1</text>
+<rect x="704.62" y="1606" width="64" height="778" rx="4" fill="#fa1e4e"/>
+<text x="736.62" y="1600" font-size="11" text-anchor="middle" fill="#0e0e10">2</text>
+<rect x="1175.3" y="1217" width="64" height="1167" rx="4" fill="#fa1e4e"/>
+<text x="1207.3" y="1211" font-size="11" text-anchor="middle" fill="#0e0e10">3</text>
+<rect x="1645.98" y="828" width="64" height="1556" rx="4" fill="#fa1e4e"/>
+<text x="1677.98" y="822" font-size="11" text-anchor="middle" fill="#0e0e10">4</text>
+<rect x="2116.66" y="439" width="64" height="1945" rx="4" fill="#fa1e4e"/>
+<text x="2148.66" y="433" font-size="11" text-anchor="middle" fill="#0e0e10">5</text>
+</svg>

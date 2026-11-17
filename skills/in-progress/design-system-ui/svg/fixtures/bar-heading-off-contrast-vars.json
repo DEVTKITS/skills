@@ -1,0 +1,18 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "bar",
+ "theme": "contrast",
+ "heading": false,
+ "grid": false,
+ "values": false,
+ "data": [
+  3,
+  1,
+  2
+ ]
+}

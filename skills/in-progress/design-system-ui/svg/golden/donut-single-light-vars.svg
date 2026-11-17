@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240" role="img" aria-label="Ringdiagramm" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>Ringdiagramm</title>
+<rect x="0.5" y="0.5" width="359" height="239" rx="12" fill="var(--bg-card, #ffffff)" stroke="var(--text, #0e0e10)" stroke-opacity="0.08"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="var(--text, #0e0e10)">Ringdiagramm</text>
+<path d="M98 51A82 82 0 1 1 98 215A82 82 0 1 1 98 51ZM98 78.88A54.12 54.12 0 1 1 98 187.12A54.12 54.12 0 1 1 98 78.88Z" fill="var(--accent, #fa1e4e)" fill-rule="evenodd" stroke="var(--bg-card, #ffffff)" stroke-width="2"/>
+<text x="98" y="141.4" font-size="24" font-weight="700" text-anchor="middle" fill="var(--text, #0e0e10)">100</text>
+<rect x="196" y="128" width="10" height="10" rx="2" fill="var(--accent, #fa1e4e)"/>
+<text x="212" y="137" font-size="12" fill="var(--text, #0e0e10)">Teil 1</text>
+<text x="344" y="137" font-size="12" text-anchor="end" fill="var(--text-muted, #6a6a6b)">100%</text>
+</svg>

@@ -1,0 +1,40 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "line",
+ "theme": "contrast",
+ "colors": "static",
+ "title": "Besucher pro Tag",
+ "data": [
+  [
+   4,
+   9,
+   6,
+   12,
+   10,
+   15,
+   13
+  ],
+  [
+   3,
+   5,
+   4,
+   8,
+   9,
+   11,
+   12
+  ]
+ ],
+ "labels": [
+  "Mo",
+  "Di",
+  "Mi",
+  "Do",
+  "Fr",
+  "Sa",
+  "So"
+ ]
+}

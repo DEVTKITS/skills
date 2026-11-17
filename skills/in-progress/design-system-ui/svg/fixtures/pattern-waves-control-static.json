@@ -1,0 +1,12 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "pattern",
+ "theme": "control",
+ "colors": "static",
+ "kind": "waves",
+ "seed": 10
+}

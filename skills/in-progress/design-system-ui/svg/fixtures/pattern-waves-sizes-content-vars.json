@@ -1,0 +1,18 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "pattern",
+ "kind": "waves",
+ "theme": "content",
+ "colors": "vars",
+ "width": 316,
+ "height": 300,
+ "size": 64,
+ "stroke": 9.5,
+ "angle": 90,
+ "opacity": 0.95,
+ "bg": false
+}

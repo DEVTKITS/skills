@@ -1,0 +1,22 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "donut",
+ "theme": "control",
+ "colors": "static",
+ "title": "Verteilung",
+ "data": [
+  45,
+  30,
+  25
+ ],
+ "labels": [
+  "Design",
+  "Code",
+  "Tests"
+ ]
+}

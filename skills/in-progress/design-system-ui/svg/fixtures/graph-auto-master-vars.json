@@ -1,0 +1,68 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "graph",
+ "theme": "master",
+ "title": "RAG-Pipeline",
+ "nodes": [
+  {
+   "id": "q",
+   "type": "input",
+   "label": "Frage"
+  },
+  {
+   "id": "e",
+   "type": "embed",
+   "label": "Embedding"
+  },
+  {
+   "id": "v",
+   "type": "store",
+   "label": "Vektor-DB"
+  },
+  {
+   "id": "k",
+   "type": "search",
+   "label": "Stichwortsuche"
+  },
+  {
+   "id": "l",
+   "type": "model",
+   "label": "LLM"
+  },
+  {
+   "id": "a",
+   "type": "output",
+   "label": "Antwort"
+  }
+ ],
+ "edges": [
+  {
+   "from": "q",
+   "to": "e"
+  },
+  {
+   "from": "e",
+   "to": "v"
+  },
+  {
+   "from": "e",
+   "to": "k"
+  },
+  {
+   "from": "v",
+   "to": "l"
+  },
+  {
+   "from": "k",
+   "to": "l"
+  },
+  {
+   "from": "l",
+   "to": "a"
+  }
+ ]
+}

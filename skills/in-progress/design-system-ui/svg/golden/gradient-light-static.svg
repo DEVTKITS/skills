@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="240" viewBox="0 0 480 240" role="img" aria-label="Verlauf" font-family="Inter,system-ui,-apple-system,sans-serif">
+<title>Verlauf</title>
+<defs><radialGradient id="sk-grad" cx="50%" cy="50%" r="75%"><stop offset="0" stop-color="#fa1e4e"/><stop offset="1" stop-color="#9d7bff"/></radialGradient></defs>
+<rect x="0.5" y="0.5" width="479" height="239" rx="12" fill="url(#sk-grad)"/>
+<text x="240" y="133.44" font-size="38.4" font-weight="700" text-anchor="middle" fill="#ffffff">DkZ Design</text>
+</svg>

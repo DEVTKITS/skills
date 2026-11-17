@@ -1,0 +1,5 @@
+{
+ "_error_field": "via",
+ "type": "gradient",
+ "via": "javascript:alert(1)"
+}

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="552" height="108" viewBox="0 0 552 108" role="img" aria-label="Workflow" font-family="Inter,system-ui,-apple-system,sans-serif">
+<title>Workflow</title>
+<rect x="0.5" y="0.5" width="551" height="107" rx="12" fill="#ffffff" stroke="#0e0e10" stroke-opacity="0.08"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="#0e0e10">Workflow</text>
+<defs><marker id="sk-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#6a6a6b"/></marker></defs>
+<path d="M152 68C180 68 180 68 208 68" fill="none" stroke="#6a6a6b" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 68C372 68 372 68 400 68" fill="none" stroke="#6a6a6b" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<rect x="16" y="44" width="136" height="48" rx="10" fill="#f0f0f2" stroke="#fa1e4e" stroke-opacity="0.45"/>
+<rect x="22" y="54" width="3" height="28" rx="1.5" fill="#fa1e4e"/>
+<text x="32" y="65" font-size="12" font-weight="600" fill="#0e0e10">A</text>
+<text x="32" y="80" font-size="10" fill="#6a6a6b">input</text>
+<rect x="208" y="44" width="136" height="48" rx="10" fill="#f0f0f2" stroke="#55acee" stroke-opacity="0.45"/>
+<rect x="214" y="54" width="3" height="28" rx="1.5" fill="#55acee"/>
+<text x="224" y="65" font-size="12" font-weight="600" fill="#0e0e10">B</text>
+<text x="224" y="80" font-size="10" fill="#6a6a6b">model</text>
+<rect x="400" y="44" width="136" height="48" rx="10" fill="#f0f0f2" stroke="#55acee" stroke-opacity="0.45"/>
+<rect x="406" y="54" width="3" height="28" rx="1.5" fill="#55acee"/>
+<text x="416" y="65" font-size="12" font-weight="600" fill="#0e0e10">C</text>
+<text x="416" y="80" font-size="10" fill="#6a6a6b">output</text>
+</svg>

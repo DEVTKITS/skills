@@ -1,0 +1,14 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "badge",
+ "theme": "content",
+ "label": "Größe",
+ "value": "日本語😀",
+ "color": "cyan",
+ "height": 40
+}

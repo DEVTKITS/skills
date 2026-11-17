@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="124" viewBox="0 0 320 124" role="img" aria-label="Workflow" font-family="var(--font-main, Archivo Expanded,Inter,system-ui,-apple-system,sans-serif)">
+<title>Workflow</title>
+<rect x="0.5" y="0.5" width="319" height="123" rx="0" fill="var(--bg-card, #0e0e10)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.3"/>
+<path d="M1 11V1H11M309 1H319V11M319 113V123H309M11 123H1V113" fill="none" stroke="var(--accent, #fa1e4e)" stroke-width="2"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="var(--text, #f6f6f7)">Workflow</text>
+<text x="160" y="80" font-size="13" text-anchor="middle" fill="var(--text-muted, #8e8e8f)">— ausstehend —</text>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="131.14" height="24" viewBox="0 0 131.14 24" role="img" aria-label="Badge" font-family="var(--font-main, Syne,Inter,system-ui,-apple-system,sans-serif)">
+<title>Badge</title>
+<rect x="0.5" y="0.5" width="130.14" height="23" rx="12" fill="var(--bg-elevated, #141418)" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<rect x="52.32" width="78.82" height="24" rx="12" fill="var(--accent, #fa1e4e)"/>
+<rect x="52.32" width="12" height="24" fill="var(--accent, #fa1e4e)"/>
+<text x="26.16" y="15.86" font-size="11.04" font-weight="500" text-anchor="middle" fill="var(--text, #f6f6f7)">Build</text>
+<text x="91.73" y="15.86" font-size="11.04" font-weight="700" text-anchor="middle" fill="#ffffff">bestanden</text>
+</svg>

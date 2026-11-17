@@ -1,0 +1,13 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "badge",
+ "theme": "control",
+ "colors": "static",
+ "color": "yellow",
+ "value": "#FA1E4E<&>"
+}

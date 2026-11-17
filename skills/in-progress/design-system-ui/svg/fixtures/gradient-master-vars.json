@@ -1,0 +1,15 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "gradient",
+ "theme": "master",
+ "colors": "vars",
+ "kind": "linear",
+ "text": "DkZ Design",
+ "from": "accent",
+ "to": "lila"
+}

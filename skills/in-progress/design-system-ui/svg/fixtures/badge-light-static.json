@@ -1,0 +1,13 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "badge",
+ "theme": "light",
+ "colors": "static",
+ "label": "Build",
+ "value": "bestanden"
+}

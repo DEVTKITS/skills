@@ -1,0 +1,11 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "gradient",
+ "theme": "control",
+ "angle": 0
+}

@@ -1,0 +1,13 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "pattern",
+ "kind": "confetti",
+ "theme": "contrast",
+ "colors": "static",
+ "density": 40,
+ "seed": 3
+}

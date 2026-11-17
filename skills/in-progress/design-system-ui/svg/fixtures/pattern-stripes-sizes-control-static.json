@@ -1,0 +1,19 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "pattern",
+ "kind": "stripes",
+ "theme": "control",
+ "colors": "static",
+ "width": 216,
+ "height": 300,
+ "size": 44,
+ "stroke": 6.5,
+ "angle": 30,
+ "opacity": 0.65,
+ "bg": true
+}

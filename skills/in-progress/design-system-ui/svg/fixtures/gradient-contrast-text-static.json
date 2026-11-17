@@ -1,0 +1,13 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "gradient",
+ "theme": "contrast",
+ "colors": "static",
+ "text": "Kontrast",
+ "angle": 360
+}

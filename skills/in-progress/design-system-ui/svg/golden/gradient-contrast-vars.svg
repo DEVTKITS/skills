@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="240" viewBox="0 0 480 240" role="img" aria-label="Verlauf" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>Verlauf</title>
+<defs><linearGradient id="sk-grad" x1="14.64%" y1="14.64%" x2="85.36%" y2="85.36%"><stop offset="0" stop-color="var(--accent, #00ff88)"/><stop offset="0.5" stop-color="var(--accent, #00ff88)"/><stop offset="0.5" stop-color="var(--bg, #000000)"/><stop offset="1" stop-color="var(--bg, #000000)"/></linearGradient></defs>
+<rect x="0.5" y="0.5" width="479" height="239" rx="12" fill="url(#sk-grad)" stroke="var(--accent, #00ff88)"/>
+<text x="240" y="133.44" font-size="38.4" font-weight="700" text-anchor="middle" fill="var(--accent, #00ff88)" stroke="var(--bg, #000000)" stroke-width="3" paint-order="stroke">DkZ Design</text>
+</svg>

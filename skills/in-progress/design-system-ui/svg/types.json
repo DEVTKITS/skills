@@ -1,0 +1,1133 @@
+{
+ "ok": true,
+ "spec_version": "svgspec/1",
+ "types": {
+  "bar": {
+   "label": "Balkendiagramm",
+   "felder": [
+    {
+     "name": "theme",
+     "type": "enum",
+     "label": "Theme",
+     "choices": [
+      "master",
+      "light",
+      "contrast",
+      "control",
+      "content"
+     ],
+     "default": "master"
+    },
+    {
+     "name": "colors",
+     "type": "enum",
+     "label": "Farbmodus",
+     "choices": [
+      "vars",
+      "static"
+     ],
+     "default": "vars"
+    },
+    {
+     "name": "idprefix",
+     "type": "str",
+     "label": "ID-Präfix",
+     "default": "sk",
+     "len": 32
+    },
+    {
+     "name": "seed",
+     "type": "int",
+     "label": "Seed",
+     "min": 0,
+     "max": 4294967295,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "name": "title",
+     "type": "str",
+     "label": "Titel",
+     "default": "Balkendiagramm",
+     "len": 120
+    },
+    {
+     "name": "width",
+     "type": "int",
+     "label": "Breite",
+     "min": 160,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 480
+    },
+    {
+     "name": "height",
+     "type": "int",
+     "label": "Höhe",
+     "min": 120,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 280
+    },
+    {
+     "name": "data",
+     "type": "nums",
+     "label": "Werte",
+     "min": -1000000000,
+     "max": 1000000000,
+     "default": [
+      12,
+      19,
+      7,
+      15,
+      22,
+      10
+     ],
+     "len": 64
+    },
+    {
+     "name": "labels",
+     "type": "strs",
+     "label": "Beschriftungen",
+     "default": [],
+     "len": 64
+    },
+    {
+     "name": "color",
+     "type": "color",
+     "label": "Farbe",
+     "default": "accent"
+    },
+    {
+     "name": "values",
+     "type": "bool",
+     "label": "Werte zeigen",
+     "default": true
+    },
+    {
+     "name": "grid",
+     "type": "bool",
+     "label": "Raster",
+     "default": true
+    },
+    {
+     "name": "heading",
+     "type": "bool",
+     "label": "Titel zeigen",
+     "default": true
+    }
+   ]
+  },
+  "line": {
+   "label": "Liniendiagramm",
+   "felder": [
+    {
+     "name": "theme",
+     "type": "enum",
+     "label": "Theme",
+     "choices": [
+      "master",
+      "light",
+      "contrast",
+      "control",
+      "content"
+     ],
+     "default": "master"
+    },
+    {
+     "name": "colors",
+     "type": "enum",
+     "label": "Farbmodus",
+     "choices": [
+      "vars",
+      "static"
+     ],
+     "default": "vars"
+    },
+    {
+     "name": "idprefix",
+     "type": "str",
+     "label": "ID-Präfix",
+     "default": "sk",
+     "len": 32
+    },
+    {
+     "name": "seed",
+     "type": "int",
+     "label": "Seed",
+     "min": 0,
+     "max": 4294967295,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "name": "title",
+     "type": "str",
+     "label": "Titel",
+     "default": "Liniendiagramm",
+     "len": 120
+    },
+    {
+     "name": "width",
+     "type": "int",
+     "label": "Breite",
+     "min": 160,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 480
+    },
+    {
+     "name": "height",
+     "type": "int",
+     "label": "Höhe",
+     "min": 120,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 280
+    },
+    {
+     "name": "data",
+     "type": "series",
+     "label": "Reihen",
+     "min": -1000000000,
+     "max": 1000000000,
+     "default": [
+      [
+       4,
+       9,
+       6,
+       12,
+       10,
+       15,
+       13
+      ]
+     ],
+     "len": 200
+    },
+    {
+     "name": "labels",
+     "type": "strs",
+     "label": "Beschriftungen",
+     "default": [],
+     "len": 200
+    },
+    {
+     "name": "color",
+     "type": "color",
+     "label": "Farbe",
+     "default": "accent"
+    },
+    {
+     "name": "area",
+     "type": "bool",
+     "label": "Fläche",
+     "default": true
+    },
+    {
+     "name": "dots",
+     "type": "bool",
+     "label": "Punkte",
+     "default": true
+    },
+    {
+     "name": "grid",
+     "type": "bool",
+     "label": "Raster",
+     "default": true
+    },
+    {
+     "name": "heading",
+     "type": "bool",
+     "label": "Titel zeigen",
+     "default": true
+    }
+   ]
+  },
+  "donut": {
+   "label": "Ringdiagramm",
+   "felder": [
+    {
+     "name": "theme",
+     "type": "enum",
+     "label": "Theme",
+     "choices": [
+      "master",
+      "light",
+      "contrast",
+      "control",
+      "content"
+     ],
+     "default": "master"
+    },
+    {
+     "name": "colors",
+     "type": "enum",
+     "label": "Farbmodus",
+     "choices": [
+      "vars",
+      "static"
+     ],
+     "default": "vars"
+    },
+    {
+     "name": "idprefix",
+     "type": "str",
+     "label": "ID-Präfix",
+     "default": "sk",
+     "len": 32
+    },
+    {
+     "name": "seed",
+     "type": "int",
+     "label": "Seed",
+     "min": 0,
+     "max": 4294967295,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "name": "title",
+     "type": "str",
+     "label": "Titel",
+     "default": "Ringdiagramm",
+     "len": 120
+    },
+    {
+     "name": "width",
+     "type": "int",
+     "label": "Breite",
+     "min": 160,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 360
+    },
+    {
+     "name": "height",
+     "type": "int",
+     "label": "Höhe",
+     "min": 120,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 240
+    },
+    {
+     "name": "data",
+     "type": "nums",
+     "label": "Werte",
+     "min": 0,
+     "max": 1000000000,
+     "default": [
+      45,
+      30,
+      25
+     ],
+     "len": 12
+    },
+    {
+     "name": "labels",
+     "type": "strs",
+     "label": "Beschriftungen",
+     "default": [],
+     "len": 12
+    },
+    {
+     "name": "thickness",
+     "type": "num",
+     "label": "Ringstärke",
+     "min": 0.1,
+     "max": 0.9,
+     "step": 0.01,
+     "default": 0.34
+    },
+    {
+     "name": "center",
+     "type": "str",
+     "label": "Mitte",
+     "default": "",
+     "len": 16
+    },
+    {
+     "name": "legend",
+     "type": "bool",
+     "label": "Legende",
+     "default": true
+    },
+    {
+     "name": "heading",
+     "type": "bool",
+     "label": "Titel zeigen",
+     "default": true
+    }
+   ]
+  },
+  "pattern": {
+   "label": "Muster",
+   "felder": [
+    {
+     "name": "theme",
+     "type": "enum",
+     "label": "Theme",
+     "choices": [
+      "master",
+      "light",
+      "contrast",
+      "control",
+      "content"
+     ],
+     "default": "master"
+    },
+    {
+     "name": "colors",
+     "type": "enum",
+     "label": "Farbmodus",
+     "choices": [
+      "vars",
+      "static"
+     ],
+     "default": "vars"
+    },
+    {
+     "name": "idprefix",
+     "type": "str",
+     "label": "ID-Präfix",
+     "default": "sk",
+     "len": 32
+    },
+    {
+     "name": "seed",
+     "type": "int",
+     "label": "Seed",
+     "min": 0,
+     "max": 4294967295,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "name": "title",
+     "type": "str",
+     "label": "Titel",
+     "default": "Muster",
+     "len": 120
+    },
+    {
+     "name": "width",
+     "type": "int",
+     "label": "Breite",
+     "min": 16,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 240
+    },
+    {
+     "name": "height",
+     "type": "int",
+     "label": "Höhe",
+     "min": 16,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 240
+    },
+    {
+     "name": "kind",
+     "type": "enum",
+     "label": "Art",
+     "choices": [
+      "grid",
+      "dots",
+      "stripes",
+      "waves",
+      "confetti"
+     ],
+     "default": "grid"
+    },
+    {
+     "name": "size",
+     "type": "int",
+     "label": "Zellgröße",
+     "min": 4,
+     "max": 200,
+     "step": 1,
+     "unit": "px",
+     "default": 24
+    },
+    {
+     "name": "stroke",
+     "type": "num",
+     "label": "Linienstärke",
+     "min": 0.5,
+     "max": 12,
+     "step": 0.01,
+     "unit": "px",
+     "default": 1.5
+    },
+    {
+     "name": "angle",
+     "type": "int",
+     "label": "Winkel",
+     "min": -90,
+     "max": 90,
+     "step": 1,
+     "unit": "°",
+     "default": 45
+    },
+    {
+     "name": "density",
+     "type": "int",
+     "label": "Dichte",
+     "min": 1,
+     "max": 400,
+     "step": 1,
+     "default": 60
+    },
+    {
+     "name": "opacity",
+     "type": "num",
+     "label": "Deckkraft",
+     "min": 0.05,
+     "max": 1,
+     "step": 0.01,
+     "default": 0.6
+    },
+    {
+     "name": "color",
+     "type": "color",
+     "label": "Farbe",
+     "default": "accent"
+    },
+    {
+     "name": "bg",
+     "type": "bool",
+     "label": "Karte",
+     "default": true
+    }
+   ]
+  },
+  "badge": {
+   "label": "Badge",
+   "felder": [
+    {
+     "name": "theme",
+     "type": "enum",
+     "label": "Theme",
+     "choices": [
+      "master",
+      "light",
+      "contrast",
+      "control",
+      "content"
+     ],
+     "default": "master"
+    },
+    {
+     "name": "colors",
+     "type": "enum",
+     "label": "Farbmodus",
+     "choices": [
+      "vars",
+      "static"
+     ],
+     "default": "vars"
+    },
+    {
+     "name": "idprefix",
+     "type": "str",
+     "label": "ID-Präfix",
+     "default": "sk",
+     "len": 32
+    },
+    {
+     "name": "seed",
+     "type": "int",
+     "label": "Seed",
+     "min": 0,
+     "max": 4294967295,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "name": "title",
+     "type": "str",
+     "label": "Titel",
+     "default": "Badge",
+     "len": 120
+    },
+    {
+     "name": "height",
+     "type": "int",
+     "label": "Höhe",
+     "min": 16,
+     "max": 64,
+     "step": 1,
+     "unit": "px",
+     "default": 24
+    },
+    {
+     "name": "label",
+     "type": "str",
+     "label": "Beschriftung",
+     "default": "DkZ",
+     "len": 32
+    },
+    {
+     "name": "value",
+     "type": "str",
+     "label": "Wert",
+     "default": "aktiv",
+     "len": 32
+    },
+    {
+     "name": "color",
+     "type": "color",
+     "label": "Farbe",
+     "default": "accent"
+    }
+   ]
+  },
+  "icon": {
+   "label": "Symbol",
+   "felder": [
+    {
+     "name": "theme",
+     "type": "enum",
+     "label": "Theme",
+     "choices": [
+      "master",
+      "light",
+      "contrast",
+      "control",
+      "content"
+     ],
+     "default": "master"
+    },
+    {
+     "name": "colors",
+     "type": "enum",
+     "label": "Farbmodus",
+     "choices": [
+      "vars",
+      "static"
+     ],
+     "default": "vars"
+    },
+    {
+     "name": "idprefix",
+     "type": "str",
+     "label": "ID-Präfix",
+     "default": "sk",
+     "len": 32
+    },
+    {
+     "name": "seed",
+     "type": "int",
+     "label": "Seed",
+     "min": 0,
+     "max": 4294967295,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "name": "title",
+     "type": "str",
+     "label": "Titel",
+     "default": "Symbol",
+     "len": 120
+    },
+    {
+     "name": "name",
+     "type": "enum",
+     "label": "Symbol",
+     "choices": [
+      "check",
+      "cross",
+      "play",
+      "pause",
+      "arrow-right",
+      "arrow-left",
+      "star",
+      "heart",
+      "menu",
+      "plus",
+      "minus",
+      "info",
+      "search",
+      "download"
+     ],
+     "default": "check"
+    },
+    {
+     "name": "size",
+     "type": "int",
+     "label": "Größe",
+     "min": 12,
+     "max": 512,
+     "step": 1,
+     "unit": "px",
+     "default": 48
+    },
+    {
+     "name": "color",
+     "type": "color",
+     "label": "Farbe",
+     "default": "accent"
+    },
+    {
+     "name": "stroke",
+     "type": "num",
+     "label": "Linienstärke",
+     "min": 1,
+     "max": 4,
+     "step": 0.01,
+     "unit": "px",
+     "default": 2
+    },
+    {
+     "name": "bg",
+     "type": "bool",
+     "label": "Karte",
+     "default": false
+    }
+   ]
+  },
+  "monogram": {
+   "label": "Monogramm",
+   "felder": [
+    {
+     "name": "theme",
+     "type": "enum",
+     "label": "Theme",
+     "choices": [
+      "master",
+      "light",
+      "contrast",
+      "control",
+      "content"
+     ],
+     "default": "master"
+    },
+    {
+     "name": "colors",
+     "type": "enum",
+     "label": "Farbmodus",
+     "choices": [
+      "vars",
+      "static"
+     ],
+     "default": "vars"
+    },
+    {
+     "name": "idprefix",
+     "type": "str",
+     "label": "ID-Präfix",
+     "default": "sk",
+     "len": 32
+    },
+    {
+     "name": "seed",
+     "type": "int",
+     "label": "Seed",
+     "min": 0,
+     "max": 4294967295,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "name": "title",
+     "type": "str",
+     "label": "Titel",
+     "default": "Monogramm",
+     "len": 120
+    },
+    {
+     "name": "text",
+     "type": "str",
+     "label": "Zeichen",
+     "default": "DZ",
+     "len": 3
+    },
+    {
+     "name": "size",
+     "type": "int",
+     "label": "Größe",
+     "min": 24,
+     "max": 512,
+     "step": 1,
+     "unit": "px",
+     "default": 96
+    },
+    {
+     "name": "shape",
+     "type": "enum",
+     "label": "Form",
+     "choices": [
+      "circle",
+      "square",
+      "hex"
+     ],
+     "default": "circle"
+    },
+    {
+     "name": "color",
+     "type": "color",
+     "label": "Farbe",
+     "default": "accent"
+    },
+    {
+     "name": "color2",
+     "type": "color",
+     "label": "Zweitfarbe",
+     "default": "lila"
+    }
+   ]
+  },
+  "gradient": {
+   "label": "Verlauf",
+   "felder": [
+    {
+     "name": "theme",
+     "type": "enum",
+     "label": "Theme",
+     "choices": [
+      "master",
+      "light",
+      "contrast",
+      "control",
+      "content"
+     ],
+     "default": "master"
+    },
+    {
+     "name": "colors",
+     "type": "enum",
+     "label": "Farbmodus",
+     "choices": [
+      "vars",
+      "static"
+     ],
+     "default": "vars"
+    },
+    {
+     "name": "idprefix",
+     "type": "str",
+     "label": "ID-Präfix",
+     "default": "sk",
+     "len": 32
+    },
+    {
+     "name": "seed",
+     "type": "int",
+     "label": "Seed",
+     "min": 0,
+     "max": 4294967295,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "name": "title",
+     "type": "str",
+     "label": "Titel",
+     "default": "Verlauf",
+     "len": 120
+    },
+    {
+     "name": "width",
+     "type": "int",
+     "label": "Breite",
+     "min": 16,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 480
+    },
+    {
+     "name": "height",
+     "type": "int",
+     "label": "Höhe",
+     "min": 16,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 240
+    },
+    {
+     "name": "kind",
+     "type": "enum",
+     "label": "Art",
+     "choices": [
+      "linear",
+      "radial"
+     ],
+     "default": "linear"
+    },
+    {
+     "name": "from",
+     "type": "color",
+     "label": "Von",
+     "default": "accent"
+    },
+    {
+     "name": "to",
+     "type": "color",
+     "label": "Bis",
+     "default": "lila"
+    },
+    {
+     "name": "via",
+     "type": "colorx",
+     "label": "Über",
+     "default": ""
+    },
+    {
+     "name": "angle",
+     "type": "int",
+     "label": "Winkel",
+     "min": 0,
+     "max": 360,
+     "step": 1,
+     "unit": "°",
+     "default": 45
+    },
+    {
+     "name": "cx",
+     "type": "num",
+     "label": "Mitte x",
+     "min": 0,
+     "max": 100,
+     "step": 0.01,
+     "unit": "%",
+     "default": 50
+    },
+    {
+     "name": "cy",
+     "type": "num",
+     "label": "Mitte y",
+     "min": 0,
+     "max": 100,
+     "step": 0.01,
+     "unit": "%",
+     "default": 50
+    },
+    {
+     "name": "text",
+     "type": "str",
+     "label": "Text",
+     "default": "",
+     "len": 60
+    }
+   ]
+  },
+  "graph": {
+   "label": "Workflow",
+   "felder": [
+    {
+     "name": "theme",
+     "type": "enum",
+     "label": "Theme",
+     "choices": [
+      "master",
+      "light",
+      "contrast",
+      "control",
+      "content"
+     ],
+     "default": "master"
+    },
+    {
+     "name": "colors",
+     "type": "enum",
+     "label": "Farbmodus",
+     "choices": [
+      "vars",
+      "static"
+     ],
+     "default": "vars"
+    },
+    {
+     "name": "idprefix",
+     "type": "str",
+     "label": "ID-Präfix",
+     "default": "sk",
+     "len": 32
+    },
+    {
+     "name": "seed",
+     "type": "int",
+     "label": "Seed",
+     "min": 0,
+     "max": 4294967295,
+     "step": 1,
+     "default": 1
+    },
+    {
+     "name": "title",
+     "type": "str",
+     "label": "Titel",
+     "default": "Workflow",
+     "len": 120
+    },
+    {
+     "name": "width",
+     "type": "int",
+     "label": "Breite",
+     "min": 0,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 0
+    },
+    {
+     "name": "height",
+     "type": "int",
+     "label": "Höhe",
+     "min": 0,
+     "max": 2400,
+     "step": 1,
+     "unit": "px",
+     "default": 0
+    },
+    {
+     "name": "nodes",
+     "type": "nodes",
+     "label": "Knoten",
+     "default": [
+      {
+       "id": "A",
+       "type": "input"
+      },
+      {
+       "id": "B",
+       "type": "model"
+      },
+      {
+       "id": "C",
+       "type": "output"
+      }
+     ],
+     "len": 60
+    },
+    {
+     "name": "edges",
+     "type": "edges",
+     "label": "Kanten",
+     "default": [
+      {
+       "from": "A",
+       "to": "B"
+      },
+      {
+       "from": "B",
+       "to": "C"
+      }
+     ],
+     "len": 120
+    },
+    {
+     "name": "heading",
+     "type": "bool",
+     "label": "Titel zeigen",
+     "default": true
+    }
+   ]
+  }
+ },
+ "themes": [
+  "master",
+  "light",
+  "contrast",
+  "control",
+  "content"
+ ],
+ "modes": [
+  "vars",
+  "static"
+ ],
+ "tokens": {
+  "master": {
+   "bg": "#060608",
+   "card": "#0e0e10",
+   "elevated": "#141418",
+   "text": "#f6f6f7",
+   "muted": "#8e8e8f",
+   "accent": "#fa1e4e",
+   "green": "#00ff88",
+   "yellow": "#ffb800",
+   "red": "#ff3b5c",
+   "blue": "#55acee",
+   "pink": "#ec4899",
+   "amber": "#f5a623",
+   "cyan": "#3fe0d0",
+   "lila": "#9d7bff"
+  },
+  "light": {
+   "bg": "#f6f6f7",
+   "card": "#ffffff",
+   "elevated": "#f0f0f2",
+   "text": "#0e0e10",
+   "muted": "#6a6a6b",
+   "accent": "#fa1e4e",
+   "green": "#00ff88",
+   "yellow": "#ffb800",
+   "red": "#ff3b5c",
+   "blue": "#55acee",
+   "pink": "#ec4899",
+   "amber": "#f5a623",
+   "cyan": "#3fe0d0",
+   "lila": "#9d7bff"
+  },
+  "contrast": {
+   "bg": "#000000",
+   "card": "#000000",
+   "elevated": "#000000",
+   "text": "#00ff88",
+   "muted": "#00ff88",
+   "accent": "#00ff88",
+   "green": "#00ff88",
+   "yellow": "#00ff88",
+   "red": "#00ff88",
+   "blue": "#00ff88",
+   "pink": "#00ff88",
+   "amber": "#00ff88",
+   "cyan": "#00ff88",
+   "lila": "#00ff88"
+  },
+  "control": {
+   "bg": "#060608",
+   "card": "#0e0e10",
+   "elevated": "#141418",
+   "text": "#f6f6f7",
+   "muted": "#8e8e8f",
+   "accent": "#fa1e4e",
+   "green": "#00ff88",
+   "yellow": "#ffb800",
+   "red": "#ff3b5c",
+   "blue": "#55acee",
+   "pink": "#ec4899",
+   "amber": "#f5a623",
+   "cyan": "#3fe0d0",
+   "lila": "#9d7bff"
+  },
+  "content": {
+   "bg": "#060608",
+   "card": "#0e0e10",
+   "elevated": "#141418",
+   "text": "#f6f6f7",
+   "muted": "#8e8e8f",
+   "accent": "#fa1e4e",
+   "green": "#00ff88",
+   "yellow": "#ffb800",
+   "red": "#ff3b5c",
+   "blue": "#55acee",
+   "pink": "#ec4899",
+   "amber": "#f5a623",
+   "cyan": "#3fe0d0",
+   "lila": "#9d7bff"
+  }
+ }
+}

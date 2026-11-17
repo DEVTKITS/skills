@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="240" viewBox="0 0 480 240" role="img" aria-label="Verlauf" font-family="var(--font-main, Archivo Expanded,Inter,system-ui,-apple-system,sans-serif)">
+<title>Verlauf</title>
+<defs><linearGradient id="sk-grad" x1="0%" y1="50%" x2="100%" y2="50%"><stop offset="0" stop-color="var(--accent, #fa1e4e)"/><stop offset="1" stop-color="var(--lila, #9d7bff)"/></linearGradient></defs>
+<rect x="0.5" y="0.5" width="479" height="239" rx="0" fill="url(#sk-grad)"/>
+</svg>

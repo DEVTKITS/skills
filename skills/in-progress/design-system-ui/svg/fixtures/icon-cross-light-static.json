@@ -1,0 +1,15 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "icon",
+ "name": "cross",
+ "theme": "light",
+ "colors": "static",
+ "size": 52,
+ "stroke": 2,
+ "bg": false
+}

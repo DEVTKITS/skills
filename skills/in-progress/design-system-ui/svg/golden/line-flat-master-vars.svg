@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="280" viewBox="0 0 480 280" role="img" aria-label="Liniendiagramm" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>Liniendiagramm</title>
+<rect x="0.5" y="0.5" width="479" height="279" rx="12" fill="var(--bg-card, #0e0e10)" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="var(--text, #f6f6f7)">Liniendiagramm</text>
+<line x1="43.8" y1="244" x2="464" y2="244" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="35.8" y="248" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">6</text>
+<line x1="43.8" y1="195.5" x2="464" y2="195.5" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="35.8" y="199.5" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">6.5</text>
+<line x1="43.8" y1="147" x2="464" y2="147" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="35.8" y="151" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">7</text>
+<line x1="43.8" y1="98.5" x2="464" y2="98.5" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="35.8" y="102.5" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">7.5</text>
+<line x1="43.8" y1="50" x2="464" y2="50" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="35.8" y="54" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">8</text>
+<text x="43.8" y="260" font-size="11" text-anchor="start" fill="var(--text-muted, #8e8e8f)">a</text>
+<text x="183.87" y="260" font-size="11" text-anchor="middle" fill="var(--text-muted, #8e8e8f)">b</text>
+<text x="323.93" y="260" font-size="11" text-anchor="middle" fill="var(--text-muted, #8e8e8f)">c</text>
+<text x="464" y="260" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">d</text>
+<path d="M43.8 147L183.87 147L323.93 147L464 147L464 244L43.8 244Z" fill="var(--accent, #fa1e4e)" fill-opacity="0.16"/>
+<path d="M43.8 147L183.87 147L323.93 147L464 147" fill="none" stroke="var(--accent, #fa1e4e)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="43.8" cy="147" r="3" fill="var(--bg-card, #0e0e10)" stroke="var(--accent, #fa1e4e)" stroke-width="2"/>
+<circle cx="183.87" cy="147" r="3" fill="var(--bg-card, #0e0e10)" stroke="var(--accent, #fa1e4e)" stroke-width="2"/>
+<circle cx="323.93" cy="147" r="3" fill="var(--bg-card, #0e0e10)" stroke="var(--accent, #fa1e4e)" stroke-width="2"/>
+<circle cx="464" cy="147" r="3" fill="var(--bg-card, #0e0e10)" stroke="var(--accent, #fa1e4e)" stroke-width="2"/>
+</svg>

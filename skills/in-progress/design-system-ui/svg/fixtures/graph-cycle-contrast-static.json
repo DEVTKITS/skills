@@ -1,0 +1,43 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "graph",
+ "theme": "contrast",
+ "colors": "static",
+ "title": "Zyklus",
+ "nodes": [
+  {
+   "id": "a",
+   "type": "x"
+  },
+  {
+   "id": "b",
+   "type": "y"
+  },
+  {
+   "id": "c",
+   "type": "z"
+  }
+ ],
+ "edges": [
+  {
+   "from": "a",
+   "to": "b"
+  },
+  {
+   "from": "b",
+   "to": "c"
+  },
+  {
+   "from": "c",
+   "to": "a"
+  },
+  {
+   "from": "a",
+   "to": "a"
+  }
+ ]
+}

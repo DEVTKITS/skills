@@ -1,0 +1,14 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "_note": "Literal-Hex wird im Theme contrast zu #00ff88",
+ "type": "badge",
+ "theme": "contrast",
+ "colors": "static",
+ "color": "#FA1E4E",
+ "value": "Hex"
+}

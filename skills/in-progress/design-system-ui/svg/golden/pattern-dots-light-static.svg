@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Muster" font-family="Inter,system-ui,-apple-system,sans-serif">
+<title>Muster</title>
+<rect x="0.5" y="0.5" width="239" height="239" rx="12" fill="#ffffff" stroke="#0e0e10" stroke-opacity="0.08"/>
+<defs><pattern id="sk-pat" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="1.5" fill="#fa1e4e"/></pattern></defs>
+<rect width="240" height="240" rx="12" fill="url(#sk-pat)" opacity="0.6"/>
+</svg>

@@ -1,0 +1,13 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "badge",
+ "theme": "contrast",
+ "height": 16,
+ "label": "a",
+ "value": "b"
+}

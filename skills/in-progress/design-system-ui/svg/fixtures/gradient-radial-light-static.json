@@ -1,0 +1,17 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "gradient",
+ "theme": "light",
+ "colors": "static",
+ "kind": "radial",
+ "cx": 25,
+ "cy": 75,
+ "from": "cyan",
+ "to": "lila",
+ "text": "Radial"
+}

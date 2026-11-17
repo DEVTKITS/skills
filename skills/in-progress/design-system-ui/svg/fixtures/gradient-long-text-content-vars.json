@@ -1,0 +1,13 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "gradient",
+ "theme": "content",
+ "text": "Ein sehr langer Text auf dem Verlauf, der gekürzt werden muss weil er nicht passt",
+ "width": 320,
+ "height": 120
+}

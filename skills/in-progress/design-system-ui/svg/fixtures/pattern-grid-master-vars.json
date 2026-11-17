@@ -1,0 +1,13 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "pattern",
+ "theme": "master",
+ "colors": "vars",
+ "kind": "grid",
+ "seed": 7
+}

@@ -1,0 +1,14 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "gradient",
+ "via": "#ffb800",
+ "text": "Drei Stopps",
+ "angle": 135,
+ "width": 600,
+ "height": 300
+}

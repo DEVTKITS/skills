@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="120" viewBox="0 0 2400 120" role="img" aria-label="Klemmen" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>Klemmen</title>
+<rect x="0.5" y="0.5" width="2399" height="119" rx="12" fill="var(--bg-card, #0e0e10)" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="var(--text, #f6f6f7)">Klemmen</text>
+<line x1="43.8" y1="104" x2="2384" y2="104" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="35.8" y="108" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">0</text>
+<line x1="43.8" y1="90.5" x2="2384" y2="90.5" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="35.8" y="94.5" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">0.5</text>
+<line x1="43.8" y1="77" x2="2384" y2="77" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="35.8" y="81" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">1</text>
+<line x1="43.8" y1="63.5" x2="2384" y2="63.5" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="35.8" y="67.5" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">1.5</text>
+<line x1="43.8" y1="50" x2="2384" y2="50" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="35.8" y="54" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">2</text>
+<rect x="596.85" y="77" width="64" height="27" rx="4" fill="var(--accent, #fa1e4e)"/>
+<text x="628.85" y="71" font-size="11" text-anchor="middle" fill="var(--text, #f6f6f7)">1</text>
+<rect x="1766.95" y="50" width="64" height="54" rx="4" fill="var(--accent, #fa1e4e)"/>
+<text x="1798.95" y="44" font-size="11" text-anchor="middle" fill="var(--text, #f6f6f7)">2</text>
+</svg>

@@ -1,0 +1,17 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "donut",
+ "theme": "control",
+ "data": [
+  3,
+  2
+ ],
+ "thickness": 0.1,
+ "width": 500,
+ "height": 200
+}

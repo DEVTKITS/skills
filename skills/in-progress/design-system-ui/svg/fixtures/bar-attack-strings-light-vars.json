@@ -1,0 +1,22 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "_note": "Angriffsstrings: kommen nur als escapter Text vor",
+ "type": "bar",
+ "theme": "light",
+ "title": "<script>alert(1)</script> onload=alert(1) javascript:alert(1) <foreignObject>",
+ "labels": [
+  "\" onclick=\"alert(1)",
+  "<img src=x onerror=alert(1)>",
+  "javascript:alert(1)"
+ ],
+ "data": [
+  1,
+  2,
+  3
+ ]
+}

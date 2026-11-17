@@ -1,0 +1,20 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "bar",
+ "data": [
+  3,
+  5,
+  4
+ ],
+ "labels": [
+  "Ein ganz außergewöhnlich langes Beschriftungswort",
+  "Zweites sehr langes Label hier",
+  "X"
+ ],
+ "title": "Ein Titel, der deutlich länger ist als die Karte hoch breit sein kann und daher gekürzt wird"
+}

@@ -1,0 +1,40 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "graph",
+ "theme": "content",
+ "title": "Manuelle Positionen",
+ "nodes": [
+  {
+   "id": "a",
+   "type": "input",
+   "x": 0,
+   "y": 0
+  },
+  {
+   "id": "b",
+   "type": "model",
+   "x": 220,
+   "y": 70
+  },
+  {
+   "id": "c",
+   "type": "output",
+   "x": 440,
+   "y": 0
+  }
+ ],
+ "edges": [
+  {
+   "from": "a",
+   "to": "b"
+  },
+  {
+   "from": "b",
+   "to": "c"
+  }
+ ]
+}

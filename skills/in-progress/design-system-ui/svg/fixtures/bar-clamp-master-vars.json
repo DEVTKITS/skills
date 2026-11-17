@@ -1,0 +1,17 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "_note": "width/height werden auf 160..2400 bzw. 120..2400 geklemmt",
+ "type": "bar",
+ "width": 99999,
+ "height": -5,
+ "data": [
+  1,
+  2
+ ],
+ "title": "Klemmen"
+}

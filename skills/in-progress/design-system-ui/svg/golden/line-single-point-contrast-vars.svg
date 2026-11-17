@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="280" viewBox="0 0 480 280" role="img" aria-label="Liniendiagramm" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>Liniendiagramm</title>
+<rect x="0.5" y="0.5" width="479" height="279" rx="12" fill="var(--bg-card, #000000)" stroke="var(--text, #00ff88)"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="var(--text, #00ff88)">Liniendiagramm</text>
+<line x1="43.8" y1="264" x2="464" y2="264" stroke="var(--text, #00ff88)" stroke-dasharray="2 4"/>
+<text x="35.8" y="268" font-size="11" text-anchor="end" fill="var(--text-muted, #00ff88)">4</text>
+<line x1="43.8" y1="210.5" x2="464" y2="210.5" stroke="var(--text, #00ff88)" stroke-dasharray="2 4"/>
+<text x="35.8" y="214.5" font-size="11" text-anchor="end" fill="var(--text-muted, #00ff88)">4.5</text>
+<line x1="43.8" y1="157" x2="464" y2="157" stroke="var(--text, #00ff88)" stroke-dasharray="2 4"/>
+<text x="35.8" y="161" font-size="11" text-anchor="end" fill="var(--text-muted, #00ff88)">5</text>
+<line x1="43.8" y1="103.5" x2="464" y2="103.5" stroke="var(--text, #00ff88)" stroke-dasharray="2 4"/>
+<text x="35.8" y="107.5" font-size="11" text-anchor="end" fill="var(--text-muted, #00ff88)">5.5</text>
+<line x1="43.8" y1="50" x2="464" y2="50" stroke="var(--text, #00ff88)" stroke-dasharray="2 4"/>
+<text x="35.8" y="54" font-size="11" text-anchor="end" fill="var(--text-muted, #00ff88)">6</text>
+<path d="M253.9 157" fill="none" stroke="var(--accent, #00ff88)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="253.9" cy="157" r="3" fill="var(--bg-card, #000000)" stroke="var(--accent, #00ff88)" stroke-width="2"/>
+</svg>

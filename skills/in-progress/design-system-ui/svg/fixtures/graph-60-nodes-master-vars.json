@@ -1,0 +1,459 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "_note": "sechs Schichten zu je zehn Knoten",
+ "type": "graph",
+ "title": "Viele Knoten",
+ "heading": false,
+ "nodes": [
+  {
+   "id": "n0",
+   "type": "input"
+  },
+  {
+   "id": "n1",
+   "type": "model"
+  },
+  {
+   "id": "n2",
+   "type": "tool"
+  },
+  {
+   "id": "n3",
+   "type": "output"
+  },
+  {
+   "id": "n4",
+   "type": "input"
+  },
+  {
+   "id": "n5",
+   "type": "model"
+  },
+  {
+   "id": "n6",
+   "type": "tool"
+  },
+  {
+   "id": "n7",
+   "type": "output"
+  },
+  {
+   "id": "n8",
+   "type": "input"
+  },
+  {
+   "id": "n9",
+   "type": "model"
+  },
+  {
+   "id": "n10",
+   "type": "tool"
+  },
+  {
+   "id": "n11",
+   "type": "output"
+  },
+  {
+   "id": "n12",
+   "type": "input"
+  },
+  {
+   "id": "n13",
+   "type": "model"
+  },
+  {
+   "id": "n14",
+   "type": "tool"
+  },
+  {
+   "id": "n15",
+   "type": "output"
+  },
+  {
+   "id": "n16",
+   "type": "input"
+  },
+  {
+   "id": "n17",
+   "type": "model"
+  },
+  {
+   "id": "n18",
+   "type": "tool"
+  },
+  {
+   "id": "n19",
+   "type": "output"
+  },
+  {
+   "id": "n20",
+   "type": "input"
+  },
+  {
+   "id": "n21",
+   "type": "model"
+  },
+  {
+   "id": "n22",
+   "type": "tool"
+  },
+  {
+   "id": "n23",
+   "type": "output"
+  },
+  {
+   "id": "n24",
+   "type": "input"
+  },
+  {
+   "id": "n25",
+   "type": "model"
+  },
+  {
+   "id": "n26",
+   "type": "tool"
+  },
+  {
+   "id": "n27",
+   "type": "output"
+  },
+  {
+   "id": "n28",
+   "type": "input"
+  },
+  {
+   "id": "n29",
+   "type": "model"
+  },
+  {
+   "id": "n30",
+   "type": "tool"
+  },
+  {
+   "id": "n31",
+   "type": "output"
+  },
+  {
+   "id": "n32",
+   "type": "input"
+  },
+  {
+   "id": "n33",
+   "type": "model"
+  },
+  {
+   "id": "n34",
+   "type": "tool"
+  },
+  {
+   "id": "n35",
+   "type": "output"
+  },
+  {
+   "id": "n36",
+   "type": "input"
+  },
+  {
+   "id": "n37",
+   "type": "model"
+  },
+  {
+   "id": "n38",
+   "type": "tool"
+  },
+  {
+   "id": "n39",
+   "type": "output"
+  },
+  {
+   "id": "n40",
+   "type": "input"
+  },
+  {
+   "id": "n41",
+   "type": "model"
+  },
+  {
+   "id": "n42",
+   "type": "tool"
+  },
+  {
+   "id": "n43",
+   "type": "output"
+  },
+  {
+   "id": "n44",
+   "type": "input"
+  },
+  {
+   "id": "n45",
+   "type": "model"
+  },
+  {
+   "id": "n46",
+   "type": "tool"
+  },
+  {
+   "id": "n47",
+   "type": "output"
+  },
+  {
+   "id": "n48",
+   "type": "input"
+  },
+  {
+   "id": "n49",
+   "type": "model"
+  },
+  {
+   "id": "n50",
+   "type": "tool"
+  },
+  {
+   "id": "n51",
+   "type": "output"
+  },
+  {
+   "id": "n52",
+   "type": "input"
+  },
+  {
+   "id": "n53",
+   "type": "model"
+  },
+  {
+   "id": "n54",
+   "type": "tool"
+  },
+  {
+   "id": "n55",
+   "type": "output"
+  },
+  {
+   "id": "n56",
+   "type": "input"
+  },
+  {
+   "id": "n57",
+   "type": "model"
+  },
+  {
+   "id": "n58",
+   "type": "tool"
+  },
+  {
+   "id": "n59",
+   "type": "output"
+  }
+ ],
+ "edges": [
+  {
+   "from": "n0",
+   "to": "n10"
+  },
+  {
+   "from": "n1",
+   "to": "n11"
+  },
+  {
+   "from": "n2",
+   "to": "n12"
+  },
+  {
+   "from": "n3",
+   "to": "n13"
+  },
+  {
+   "from": "n4",
+   "to": "n14"
+  },
+  {
+   "from": "n5",
+   "to": "n15"
+  },
+  {
+   "from": "n6",
+   "to": "n16"
+  },
+  {
+   "from": "n7",
+   "to": "n17"
+  },
+  {
+   "from": "n8",
+   "to": "n18"
+  },
+  {
+   "from": "n9",
+   "to": "n19"
+  },
+  {
+   "from": "n10",
+   "to": "n20"
+  },
+  {
+   "from": "n11",
+   "to": "n21"
+  },
+  {
+   "from": "n12",
+   "to": "n22"
+  },
+  {
+   "from": "n13",
+   "to": "n23"
+  },
+  {
+   "from": "n14",
+   "to": "n24"
+  },
+  {
+   "from": "n15",
+   "to": "n25"
+  },
+  {
+   "from": "n16",
+   "to": "n26"
+  },
+  {
+   "from": "n17",
+   "to": "n27"
+  },
+  {
+   "from": "n18",
+   "to": "n28"
+  },
+  {
+   "from": "n19",
+   "to": "n29"
+  },
+  {
+   "from": "n20",
+   "to": "n30"
+  },
+  {
+   "from": "n21",
+   "to": "n31"
+  },
+  {
+   "from": "n22",
+   "to": "n32"
+  },
+  {
+   "from": "n23",
+   "to": "n33"
+  },
+  {
+   "from": "n24",
+   "to": "n34"
+  },
+  {
+   "from": "n25",
+   "to": "n35"
+  },
+  {
+   "from": "n26",
+   "to": "n36"
+  },
+  {
+   "from": "n27",
+   "to": "n37"
+  },
+  {
+   "from": "n28",
+   "to": "n38"
+  },
+  {
+   "from": "n29",
+   "to": "n39"
+  },
+  {
+   "from": "n30",
+   "to": "n40"
+  },
+  {
+   "from": "n31",
+   "to": "n41"
+  },
+  {
+   "from": "n32",
+   "to": "n42"
+  },
+  {
+   "from": "n33",
+   "to": "n43"
+  },
+  {
+   "from": "n34",
+   "to": "n44"
+  },
+  {
+   "from": "n35",
+   "to": "n45"
+  },
+  {
+   "from": "n36",
+   "to": "n46"
+  },
+  {
+   "from": "n37",
+   "to": "n47"
+  },
+  {
+   "from": "n38",
+   "to": "n48"
+  },
+  {
+   "from": "n39",
+   "to": "n49"
+  },
+  {
+   "from": "n40",
+   "to": "n50"
+  },
+  {
+   "from": "n41",
+   "to": "n51"
+  },
+  {
+   "from": "n42",
+   "to": "n52"
+  },
+  {
+   "from": "n43",
+   "to": "n53"
+  },
+  {
+   "from": "n44",
+   "to": "n54"
+  },
+  {
+   "from": "n45",
+   "to": "n55"
+  },
+  {
+   "from": "n46",
+   "to": "n56"
+  },
+  {
+   "from": "n47",
+   "to": "n57"
+  },
+  {
+   "from": "n48",
+   "to": "n58"
+  },
+  {
+   "from": "n49",
+   "to": "n59"
+  },
+  {
+   "from": "n3",
+   "to": "n40"
+  }
+ ]
+}

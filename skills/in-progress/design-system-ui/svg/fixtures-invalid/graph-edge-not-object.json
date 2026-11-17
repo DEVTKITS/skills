@@ -1,0 +1,12 @@
+{
+ "_error_field": "edges",
+ "type": "graph",
+ "nodes": [
+  {
+   "id": "a"
+  }
+ ],
+ "edges": [
+  5
+ ]
+}

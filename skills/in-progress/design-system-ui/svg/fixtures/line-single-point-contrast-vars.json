@@ -1,0 +1,14 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "line",
+ "theme": "contrast",
+ "data": [
+  [
+   5
+  ]
+ ]
+}

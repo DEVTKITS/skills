@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300" viewBox="0 0 600 300" role="img" aria-label="Verlauf" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>Verlauf</title>
+<defs><linearGradient id="sk-grad" x1="85.36%" y1="14.64%" x2="14.64%" y2="85.36%"><stop offset="0" stop-color="var(--accent, #fa1e4e)"/><stop offset="0.5" stop-color="#ffb800"/><stop offset="1" stop-color="var(--lila, #9d7bff)"/></linearGradient></defs>
+<rect x="0.5" y="0.5" width="599" height="299" rx="12" fill="url(#sk-grad)"/>
+<text x="300" y="166.8" font-size="48" font-weight="700" text-anchor="middle" fill="#ffffff">Drei Stopps</text>
+</svg>

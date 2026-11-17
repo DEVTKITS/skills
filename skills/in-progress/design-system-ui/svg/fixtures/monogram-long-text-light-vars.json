@@ -1,0 +1,13 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "monogram",
+ "theme": "light",
+ "text": "ABCDEF",
+ "size": 200,
+ "color": "cyan",
+ "color2": "#9d7bff"
+}

@@ -1,0 +1,21 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "donut",
+ "theme": "content",
+ "colors": "static",
+ "title": "Größe ÄÖÜ",
+ "data": [
+  1,
+  2
+ ],
+ "labels": [
+  "日本語のとても長いラベルです",
+  "😀"
+ ],
+ "center": "日本"
+}

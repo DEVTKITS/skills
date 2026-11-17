@@ -1,0 +1,15 @@
+{
+ "_error_field": "edges",
+ "type": "graph",
+ "nodes": [
+  {
+   "id": "a"
+  }
+ ],
+ "edges": [
+  {
+   "from": "a",
+   "to": "zz"
+  }
+ ]
+}

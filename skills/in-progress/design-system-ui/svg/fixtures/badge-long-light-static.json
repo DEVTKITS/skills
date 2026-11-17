@@ -1,0 +1,15 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "badge",
+ "theme": "light",
+ "colors": "static",
+ "label": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+ "value": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+ "height": 64,
+ "color": "#abc"
+}

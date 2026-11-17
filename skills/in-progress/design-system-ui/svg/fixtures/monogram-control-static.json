@@ -1,0 +1,12 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "monogram",
+ "theme": "control",
+ "colors": "static",
+ "text": "DZ",
+ "shape": "circle"
+}

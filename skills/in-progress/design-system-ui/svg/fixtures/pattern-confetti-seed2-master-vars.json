@@ -1,0 +1,14 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "pattern",
+ "kind": "confetti",
+ "seed": 2,
+ "density": 400,
+ "size": 30,
+ "width": 400,
+ "height": 300
+}

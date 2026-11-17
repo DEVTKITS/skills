@@ -1,0 +1,12 @@
+{
+ "_error_field": "nodes",
+ "type": "graph",
+ "nodes": [
+  {
+   "id": "a"
+  },
+  {
+   "id": "a"
+  }
+ ]
+}

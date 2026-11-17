@@ -1,0 +1,16 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "icon",
+ "name": "heart",
+ "theme": "light",
+ "colors": "static",
+ "size": 512,
+ "stroke": 1,
+ "bg": true,
+ "color": "text"
+}

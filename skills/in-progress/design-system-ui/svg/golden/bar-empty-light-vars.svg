@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="280" viewBox="0 0 480 280" role="img" aria-label="Balkendiagramm" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>Balkendiagramm</title>
+<rect x="0.5" y="0.5" width="479" height="279" rx="12" fill="var(--bg-card, #ffffff)" stroke="var(--text, #0e0e10)" stroke-opacity="0.08"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="var(--text, #0e0e10)">Balkendiagramm</text>
+<text x="240" y="144" font-size="13" text-anchor="middle" fill="var(--text-muted, #6a6a6b)">— ausstehend —</text>
+</svg>

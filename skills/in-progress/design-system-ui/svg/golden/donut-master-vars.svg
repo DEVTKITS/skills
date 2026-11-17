@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240" role="img" aria-label="Verteilung" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>Verteilung</title>
+<rect x="0.5" y="0.5" width="359" height="239" rx="12" fill="var(--bg-card, #0e0e10)" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="var(--text, #f6f6f7)">Verteilung</text>
+<path d="M98 51A82 82 0 0 1 123.34 210.99L114.72 184.47A54.12 54.12 0 0 0 98 78.88Z" fill="var(--accent, #fa1e4e)" stroke="var(--bg-card, #0e0e10)" stroke-width="2"/>
+<path d="M123.34 210.99A82 82 0 0 1 16 133L43.88 133A54.12 54.12 0 0 0 114.72 184.47Z" fill="var(--cyan, #3fe0d0)" stroke="var(--bg-card, #0e0e10)" stroke-width="2"/>
+<path d="M16 133A82 82 0 0 1 98 51L98 78.88A54.12 54.12 0 0 0 43.88 133Z" fill="var(--lila, #9d7bff)" stroke="var(--bg-card, #0e0e10)" stroke-width="2"/>
+<text x="98" y="141.4" font-size="24" font-weight="700" text-anchor="middle" fill="var(--text, #f6f6f7)">100</text>
+<rect x="196" y="108" width="10" height="10" rx="2" fill="var(--accent, #fa1e4e)"/>
+<text x="212" y="117" font-size="12" fill="var(--text, #f6f6f7)">Design</text>
+<text x="344" y="117" font-size="12" text-anchor="end" fill="var(--text-muted, #8e8e8f)">45%</text>
+<rect x="196" y="128" width="10" height="10" rx="2" fill="var(--cyan, #3fe0d0)"/>
+<text x="212" y="137" font-size="12" fill="var(--text, #f6f6f7)">Code</text>
+<text x="344" y="137" font-size="12" text-anchor="end" fill="var(--text-muted, #8e8e8f)">30%</text>
+<rect x="196" y="148" width="10" height="10" rx="2" fill="var(--lila, #9d7bff)"/>
+<text x="212" y="157" font-size="12" fill="var(--text, #f6f6f7)">Tests</text>
+<text x="344" y="157" font-size="12" text-anchor="end" fill="var(--text-muted, #8e8e8f)">25%</text>
+</svg>

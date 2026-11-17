@@ -1,0 +1,15 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "gradient",
+ "theme": "light",
+ "colors": "static",
+ "kind": "radial",
+ "text": "DkZ Design",
+ "from": "accent",
+ "to": "lila"
+}

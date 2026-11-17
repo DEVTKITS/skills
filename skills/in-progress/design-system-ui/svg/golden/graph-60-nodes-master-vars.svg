@@ -1,0 +1,296 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1128" height="692" viewBox="0 0 1128 692" role="img" aria-label="Viele Knoten" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>Viele Knoten</title>
+<rect x="0.5" y="0.5" width="1127" height="691" rx="12" fill="var(--bg-card, #0e0e10)" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<defs><marker id="sk-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="var(--text-muted, #8e8e8f)"/></marker></defs>
+<path d="M152 40C180 40 180 40 208 40" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M152 108C180 108 180 108 208 108" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M152 176C180 176 180 176 208 176" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M152 244C180 244 180 244 208 244" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M152 312C180 312 180 312 208 312" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M152 380C180 380 180 380 208 380" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M152 448C180 448 180 448 208 448" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M152 516C180 516 180 516 208 516" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M152 584C180 584 180 584 208 584" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M152 652C180 652 180 652 208 652" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 40C372 40 372 40 400 40" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 108C372 108 372 108 400 108" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 176C372 176 372 176 400 176" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 244C372 244 372 244 400 244" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 312C372 312 372 312 400 312" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 380C372 380 372 380 400 380" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 448C372 448 372 448 400 448" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 516C372 516 372 516 400 516" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 584C372 584 372 584 400 584" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M344 652C372 652 372 652 400 652" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 40C564 40 564 40 592 40" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 108C564 108 564 108 592 108" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 176C564 176 564 176 592 176" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 244C564 244 564 244 592 244" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 312C564 312 564 312 592 312" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 380C564 380 564 380 592 380" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 448C564 448 564 448 592 448" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 516C564 516 564 516 592 516" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 584C564 584 564 584 592 584" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M536 652C564 652 564 652 592 652" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M728 40C756 40 756 40 784 40" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M728 108C756 108 756 108 784 108" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M728 176C756 176 756 176 784 176" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M728 244C756 244 756 244 784 244" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M728 312C756 312 756 312 784 312" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M728 380C756 380 756 380 784 380" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M728 448C756 448 756 448 784 448" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M728 516C756 516 756 516 784 516" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M728 584C756 584 756 584 784 584" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M728 652C756 652 756 652 784 652" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M920 40C948 40 948 40 976 40" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M920 108C948 108 948 108 976 108" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M920 176C948 176 948 176 976 176" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M920 244C948 244 948 244 976 244" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M920 312C948 312 948 312 976 312" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M920 380C948 380 948 380 976 380" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M920 448C948 448 948 448 976 448" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M920 516C948 516 948 516 976 516" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M920 584C948 584 948 584 976 584" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M920 652C948 652 948 652 976 652" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<path d="M152 244C468 244 468 40 784 40" fill="none" stroke="var(--text-muted, #8e8e8f)" stroke-width="1.5" marker-end="url(#sk-arrow)"/>
+<rect x="16" y="16" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="22" y="26" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="32" y="37" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n0</text>
+<text x="32" y="52" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="16" y="84" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="22" y="94" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="32" y="105" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n1</text>
+<text x="32" y="120" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="16" y="152" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="22" y="162" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="32" y="173" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n2</text>
+<text x="32" y="188" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="16" y="220" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="22" y="230" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="32" y="241" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n3</text>
+<text x="32" y="256" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="16" y="288" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="22" y="298" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="32" y="309" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n4</text>
+<text x="32" y="324" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="16" y="356" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="22" y="366" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="32" y="377" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n5</text>
+<text x="32" y="392" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="16" y="424" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="22" y="434" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="32" y="445" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n6</text>
+<text x="32" y="460" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="16" y="492" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="22" y="502" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="32" y="513" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n7</text>
+<text x="32" y="528" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="16" y="560" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="22" y="570" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="32" y="581" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n8</text>
+<text x="32" y="596" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="16" y="628" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="22" y="638" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="32" y="649" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n9</text>
+<text x="32" y="664" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="208" y="16" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="214" y="26" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="224" y="37" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n10</text>
+<text x="224" y="52" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="208" y="84" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="214" y="94" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="224" y="105" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n11</text>
+<text x="224" y="120" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="208" y="152" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="214" y="162" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="224" y="173" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n12</text>
+<text x="224" y="188" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="208" y="220" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="214" y="230" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="224" y="241" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n13</text>
+<text x="224" y="256" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="208" y="288" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="214" y="298" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="224" y="309" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n14</text>
+<text x="224" y="324" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="208" y="356" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="214" y="366" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="224" y="377" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n15</text>
+<text x="224" y="392" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="208" y="424" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="214" y="434" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="224" y="445" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n16</text>
+<text x="224" y="460" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="208" y="492" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="214" y="502" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="224" y="513" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n17</text>
+<text x="224" y="528" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="208" y="560" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="214" y="570" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="224" y="581" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n18</text>
+<text x="224" y="596" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="208" y="628" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="214" y="638" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="224" y="649" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n19</text>
+<text x="224" y="664" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="400" y="16" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="406" y="26" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="416" y="37" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n20</text>
+<text x="416" y="52" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="400" y="84" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="406" y="94" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="416" y="105" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n21</text>
+<text x="416" y="120" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="400" y="152" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="406" y="162" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="416" y="173" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n22</text>
+<text x="416" y="188" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="400" y="220" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="406" y="230" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="416" y="241" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n23</text>
+<text x="416" y="256" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="400" y="288" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="406" y="298" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="416" y="309" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n24</text>
+<text x="416" y="324" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="400" y="356" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="406" y="366" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="416" y="377" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n25</text>
+<text x="416" y="392" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="400" y="424" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="406" y="434" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="416" y="445" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n26</text>
+<text x="416" y="460" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="400" y="492" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="406" y="502" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="416" y="513" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n27</text>
+<text x="416" y="528" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="400" y="560" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="406" y="570" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="416" y="581" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n28</text>
+<text x="416" y="596" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="400" y="628" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="406" y="638" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="416" y="649" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n29</text>
+<text x="416" y="664" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="592" y="16" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="598" y="26" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="608" y="37" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n30</text>
+<text x="608" y="52" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="592" y="84" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="598" y="94" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="608" y="105" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n31</text>
+<text x="608" y="120" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="592" y="152" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="598" y="162" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="608" y="173" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n32</text>
+<text x="608" y="188" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="592" y="220" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="598" y="230" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="608" y="241" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n33</text>
+<text x="608" y="256" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="592" y="288" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="598" y="298" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="608" y="309" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n34</text>
+<text x="608" y="324" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="592" y="356" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="598" y="366" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="608" y="377" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n35</text>
+<text x="608" y="392" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="592" y="424" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="598" y="434" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="608" y="445" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n36</text>
+<text x="608" y="460" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="592" y="492" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="598" y="502" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="608" y="513" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n37</text>
+<text x="608" y="528" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="592" y="560" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="598" y="570" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="608" y="581" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n38</text>
+<text x="608" y="596" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="592" y="628" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="598" y="638" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="608" y="649" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n39</text>
+<text x="608" y="664" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="784" y="16" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="790" y="26" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="800" y="37" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n40</text>
+<text x="800" y="52" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="784" y="84" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="790" y="94" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="800" y="105" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n41</text>
+<text x="800" y="120" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="784" y="152" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="790" y="162" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="800" y="173" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n42</text>
+<text x="800" y="188" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="784" y="220" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="790" y="230" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="800" y="241" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n43</text>
+<text x="800" y="256" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="784" y="288" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="790" y="298" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="800" y="309" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n44</text>
+<text x="800" y="324" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="784" y="356" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="790" y="366" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="800" y="377" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n45</text>
+<text x="800" y="392" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="784" y="424" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="790" y="434" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="800" y="445" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n46</text>
+<text x="800" y="460" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="784" y="492" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="790" y="502" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="800" y="513" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n47</text>
+<text x="800" y="528" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="784" y="560" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="790" y="570" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="800" y="581" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n48</text>
+<text x="800" y="596" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="784" y="628" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="790" y="638" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="800" y="649" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n49</text>
+<text x="800" y="664" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="976" y="16" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="982" y="26" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="992" y="37" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n50</text>
+<text x="992" y="52" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="976" y="84" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="982" y="94" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="992" y="105" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n51</text>
+<text x="992" y="120" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="976" y="152" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="982" y="162" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="992" y="173" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n52</text>
+<text x="992" y="188" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="976" y="220" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="982" y="230" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="992" y="241" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n53</text>
+<text x="992" y="256" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="976" y="288" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="982" y="298" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="992" y="309" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n54</text>
+<text x="992" y="324" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="976" y="356" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="982" y="366" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="992" y="377" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n55</text>
+<text x="992" y="392" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+<rect x="976" y="424" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.45"/>
+<rect x="982" y="434" width="3" height="28" rx="1.5" fill="var(--accent, #fa1e4e)"/>
+<text x="992" y="445" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n56</text>
+<text x="992" y="460" font-size="10" fill="var(--text-muted, #8e8e8f)">input</text>
+<rect x="976" y="492" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="982" y="502" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="992" y="513" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n57</text>
+<text x="992" y="528" font-size="10" fill="var(--text-muted, #8e8e8f)">model</text>
+<rect x="976" y="560" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--pink, #ec4899)" stroke-opacity="0.45"/>
+<rect x="982" y="570" width="3" height="28" rx="1.5" fill="var(--pink, #ec4899)"/>
+<text x="992" y="581" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n58</text>
+<text x="992" y="596" font-size="10" fill="var(--text-muted, #8e8e8f)">tool</text>
+<rect x="976" y="628" width="136" height="48" rx="10" fill="var(--bg-elevated, #141418)" stroke="var(--cyan, #3fe0d0)" stroke-opacity="0.45"/>
+<rect x="982" y="638" width="3" height="28" rx="1.5" fill="var(--cyan, #3fe0d0)"/>
+<text x="992" y="649" font-size="12" font-weight="600" fill="var(--text, #f6f6f7)">n59</text>
+<text x="992" y="664" font-size="10" fill="var(--text-muted, #8e8e8f)">output</text>
+</svg>

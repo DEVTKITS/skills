@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="200" viewBox="0 0 500 200" role="img" aria-label="Ringdiagramm" font-family="var(--font-main, Archivo Expanded,Inter,system-ui,-apple-system,sans-serif)">
+<title>Ringdiagramm</title>
+<rect x="0.5" y="0.5" width="499" height="199" rx="0" fill="var(--bg-card, #0e0e10)" stroke="var(--accent, #fa1e4e)" stroke-opacity="0.3"/>
+<path d="M1 11V1H11M489 1H499V11M499 189V199H489M11 199H1V189" fill="none" stroke="var(--accent, #fa1e4e)" stroke-width="2"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="var(--text, #f6f6f7)">Ringdiagramm</text>
+<path d="M133 42A71 71 0 1 1 91.27 170.44L95.44 164.7A63.9 63.9 0 1 0 133 49.1Z" fill="var(--accent, #fa1e4e)" stroke="var(--bg-card, #0e0e10)" stroke-width="2"/>
+<path d="M91.27 170.44A71 71 0 0 1 133 42L133 49.1A63.9 63.9 0 0 0 95.44 164.7Z" fill="var(--cyan, #3fe0d0)" stroke="var(--bg-card, #0e0e10)" stroke-width="2"/>
+<text x="133" y="122.8" font-size="28" font-weight="700" text-anchor="middle" fill="var(--text, #f6f6f7)">5</text>
+<rect x="266" y="98" width="10" height="10" rx="2" fill="var(--accent, #fa1e4e)"/>
+<text x="282" y="107" font-size="12" fill="var(--text, #f6f6f7)">Teil 1</text>
+<text x="484" y="107" font-size="12" text-anchor="end" fill="var(--text-muted, #8e8e8f)">60%</text>
+<rect x="266" y="118" width="10" height="10" rx="2" fill="var(--cyan, #3fe0d0)"/>
+<text x="282" y="127" font-size="12" fill="var(--text, #f6f6f7)">Teil 2</text>
+<text x="484" y="127" font-size="12" text-anchor="end" fill="var(--text-muted, #8e8e8f)">40%</text>
+</svg>

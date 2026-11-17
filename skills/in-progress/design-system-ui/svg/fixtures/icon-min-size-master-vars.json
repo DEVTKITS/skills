@@ -1,0 +1,12 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "icon",
+ "name": "star",
+ "size": 12,
+ "stroke": 4
+}

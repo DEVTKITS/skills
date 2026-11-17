@@ -1,0 +1,15 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "bar",
+ "data": [
+  42
+ ],
+ "labels": [
+  "Eins"
+ ]
+}

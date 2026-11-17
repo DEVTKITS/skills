@@ -1,0 +1,15 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "icon",
+ "name": "info",
+ "theme": "light",
+ "colors": "static",
+ "size": 92,
+ "stroke": 3,
+ "bg": false
+}

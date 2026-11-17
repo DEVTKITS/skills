@@ -1,0 +1,28 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "bar",
+ "theme": "light",
+ "colors": "static",
+ "title": "Umsatz pro Monat",
+ "data": [
+  12,
+  19,
+  7,
+  15,
+  22,
+  10
+ ],
+ "labels": [
+  "Jan",
+  "Feb",
+  "Mär",
+  "Apr",
+  "Mai",
+  "Jun"
+ ]
+}

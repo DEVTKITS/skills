@@ -1,0 +1,15 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "icon",
+ "name": "play",
+ "theme": "contrast",
+ "colors": "vars",
+ "size": 56,
+ "stroke": 2.5,
+ "bg": false
+}

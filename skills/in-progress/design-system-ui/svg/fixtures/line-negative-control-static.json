@@ -1,0 +1,22 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "line",
+ "theme": "control",
+ "colors": "static",
+ "data": [
+  [
+   -5,
+   3,
+   -2,
+   8,
+   -9,
+   4
+  ]
+ ],
+ "area": false,
+ "dots": false
+}

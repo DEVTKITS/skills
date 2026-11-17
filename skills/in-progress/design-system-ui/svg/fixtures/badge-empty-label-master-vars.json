@@ -1,0 +1,11 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "badge",
+ "label": "",
+ "value": "nur Wert"
+}

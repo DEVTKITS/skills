@@ -1,0 +1,19 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs",
+  "c"
+ ],
+ "type": "pattern",
+ "kind": "dots",
+ "theme": "contrast",
+ "colors": "vars",
+ "width": 116,
+ "height": 300,
+ "size": 24,
+ "stroke": 3.5,
+ "angle": -30,
+ "opacity": 0.35,
+ "bg": false
+}

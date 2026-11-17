@@ -1,0 +1,16 @@
+{
+ "_impl": [
+  "js",
+  "py",
+  "rs"
+ ],
+ "type": "graph",
+ "colors": "static",
+ "nodes": [
+  {
+   "id": "solo",
+   "type": "agent",
+   "label": "Einzelner Knoten"
+  }
+ ]
+}

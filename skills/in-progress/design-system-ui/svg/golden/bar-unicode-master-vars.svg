@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="280" viewBox="0 0 480 280" role="img" aria-label="Ünïcödé 😀 日本語 العربية" font-family="var(--font-main, Inter,system-ui,-apple-system,sans-serif)">
+<title>Ünïcödé 😀 日本語 العربية</title>
+<rect x="0.5" y="0.5" width="479" height="279" rx="12" fill="var(--bg-card, #0e0e10)" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="16" y="29" font-size="13" font-weight="600" fill="var(--text, #f6f6f7)">Ünïcödé 😀 日本語 العربية</text>
+<line x1="30.6" y1="244" x2="464" y2="244" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="22.6" y="248" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">0</text>
+<line x1="30.6" y1="195.5" x2="464" y2="195.5" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="22.6" y="199.5" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">2</text>
+<line x1="30.6" y1="147" x2="464" y2="147" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="22.6" y="151" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">4</text>
+<line x1="30.6" y1="98.5" x2="464" y2="98.5" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="22.6" y="102.5" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">6</text>
+<line x1="30.6" y1="50" x2="464" y2="50" stroke="var(--text, #f6f6f7)" stroke-opacity="0.08"/>
+<text x="22.6" y="54" font-size="11" text-anchor="end" fill="var(--text-muted, #8e8e8f)">8</text>
+<rect x="70.83" y="171.25" width="64" height="72.75" rx="4" fill="var(--accent, #fa1e4e)"/>
+<text x="102.83" y="165.25" font-size="11" text-anchor="middle" fill="var(--text, #f6f6f7)">3</text>
+<text x="102.83" y="260" font-size="11" text-anchor="middle" fill="var(--text-muted, #8e8e8f)">Äpfel</text>
+<rect x="215.3" y="74.25" width="64" height="169.75" rx="4" fill="var(--accent, #fa1e4e)"/>
+<text x="247.3" y="68.25" font-size="11" text-anchor="middle" fill="var(--text, #f6f6f7)">7</text>
+<text x="247.3" y="260" font-size="11" text-anchor="middle" fill="var(--text-muted, #8e8e8f)">日本</text>
+<rect x="359.77" y="122.75" width="64" height="121.25" rx="4" fill="var(--accent, #fa1e4e)"/>
+<text x="391.77" y="116.75" font-size="11" text-anchor="middle" fill="var(--text, #f6f6f7)">5</text>
+<text x="391.77" y="260" font-size="11" text-anchor="middle" fill="var(--text-muted, #8e8e8f)">😀😀😀</text>
+</svg>
