@@ -17,6 +17,8 @@
  *   POST /api/workflow/evaluate  Bewertung mit Urteil iterate/done
  *   GET  /api/agent/activity     Aktivitäts-Feed
  *   POST /api/agent/activity     Schritt melden (roter Monitorrand)
+ *   POST /api/svg/generate       SVG aus einer svgspec/1-Spezifikation (C-Teilmenge, svgkit.c)
+ *   GET  /api/svg/types          svg/types.json (Felder, Grenzen, Standardwerte)
  *
  * Bewusst schlank: der C-Server ist das Gerüst für Umgebungen ohne Python.
  * Für Provider-Aufrufe und die Agenten-Shell bleibt server.py zuständig.
@@ -36,6 +38,10 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+
+/* SVG-Generator (C-Teilmenge). Direkt eingebunden, damit der Einzeiler
+ * "cc -O2 -std=c99 -pthread -o dsui-c server.c" ohne weitere Dateien und ohne -lm baut. */
+#include "svgkit.c"
 
 #define MAX_REQ      (256 * 1024)
 #define MAX_NODES    256
@@ -259,6 +265,9 @@ static void send_raw(int fd, int status, const char *ctype,
                      const char *body, size_t len) {
     const char *reason = status == 200 ? "OK"
                        : status == 404 ? "Not Found"
+                       : status == 400 ? "Bad Request"
+                       : status == 413 ? "Payload Too Large"
+                       : status == 501 ? "Not Implemented"
                        : status == 204 ? "No Content" : "Error";
     char head[512];
     int hn = snprintf(head, sizeof head,
@@ -400,6 +409,69 @@ static void handle_evaluate(int fd, const char *body) {
     send_json(fd, 200, out);
 }
 
+/* ───────────────────────── SVG-Endpunkte (svgkit.c) ───────────────────────── */
+
+static int file_readable(const char *name) {
+    char path[512];
+    FILE *f;
+    snprintf(path, sizeof path, "../%s", name);
+    f = fopen(path, "rb");
+    if (!f) { snprintf(path, sizeof path, "%s", name); f = fopen(path, "rb"); }
+    if (!f) return 0;
+    fclose(f);
+    return 1;
+}
+
+/* GET /api/svg/types — Inhalt von svg/types.json (einzige Quelle, wie bei der Python-Fassung). */
+static void handle_svg_types(int fd) {
+    if (!file_readable("svg/types.json")) {
+        send_json(fd, 404, "{\"ok\":false,\"error\":\"\xE2\x80\x94 ausstehend \xE2\x80\x94\",\"needs\":\"svg/types.json\"}");
+        return;
+    }
+    send_file(fd, "svg/types.json", "application/json; charset=utf-8");
+}
+
+/* POST /api/svg/generate — Rumpf = Spezifikation (JSON). */
+static void handle_svg_generate(int fd, const char *body) {
+    char *svg = (char *)malloc(SVG_OUT_MAX);
+    char err[256], field[64] = "spec", msg[256] = "", ef[160], em[600], out[1100];
+    size_t svg_len = 0;
+    int rc;
+    if (!svg) { send_json(fd, 500, "{\"ok\":false,\"error\":\"Speicher erschoepft\",\"engine\":\"c\"}"); return; }
+    rc = svg_generate_n(body, strlen(body), svg, SVG_OUT_MAX, &svg_len, err, sizeof err);
+    if (rc == SVG_OK) {
+        size_t rcap = svg_len * 6 + 256, o;
+        char *resp = (char *)malloc(rcap);
+        if (!resp) { free(svg); send_json(fd, 500, "{\"ok\":false,\"error\":\"Speicher erschoepft\",\"engine\":\"c\"}"); return; }
+        o = (size_t)snprintf(resp, rcap, "{\"ok\":true,\"svg\":\"");
+        json_escape(svg, resp + o, rcap - o);
+        o += strlen(resp + o);
+        snprintf(resp + o, rcap - o, "\",\"bytes\":%zu,\"engine\":\"c\"}", svg_len);
+        send_json(fd, 200, resp);
+        free(resp);
+        free(svg);
+        return;
+    }
+    free(svg);
+    {   /* err = "<Feld>: <Meldung>" */
+        const char *sep = strstr(err, ": ");
+        if (sep) {
+            size_t fl = (size_t)(sep - err);
+            if (fl >= sizeof field) fl = sizeof field - 1;
+            memcpy(field, err, fl); field[fl] = 0;
+            snprintf(msg, sizeof msg, "%s", sep + 2);
+        } else snprintf(msg, sizeof msg, "%s", err);
+    }
+    json_escape(field, ef, sizeof ef);
+    json_escape(msg, em, sizeof em);
+    if (rc == SVG_E_SUBSET)
+        snprintf(out, sizeof out, "{\"ok\":false,\"error\":\"%s\",\"field\":\"%s\",\"supported\":%s,\"engine\":\"c\"}",
+                 em, ef, SVG_SUPPORTED_JSON);
+    else
+        snprintf(out, sizeof out, "{\"ok\":false,\"error\":\"%s\",\"field\":\"%s\",\"engine\":\"c\"}", em, ef);
+    send_json(fd, rc == SVG_E_SUBSET ? 501 : rc == SVG_E_LIMIT ? 413 : rc == SVG_E_BUF ? 500 : 400, out);
+}
+
 static void handle_activity_get(int fd, const char *path) {
     long since = 0;
     const char *q = strstr(path, "since=");
@@ -508,6 +580,8 @@ static void *handle_conn(void *arg) {
         }
         else if (strncmp(path, "/api/agent/activity", 19) == 0)
             handle_activity_get(fd, path);
+        else if (strcmp(path, "/api/svg/types") == 0 || strncmp(path, "/api/svg/types?", 15) == 0)
+            handle_svg_types(fd);
         else if (strcmp(path, "/favicon.ico") == 0) {
             const char *svg =
               "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\">"
@@ -520,6 +594,8 @@ static void *handle_conn(void *arg) {
             handle_execute(fd, body);
         else if (strcmp(path, "/api/workflow/evaluate") == 0)
             handle_evaluate(fd, body);
+        else if (strcmp(path, "/api/svg/generate") == 0)
+            handle_svg_generate(fd, body);
         else if (strcmp(path, "/api/agent/activity") == 0) {
             char out[128];
             snprintf(out, sizeof out, "{\"ok\":true,\"seq\":%d,\"engine\":\"c\"}",

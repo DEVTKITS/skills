@@ -1,0 +1,22 @@
+[package]
+name = "dsui-svg"
+version = "0.1.0"
+edition = "2021"
+description = "svgspec/1 SVG-Generator (DkZ) - Rust-Fassung ohne externe Abhaengigkeiten, byte-gleich zu svgkit.js"
+license = "MIT"
+publish = false
+
+[lib]
+name = "dsui_svg"
+path = "src/lib.rs"
+
+[[bin]]
+name = "dsui-svg"
+path = "src/main.rs"
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
