@@ -20,12 +20,16 @@ mkdir -p "$DEST"
 # Alles außer den Versionen selbst und flüchtigen Verzeichnissen
 for item in *; do
   case "$item" in
-    versions|__pycache__|node_modules|shots) continue ;;
+    versions|__pycache__|node_modules|shots|.venv|data|target) continue ;;
   esac
   cp -r "$item" "$DEST/"
 done
 rm -rf "$DEST/demo/node_modules" "$DEST/demo/shots" "$DEST/__pycache__" \
-       "$DEST"/**/__pycache__ 2>/dev/null || true
+       "$DEST/.venv" "$DEST/rust/target" "$DEST/video/node_modules" 2>/dev/null || true
+find "$DEST" -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
+# link-skills.sh verlinkt jede SKILL.md im Repo — eine archivierte Kopie darf nicht
+# als zusätzlicher, doppelter Skill auftauchen.
+[ -f "$DEST/SKILL.md" ] && mv "$DEST/SKILL.md" "$DEST/SKILL.archiv.md"
 
 cat > "$DEST/VERSION.md" <<EOF
 # $NAME

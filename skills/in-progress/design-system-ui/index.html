@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Design System UI — Workflow & Skill Builder</title>
+    <link rel="stylesheet" href="dkz.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="svgstudio.css">
+    <link rel="stylesheet" href="designbot.css">
 </head>
 <body>
     <!-- Roter Monitorrand, sichtbar solange eine KI arbeitet -->
@@ -45,6 +48,7 @@
             <li><button class="drawer-item active" data-view="builder"><span>🧩</span> Workflow Builder</button></li>
             <li><button class="drawer-item" data-view="chat"><span>💬</span> Chat &amp; Canvas</button></li>
             <li><button class="drawer-item" data-view="studio"><span>🎙️</span> Content Studio</button></li>
+            <li><button class="drawer-item" data-view="svg"><span>🧬</span> SVG Studio</button></li>
             <li><button class="drawer-item" data-view="skills"><span>🧠</span> Skill Builder</button></li>
             <li><button class="drawer-item" data-view="providers"><span>🔌</span> Provider &amp; APIs</button></li>
             <li><button class="drawer-item" data-view="stock"><span>🖼️</span> Stock Medien</button></li>
@@ -480,6 +484,9 @@
             </section>
         </main>
 
+        <!-- ═══════════ VIEW: SVG STUDIO (von svgstudio.js befüllt) ═══════════ -->
+        <main class="app-main single view hidden" id="view-svg"></main>
+
         <!-- ═══════════ VIEW: DOCS ═══════════ -->
         <main class="app-main single view hidden" id="view-docs">
             <section class="panel">
@@ -522,6 +529,10 @@
         </div>
     </div>
 
+    <script src="dkz.js"></script>
+    <script src="svgkit.js"></script>
     <script src="app.js"></script>
+    <script src="svgstudio.js"></script>
+    <script src="designbot.js"></script>
 </body>
 </html>

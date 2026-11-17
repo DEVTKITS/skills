@@ -35,7 +35,17 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger("design-system-ui")
 
 ROOT = Path(__file__).resolve().parent
-STATIC_FILES = {"index.html", "app.js", "styles.css", "llms.txt"}
+# Ausdrücklich freigegebene Dateien im Wurzelverzeichnis. Bewusst KEINE
+# Muster wie "*.json": settings.json und imported-skills.json liegen daneben
+# und dürfen nie ausgeliefert werden.
+STATIC_FILES = {
+    "index.html", "app.js", "styles.css", "llms.txt",
+    # DkZ-Designsystem und neue Oberflächen
+    "dkz.css", "dkz.js", "svgkit.js", "svgstudio.js", "svgstudio.css",
+    "designbot.js", "designbot.css",
+}
+MEDIA_DIR = ROOT / "data" / "media"
+MEDIA_NAME = __import__("re").compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,99}\.(mp4|webm|svg|png|mp3)$")
 
 
 def now_iso() -> str:
@@ -800,6 +810,70 @@ PARAM_SUGGESTIONS = {
 # --------------------------------------------------------------------------- #
 # HTTP handler                                                                #
 # --------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
+# Plug-ins — jede Fähigkeit liefert ihre Routen selbst                         #
+# --------------------------------------------------------------------------- #
+# Ein Plug-in ist eine Datei plugins/<name>.py mit:
+#   ROUTES = {"GET /api/x": fn, "POST /api/y": fn, "GET /api/z/*": fn}
+#   STATUS()  (optional) -> dict, erscheint unter /api/plugins
+# fn(ctx) bekommt {"payload","query","path","rest","port","edition"} und liefert
+#   dict|list              -> 200 JSON
+#   (status, dict|list)    -> JSON mit Status
+#   (status, bytes, ctype) -> rohe Antwort (z. B. SVG, MP4)
+# So schreibt jede Fähigkeit nur in ihre eigene Datei; server.py bleibt klein.
+PLUGIN_NAMES = ["svgapi", "botapi", "controlapi", "videoapi"]
+PLUGINS: dict[str, dict] = {}
+PLUGIN_ROUTES: dict[str, object] = {}
+
+
+def load_plugins() -> None:
+    import importlib
+
+    PLUGINS.clear()
+    PLUGIN_ROUTES.clear()
+    for name in PLUGIN_NAMES:
+        entry = {"name": name, "loaded": False, "routes": [], "error": None,
+                 "status": None}
+        try:
+            mod = importlib.import_module(f"plugins.{name}")
+        except ModuleNotFoundError as exc:
+            if exc.name in ("plugins", f"plugins.{name}"):
+                entry["error"] = "— ausstehend —"          # Datei gibt es noch nicht
+            else:
+                entry["error"] = f"Abhängigkeit fehlt: {exc.name}"
+        except Exception as exc:  # noqa: BLE001 — ein kaputtes Plug-in darf den Server nicht stoppen
+            entry["error"] = f"{type(exc).__name__}: {exc}"
+            log.exception("Plug-in %s konnte nicht geladen werden", name)
+        else:
+            routes = getattr(mod, "ROUTES", {}) or {}
+            for key, fn in routes.items():
+                PLUGIN_ROUTES[key] = fn
+                entry["routes"].append(key)
+            entry["loaded"] = True
+            status_fn = getattr(mod, "STATUS", None)
+            if callable(status_fn):
+                try:
+                    entry["status"] = status_fn()
+                except Exception as exc:  # noqa: BLE001
+                    entry["status"] = {"error": f"{type(exc).__name__}: {exc}"}
+        PLUGINS[name] = entry
+
+
+def find_plugin_route(method: str, path: str):
+    """Exakte Route zuerst, dann die längste passende Präfix-Route (…/*)."""
+    exact = PLUGIN_ROUTES.get(f"{method} {path}")
+    if exact:
+        return exact, ""
+    best, best_len, rest = None, -1, ""
+    for key, fn in PLUGIN_ROUTES.items():
+        m, _, route = key.partition(" ")
+        if m == method and route.endswith("/*"):
+            prefix = route[:-1]                       # behält den Schrägstrich
+            if path.startswith(prefix) and len(prefix) > best_len:
+                best, best_len, rest = fn, len(prefix), path[len(prefix):]
+    return (best, rest) if best else (None, "")
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "DesignSystemUI/1.0"
 
@@ -826,6 +900,68 @@ class Handler(BaseHTTPRequestHandler):
             return json.loads(self.rfile.read(length) or b"{}")
         except json.JSONDecodeError:
             return {}
+
+    def _try_plugin(self, method: str, path: str, payload: dict) -> bool:
+        fn, rest = find_plugin_route(method, path)
+        if fn is None:
+            return False
+        qs = {k: v[0] for k, v in parse_qs(urlparse(self.path).query).items()}
+        ctx = {"payload": payload, "query": qs, "path": path, "rest": rest,
+               "port": CURRENT_PORT, "edition": current_edition()["id"]}
+        try:
+            result = fn(ctx)
+        except Exception as exc:  # noqa: BLE001 — Fehler melden, nicht abstürzen
+            log.exception("Plug-in-Route %s %s fehlgeschlagen", method, path)
+            self._json({"ok": False, "error": f"{type(exc).__name__}: {exc}"}, 500)
+            return True
+        if isinstance(result, tuple) and len(result) == 3:
+            self._send(result[0], result[1], result[2])
+        elif isinstance(result, tuple) and len(result) == 2:
+            self._json(result[1], result[0])
+        else:
+            self._json(result)
+        return True
+
+    def _serve_media(self, name: str) -> None:
+        """Mediendateien (Video, Audio, SVG) — mit Range-Unterstützung zum Springen."""
+        if not MEDIA_NAME.match(name):
+            self._json({"error": "not found"}, 404)
+            return
+        path = MEDIA_DIR / name
+        if not path.is_file():
+            self._json({"error": "not found"}, 404)
+            return
+        data = path.read_bytes()
+        ctype = mimetypes.guess_type(name)[0] or "application/octet-stream"
+        rng = self.headers.get("Range", "")
+        if rng.startswith("bytes="):
+            try:
+                a, _, b = rng[6:].partition("-")
+                start = int(a) if a else 0
+                end = int(b) if b else len(data) - 1
+                end = min(end, len(data) - 1)
+                if start > end:
+                    raise ValueError
+            except ValueError:
+                self._send(416, b"", ctype)
+                return
+            chunk = data[start:end + 1]
+            self.send_response(206)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Range", f"bytes {start}-{end}/{len(data)}")
+            self.send_header("Accept-Ranges", "bytes")
+            self.send_header("Content-Length", str(len(chunk)))
+            self.end_headers()
+            if self.command != "HEAD":
+                self.wfile.write(chunk)
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Accept-Ranges", "bytes")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(data)
 
     def _serve_static(self, name: str) -> None:
         if name == "" or name == "/":
@@ -915,8 +1051,15 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/health":
             self._json({"status": "healthy", "service": "design-system-ui",
                         "timestamp": now_iso()})
+        elif path == "/api/plugins":
+            self._json({"plugins": list(PLUGINS.values()),
+                        "loaded": sum(1 for p in PLUGINS.values() if p["loaded"])})
+        elif path.startswith("/media/"):
+            self._serve_media(path[len("/media/"):])
         elif path.lstrip("/") in STATIC_FILES:
             self._serve_static(path)
+        elif self._try_plugin("GET", path, {}):
+            pass
         else:
             self._json({"error": "not found", "path": path}, 404)
 
@@ -991,6 +1134,8 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self._json(OPENCLAW.run(str(payload.get("task", ""))[:2000],
                                     payload.get("pattern")))
+        elif self._try_plugin("POST", path, payload):
+            pass
         else:
             self._json({"error": "not found", "path": path}, 404)
 
@@ -1003,6 +1148,9 @@ def main() -> None:
     port = int(os.environ.get("PORT", "8000"))
     CURRENT_PORT = port
     host = os.environ.get("HOST", "0.0.0.0")
+    load_plugins()
+    loaded = [n for n, p in PLUGINS.items() if p["loaded"]]
+    log.info("Plug-ins geladen: %s", ", ".join(loaded) or "keine")
     httpd = ThreadingHTTPServer((host, port), Handler)
     log.info("Design System UI serving on http://%s:%d", host, port)
     log.info("Open http://localhost:%d  |  agents: http://localhost:%d/llms.txt",

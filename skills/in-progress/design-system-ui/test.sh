@@ -7,10 +7,13 @@
 set -u
 cd "$(dirname "$0")"
 
+PY="python3"; [ -x .venv/bin/python ] && PY=".venv/bin/python"
 PORT="${TEST_PORT:-8765}"
 BASE="http://localhost:${PORT}"
 PASS=0; FAIL=0
 LOG="$(mktemp)"
+TMPDB="$(mktemp -d)"
+export DKZ_DB="$TMPDB/dkz.duckdb"   # Testläufe fassen die echte Datenbank in data/ nie an
 
 say()  { printf '%s\n' "$*"; }
 ok()   { PASS=$((PASS+1)); say "  ✓ $1"; }
@@ -22,9 +25,9 @@ assert_contains() {
 }
 
 say "── boot ─────────────────────────────────────────────"
-PORT="$PORT" python3 server.py >"$LOG" 2>&1 &
+PORT="$PORT" "$PY" server.py >"$LOG" 2>&1 &
 SRV=$!
-trap 'kill "$SRV" ${CLAW_SRV:-} 2>/dev/null' EXIT
+trap 'kill "$SRV" ${CLAW_SRV:-} 2>/dev/null; rm -rf "$TMPDB"' EXIT
 
 ready=""
 for _ in $(seq 1 50); do
@@ -277,7 +280,7 @@ N404=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/api/openclaw/status")
                     || bad "openclaw antwortet in Normal-Edition ($N404)"
 # Zweite Instanz in der OpenCLAW-Edition hochfahren
 CLAW_PORT=$((PORT + 1))
-PORT="$CLAW_PORT" EDITION=openclaw python3 server.py >/dev/null 2>&1 &
+PORT="$CLAW_PORT" EDITION=openclaw "$PY" server.py >/dev/null 2>&1 &
 CLAW_SRV=$!
 CLAW_BASE="http://localhost:${CLAW_PORT}"
 for _ in $(seq 1 50); do
@@ -314,6 +317,16 @@ UIHTML=$(curl -s "$BASE/")
 assert_contains "steuerung in der Oberflaeche" 'id="clawRun"'    "$UIHTML"
 
 BASE="http://localhost:${PORT}"   # zurück zur Normal-Edition
+
+# Tests der Fähigkeiten: jede Datei tests/NN-name.sh nutzt ok/bad/assert_contains,
+# $BASE, $PY, $PORT und $LOG. So schreibt jeder Track seine Prüfungen selbst.
+for t in tests/*.sh; do
+  [ -f "$t" ] || continue
+  say "── $(basename "$t" .sh) ──────────────────────────────"
+  # shellcheck disable=SC1090
+  . "$t"
+done
+
 say "── Sicherheit ───────────────────────────────────────"
 if command -v node >/dev/null 2>&1 && [ -d demo/node_modules/playwright ]; then
   if (cd demo && CHROMIUM_PATH="${CHROMIUM_PATH:-/opt/pw-browsers/chromium}" \

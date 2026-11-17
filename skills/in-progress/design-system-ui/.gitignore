@@ -6,3 +6,10 @@ demo/package-lock.json
 demo/shots/
 settings.json
 imported-skills.json
+.venv/
+data/
+*.duckdb
+rust/target/
+video/node_modules/
+node_modules/
+bun.lockb

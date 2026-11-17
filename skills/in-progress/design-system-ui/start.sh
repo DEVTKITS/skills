@@ -44,5 +44,8 @@ echo "  Agenten: http://localhost:${PORT}/llms.txt"
 echo "  Status:  http://localhost:${PORT}/health"
 echo
 
+# Mit DuckDB-Umgebung (./setup.sh) starten, wenn vorhanden — sonst reine Standardbibliothek.
+PY="python3"; [ -x .venv/bin/python ] && PY=".venv/bin/python"
+[ "$PY" = "python3" ] && echo "  Hinweis: ohne ./setup.sh fehlen Wissensbasis, Verlauf und SVG-Bibliothek (— ausstehend —)"
 export PORT EDITION
-exec python3 server.py
+exec "$PY" server.py
