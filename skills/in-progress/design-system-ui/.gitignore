@@ -13,3 +13,4 @@ rust/target/
 video/node_modules/
 node_modules/
 bun.lockb
+c/dsui-svg

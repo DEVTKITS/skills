@@ -27,9 +27,9 @@ SCHEMA: dict[str, dict] = {
     "accent_lightness": {"type": "range", "default": 48, "min": 20, "max": 80,
                          "step": 1, "unit": "%", "group": "Farbe",
                          "label": "Helligkeit"},
-    "theme": {"type": "choice", "default": "auto",
-              "choices": ["auto", "hell", "dunkel"], "group": "Farbe",
-              "label": "Erscheinungsbild"},
+    "theme": {"type": "choice", "default": "master",
+              "choices": ["master", "light", "contrast", "control", "content"],
+              "group": "Farbe", "label": "Erscheinungsbild (DkZ-Theme)"},
     "contrast": {"type": "range", "default": 100, "min": 80, "max": 140,
                  "step": 1, "unit": "%", "group": "Farbe",
                  "label": "Kontrast"},
@@ -72,6 +72,8 @@ SCHEMA: dict[str, dict] = {
                     "label": "Vorlesen bei Doppelklick"},
     "info_blink": {"type": "bool", "default": True, "group": "Verhalten",
                    "label": "Info-Buttons blinken"},
+    "dkz_fonts": {"type": "bool", "default": False, "group": "Schrift",
+                  "label": "DkZ-Schriften laden (Google Fonts, sendet Anfragen nach außen)"},
 
     # ---- Arbeitsfläche ----
     "canvas_grid": {"type": "bool", "default": True, "group": "Arbeitsfläche",
