@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="master">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -78,6 +78,13 @@
             </button>
             <h1>🎨 Design System <span class="text-muted" id="viewName">Workflow Builder</span></h1>
             <div class="header-controls">
+                <div class="theme-bar" id="themeBar" role="group" aria-label="Erscheinungsbild (DkZ-Theme)">
+                    <button type="button" class="theme-btn active" data-theme="master" title="Master Neonrot" aria-label="Theme Master Neonrot" aria-pressed="true"><span class="theme-ico" aria-hidden="true">🔴</span><span class="theme-name">Master</span></button>
+                    <button type="button" class="theme-btn" data-theme="light" title="Hell" aria-label="Theme Hell" aria-pressed="false"><span class="theme-ico" aria-hidden="true">⚪</span><span class="theme-name">Hell</span></button>
+                    <button type="button" class="theme-btn" data-theme="contrast" title="Kontrast (nur Schwarz und Neongrün)" aria-label="Theme Kontrast (nur Schwarz und Neongrün)" aria-pressed="false"><span class="theme-ico" aria-hidden="true">🟢</span><span class="theme-name">Kontrast</span></button>
+                    <button type="button" class="theme-btn" data-theme="control" title="Control Room" aria-label="Theme Control Room" aria-pressed="false"><span class="theme-ico" aria-hidden="true">🟠</span><span class="theme-name">Control</span></button>
+                    <button type="button" class="theme-btn" data-theme="content" title="Content" aria-label="Theme Content" aria-pressed="false"><span class="theme-ico" aria-hidden="true">🟣</span><span class="theme-name">Content</span></button>
+                </div>
                 <span class="edition-chip" id="editionChip" title="Edition">–</span>
                 <span class="ampel-chip" title="Provider-Status">
                     <span class="ampel" id="headerAmpel" data-state="red"></span>

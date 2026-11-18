@@ -316,6 +316,9 @@ class DesignSystemApp {
     redrawCanvas() {
         const svg = document.getElementById('canvasSvg');
         svg.innerHTML = '';
+        // Farben kommen aus den DkZ-Tokens (zur Laufzeit gelesen, folgen dem Theme)
+        const tk = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+        const cEdge = tk('--accent'), cNode = tk('--bg-card'), cText = tk('--text');
 
         // Draw edges
         this.workflow.edges.forEach(edge => {
@@ -328,7 +331,7 @@ class DesignSystemApp {
                 line.setAttribute('y1', fromNode.y + 25);
                 line.setAttribute('x2', toNode.x - 10);
                 line.setAttribute('y2', toNode.y + 25);
-                line.setAttribute('stroke', '#0ea5e9');
+                line.setAttribute('stroke', cEdge);
                 line.setAttribute('stroke-width', '2');
                 svg.appendChild(line);
             }
@@ -343,8 +346,8 @@ class DesignSystemApp {
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             rect.setAttribute('width', '100');
             rect.setAttribute('height', '50');
-            rect.setAttribute('fill', '#1a1f26');
-            rect.setAttribute('stroke', '#0ea5e9');
+            rect.setAttribute('fill', cNode);
+            rect.setAttribute('stroke', cEdge);
             rect.setAttribute('stroke-width', '2');
             rect.setAttribute('rx', '4');
             group.appendChild(rect);
@@ -353,7 +356,7 @@ class DesignSystemApp {
             text.setAttribute('x', '50');
             text.setAttribute('y', '28');
             text.setAttribute('text-anchor', 'middle');
-            text.setAttribute('fill', '#e4e6eb');
+            text.setAttribute('fill', cText);
             text.setAttribute('font-size', '12');
             text.textContent = node.type.replace('-', ' ');
             group.appendChild(text);
@@ -602,7 +605,7 @@ END llms.txt
     updateBadge(text, type) {
         const badge = document.getElementById('workflowStatus');
         badge.textContent = text;
-        badge.style.background = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#f59e0b';
+        badge.dataset.state = type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning';
     }
 
     // === Import/Export ===
@@ -1526,33 +1529,84 @@ DesignSystemApp.prototype.settingControl = function (it) {
 DesignSystemApp.prototype.applySettings = function () {
     const s = this.settings || {};
     const r = document.documentElement.style;
+    const D = window.DkZ;
+    const THEMES = D ? D.THEMES : ['master', 'light', 'contrast', 'control', 'content'];
+
+    // ── Theme (DkZ): localStorage-Wahl der Theme-Leiste gewinnt beim Start,
+    //    danach gilt die Einstellung; Wechsel per Leiste werden zurückgespiegelt.
+    let t = THEMES.includes(s.theme) ? s.theme : 'master';
+    if (!this._themeInit) {
+        this._themeInit = true;
+        const saved = D && D.saved && D.saved();
+        if (saved && saved !== t) {
+            t = s.theme = saved;
+            clearTimeout(this._saveTimer);
+            this._saveTimer = setTimeout(() => this.saveSettings(), 350);
+        }
+        window.addEventListener('dkz-themechange', (e) => {
+            const n = e.detail && e.detail.theme;
+            if (n && this.settings && this.settings.theme !== n) {
+                this.settings.theme = n;
+                const sel = document.querySelector('select[data-setting="theme"]');
+                if (sel) sel.value = n;
+                clearTimeout(this._saveTimer);
+                this._saveTimer = setTimeout(() => this.saveSettings(), 350);
+            }
+            this.applySettings();   // Akzent-Lesbarkeit hängt am Theme
+        });
+    }
+    if (D) { if (D.theme() !== t) D.setTheme(t); }
+    else document.documentElement.setAttribute('data-theme', t);
+    if (D && D.loadFonts) D.loadFonts(!!s.dkz_fonts);   // Google Fonts nur auf Wunsch
+
+    // ── Akzentfarbe: gilt nur, wenn die Regler vom Standard abweichen, und
+    //    nie im Theme contrast (dort ausschließlich Schwarz und Neongrün).
     const h = s.accent_hue ?? 199, sa = s.accent_saturation ?? 89, l = s.accent_lightness ?? 48;
-    r.setProperty('--color-primary', `hsl(${h} ${sa}% ${l}%)`);
-    r.setProperty('--color-primary-hover', `hsl(${h} ${sa}% ${Math.max(10, l - 8)}%)`);
-    r.setProperty('--radius-sm', `${(s.radius ?? 8) * 0.5}px`);
-    r.setProperty('--radius-md', `${s.radius ?? 8}px`);
-    r.setProperty('--radius-lg', `${(s.radius ?? 8) * 1.4}px`);
+    const custom = (h !== 199 || sa !== 89 || l !== 48) && t !== 'contrast';
+    const ACC = ['--accent', '--accent-hover', '--on-accent', '--accent-glow',
+                 '--border-accent', '--shadow-glow'];
+    if (custom) {
+        const c = `hsl(${h} ${sa}% ${l}%)`;
+        r.setProperty('--accent', c);
+        r.setProperty('--accent-hover', `hsl(${h} ${sa}% ${Math.max(10, l - 8)}%)`);
+        if (D && D.readable) r.setProperty('--on-accent', D.readable(c));
+        r.setProperty('--accent-glow', `color-mix(in srgb, ${c} 35%, transparent)`);
+        r.setProperty('--border-accent', `1px solid color-mix(in srgb, ${c} 30%, transparent)`);
+        r.setProperty('--shadow-glow', `0 0 20px color-mix(in srgb, ${c} 15%, transparent)`);
+    } else {
+        ACC.forEach(n => r.removeProperty(n));
+    }
+
+    // ── Form: nur überschreiben, wenn vom Standard abweichend (sonst gelten
+    //    die Werte des jeweiligen Themes aus dkz.css).
+    const rad = s.radius ?? 8;
+    if (rad !== 8) {
+        r.setProperty('--radius-sm', `${rad}px`);
+        r.setProperty('--radius', `${Math.round(rad * 1.5)}px`);
+    } else { r.removeProperty('--radius-sm'); r.removeProperty('--radius'); }
     const d = (s.density ?? 100) / 100;
-    r.setProperty('--space-xs', `${0.25 * d}rem`);
-    r.setProperty('--space-sm', `${0.5 * d}rem`);
-    r.setProperty('--space-md', `${1 * d}rem`);
-    r.setProperty('--space-lg', `${1.5 * d}rem`);
+    ['xs', 'sm', 'md', 'lg', 'xl'].forEach((k, i) => {
+        const px = [4, 8, 16, 24, 32][i];
+        if (d !== 1) r.setProperty(`--space-${k}`, `${Math.round(px * d)}px`);
+        else r.removeProperty(`--space-${k}`);
+    });
     document.body.style.fontSize = `${s.font_size ?? 14}px`;
     document.body.style.lineHeight = `${(s.line_height ?? 150) / 100}`;
-    document.body.style.filter = (s.contrast ?? 100) !== 100 ? `contrast(${s.contrast}%)` : '';
+    document.body.style.filter = (s.contrast ?? 100) !== 100 && t !== 'contrast'
+        ? `contrast(${s.contrast}%)` : '';
     const fam = { serif: 'Georgia, "Times New Roman", serif',
                   mono: '"Monaco","Menlo",monospace' }[s.font_family];
     document.body.style.fontFamily = fam || '';
     document.body.classList.toggle('no-animations', s.animations === false);
     document.body.classList.toggle('no-info-blink', s.info_blink === false);
-    if (s.theme && s.theme !== 'auto') document.documentElement.dataset.theme = s.theme;
-    else delete document.documentElement.dataset.theme;
     r.setProperty('--glow-strength', `${(s.glow_intensity ?? 100) / 100}`);
     if (typeof s.tts_enabled === 'boolean') {
         this.ttsEnabled = s.tts_enabled;
-        const t = document.getElementById('ttsToggle');
-        if (t) t.checked = s.tts_enabled;
+        const tt = document.getElementById('ttsToggle');
+        if (tt) tt.checked = s.tts_enabled;
     }
+    // Canvas liest seine Farben aus den Tokens: nach Theme-/Akzentwechsel neu zeichnen
+    if (this.workflow && typeof this.redrawCanvas === 'function') this.redrawCanvas();
 };
 
 DesignSystemApp.prototype.saveSettings = async function () {

@@ -1,1 +1,367 @@
-/* Platzhalter — wird vom zuständigen Track ersetzt */
+/* ══════════════════════════════════════════════════════════════════════
+   DkZ-Designsystem — Token-Schicht, fünf Themes, Basis-Bausteine
+   Quelle der Werte: docs/CONTRACT.md §1 (Skill dkz-vanilla-ui-engine).
+   Themes über data-theme auf <html>: master (Standard) · light · contrast ·
+   control · content. Hartkodiertes Hex steht NUR in diesen Token-Blöcken;
+   alle Regeln darunter und in allen anderen Stylesheets nutzen var(--…).
+
+   Verbindliche Token-Namen (nicht umbenennen): siehe §1. Zusätzliche,
+   rein ergänzende Tokens (alle in jedem Theme definiert):
+     --border-color --on-accent --accent-text --accent-2 --bg-hover
+     --text-hover --bg-active --text-active --bg-code --text-code
+     --scrim --agent --agent-edge --agent-glow --agent-tint --accent-glow
+     --code-red --code-yellow --code-green --focus --tint --scan --hud --cut
+     --card-radius
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Theme 1: master (Standard) ─────────────────────────────────────── */
+:root,
+:root[data-theme="master"] {
+    --accent: #fa1e4e;
+    --accent-hover: #ff3366;
+    --bg: #060608;
+    --bg-card: #0e0e10;
+    --bg-elevated: #141418;
+    --text: #f6f6f7;
+    --text-muted: rgba(246, 246, 247, 0.55);
+    --green: #00ff88;
+    --yellow: #ffb800;
+    --red: #ff3b5c;
+    --blue: #55ACEE;
+    --pink: #ec4899;
+    --amber: #f5a623;
+    --cyan: #3fe0d0;
+    --lila: #9d7bff;
+    --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+    --font-size-xs: .75rem;
+    --font-size-sm: .875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2xl: 2rem;
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --border: 1px solid rgba(255, 255, 255, 0.08);
+    --border-accent: 1px solid rgba(250, 30, 78, 0.3);
+    --glass: rgba(14, 14, 16, 0.85);
+    --glass-blur: blur(12px);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-pill: 50px;
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    --shadow-glow: 0 0 20px rgba(250, 30, 78, 0.15);
+    --transition: all .2s ease;
+
+    /* ergänzende Tokens */
+    --border-color: rgba(255, 255, 255, 0.08);
+    --on-accent: #060608;                 /* Text auf Akzentfläche (≥ 4.5:1) */
+    --accent-text: var(--accent);         /* Akzent als Schriftfarbe */
+    --accent-2: var(--lila);              /* Zweitfarbe */
+    --bg-hover: rgba(255, 255, 255, 0.06);
+    --text-hover: var(--text);
+    --bg-active: var(--bg-elevated);
+    --text-active: var(--accent-text);
+    --bg-code: #030304;
+    --text-code: #00ff88;
+    --scrim: rgba(0, 0, 0, 0.6);
+    --agent: var(--red);                  /* roter Monitorrand / „KI arbeitet" */
+    --code-red: #ff3b5c;                  /* Terminal-Zeilen (immer auf dunklem Grund) */
+    --code-yellow: #ffb800;
+    --code-green: #00ff88;
+    --agent-edge: rgba(255, 59, 92, 0.9);
+    --agent-glow: rgba(255, 59, 92, 0.35);
+    --agent-tint: rgba(255, 59, 92, 0.12);
+    --accent-glow: rgba(250, 30, 78, 0.35);
+    --focus: var(--accent);
+    --tint: 14%;                          /* Anteil Statusfarbe in Tönungen */
+    --scan: transparent;                  /* Scanlines (nur Theme control) */
+    --hud: var(--accent);
+    --cut: 0px;                           /* Kantenschnitt (nur Theme control) */
+    --card-radius: var(--radius);
+    color-scheme: dark;
+}
+
+/* ── Theme 2: light ─────────────────────────────────────────────────── */
+:root[data-theme="light"] {
+    --bg: #f6f6f7;
+    --bg-card: #ffffff;
+    --bg-elevated: #f0f0f2;
+    --text: #0e0e10;
+    --text-muted: rgba(14, 14, 16, 0.68);
+    /* Statusfarben für Text auf hellem Grund abgedunkelt (≥ 4.5:1) */
+    --green: #00703f;
+    --yellow: #8a5a00;
+    --red: #c8102e;
+    --blue: #1560a8;
+    --pink: #b01d6d;
+    --amber: #935800;
+    --cyan: #00695f;
+    --lila: #6240d4;
+    --border: 1px solid rgba(0, 0, 0, 0.08);
+    --border-accent: 1px solid rgba(250, 30, 78, 0.3);
+    --glass: rgba(255, 255, 255, 0.85);
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    --shadow-glow: 0 0 20px rgba(250, 30, 78, 0.12);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --accent-text: color-mix(in srgb, var(--accent) 78%, #000);
+    --bg-hover: rgba(0, 0, 0, 0.05);
+    --scrim: rgba(14, 14, 16, 0.45);
+    --bg-code: #0e0e10;
+    --agent-edge: rgba(200, 16, 46, 0.9);
+    --agent-glow: rgba(200, 16, 46, 0.3);
+    --agent-tint: rgba(200, 16, 46, 0.1);
+    --tint: 12%;
+    color-scheme: light;
+}
+
+/* ── Theme 3: contrast — ausschließlich Schwarz und #00ff88 ─────────── */
+:root[data-theme="contrast"] {
+    --accent: #00ff88;
+    --accent-hover: #00ff88;
+    --bg: #000000;
+    --bg-card: #000000;
+    --bg-elevated: #000000;
+    --text: #00ff88;
+    --text-muted: #00ff88;
+    --green: #00ff88;
+    --yellow: #00ff88;
+    --red: #00ff88;
+    --blue: #00ff88;
+    --pink: #00ff88;
+    --amber: #00ff88;
+    --cyan: #00ff88;
+    --lila: #00ff88;
+    --border: 1px solid #00ff88;
+    --border-accent: 1px solid #00ff88;
+    --glass: #000000;
+    --glass-blur: none;
+    --shadow: none;
+    --shadow-glow: 0 0 12px #00ff88;
+    --border-color: #00ff88;
+    --on-accent: #000000;
+    --accent-text: #00ff88;
+    --accent-2: #00ff88;
+    --bg-hover: #00ff88;                  /* Hover = invertiert */
+    --text-hover: #000000;
+    --bg-active: #00ff88;
+    --text-active: #000000;
+    --bg-code: #000000;
+    --text-code: #00ff88;
+    --scrim: #000000;
+    --agent: #00ff88;
+    --focus: #00ff88;
+    --code-red: #00ff88;
+    --code-yellow: #00ff88;
+    --code-green: #00ff88;
+    --agent-edge: #00ff88;
+    --agent-glow: #00ff88;
+    --agent-tint: #000000;
+    --accent-glow: #00ff88;
+    --tint: 0%;
+    --hud: #00ff88;
+    color-scheme: dark;
+}
+
+/* ── Theme 4: control (Control Room) ────────────────────────────────── */
+:root[data-theme="control"] {
+    --font-main: 'Archivo Expanded', 'Archivo', system-ui, -apple-system, sans-serif;
+    --border: 1px solid rgba(250, 30, 78, 0.3);
+    --border-color: rgba(250, 30, 78, 0.3);
+    --bg-card: #0d0b0d;
+    --bg-elevated: #151115;
+    --glass: rgba(13, 11, 13, 0.88);
+    --glass-blur: blur(6px);
+    --radius: 2px;
+    --radius-sm: 0px;
+    --shadow: 0 0 0 1px rgba(250, 30, 78, 0.12), 0 6px 24px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 18px rgba(250, 30, 78, 0.28);
+    --scan: rgba(0, 0, 0, 0.28);
+    --hud: rgba(250, 30, 78, 0.75);
+    --cut: 10px;
+    --card-radius: 0px;
+    --bg-hover: rgba(250, 30, 78, 0.12);
+    --transition: all .15s steps(4, end);
+}
+
+/* ── Theme 5: content ───────────────────────────────────────────────── */
+:root[data-theme="content"] {
+    --font-main: 'Syne', system-ui, -apple-system, sans-serif;
+    --font-mono: 'Space Mono', 'JetBrains Mono', monospace;
+    --border: 1px solid rgba(157, 123, 255, 0.18);
+    --border-accent: 1px solid rgba(157, 123, 255, 0.4);
+    --border-color: rgba(157, 123, 255, 0.18);
+    --bg-card: #0f0d15;
+    --bg-elevated: #171420;
+    --glass: rgba(15, 13, 21, 0.82);
+    --glass-blur: blur(16px);
+    --radius: 20px;
+    --radius-sm: 14px;
+    --shadow: 0 8px 32px rgba(10, 6, 24, 0.55);
+    --shadow-glow: 0 0 24px rgba(157, 123, 255, 0.22);
+    --bg-hover: rgba(157, 123, 255, 0.12);
+    --card-radius: 20px;
+    --accent-2: var(--lila);
+}
+
+/* ══════════════ Basis ══════════════ */
+html { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; }
+
+html, body {
+    font-family: var(--font-main);
+    background: var(--bg);
+    color: var(--text);
+}
+
+::selection { background: var(--accent); color: var(--on-accent); }
+
+:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+* { scrollbar-color: var(--border-color) transparent; scrollbar-width: thin; }
+
+a { color: var(--accent-text); }
+code, kbd, samp, pre { font-family: var(--font-mono); }
+
+/* Formularelemente: nie Systemfarben (im Theme contrast sonst Grau/Blau) */
+input, select, textarea, button, option {
+    font-family: inherit;
+    color: var(--text);
+    background-color: var(--bg-elevated);
+    border-color: var(--border-color);
+}
+input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1; }
+button:disabled, input:disabled, select:disabled, textarea:disabled {
+    color: var(--text-muted); opacity: .55; cursor: not-allowed;
+}
+input[type="checkbox"], input[type="radio"], input[type="range"], progress {
+    accent-color: var(--accent);
+}
+hr { border: 0; border-top: var(--border); }
+
+/* ══════════════ Bausteine ══════════════ */
+
+/* Glas-Karte */
+.glass-card, .dkz-card {
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: var(--border);
+    border-radius: var(--card-radius);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+.glass-card:hover, .dkz-card:hover { border: var(--border-accent); box-shadow: var(--shadow-glow); }
+
+/* Border-Varianten */
+.border-none   { border: 0; }
+.border-subtle { border: var(--border); }
+.border-accent { border: var(--border-accent); }
+.border-glow   { border: var(--border-accent); box-shadow: var(--shadow-glow); }
+.border-solid  { border: 1px solid var(--accent); }
+
+/* Pill-Tag (in jedem Theme verfügbar, im Theme content der Standard-Look) */
+.dkz-tag, .pill {
+    display: inline-flex; align-items: center; gap: var(--space-xs);
+    padding: 2px var(--space-sm);
+    border: var(--border-accent); border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs); color: var(--accent-text);
+    background: color-mix(in srgb, var(--accent) var(--tint), transparent);
+}
+
+/* Theme-Leiste (Kopfzeile) */
+.theme-bar { display: inline-flex; align-items: center; gap: var(--space-xs); flex-shrink: 0; }
+.theme-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    min-width: 2rem; height: 2rem; padding: 0 6px;
+    background: var(--bg-elevated); color: var(--text);
+    border: var(--border); border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm); line-height: 1; cursor: pointer;
+    transition: var(--transition);
+}
+.theme-btn:hover { background: var(--bg-hover); color: var(--text-hover); }
+.theme-btn.active {
+    border: 1px solid var(--accent); box-shadow: var(--shadow-glow);
+    background: var(--bg-active); color: var(--text-active);
+}
+.theme-btn .theme-name { display: none; font-size: var(--font-size-xs); font-weight: 600; }
+/* Emoji sind Farbbilder: im Theme contrast durch den Namen ersetzt */
+:root[data-theme="contrast"] .theme-btn .theme-ico { display: none; }
+:root[data-theme="contrast"] .theme-btn .theme-name { display: inline; }
+
+/* ══════════════ Theme control — HUD, Scanlines, Kantenschnitt ══════════════ */
+:root[data-theme="control"] body::after {
+    content: ""; position: fixed; inset: 0; z-index: 2500; pointer-events: none;
+    background: repeating-linear-gradient(to bottom, transparent 0, transparent 2px, var(--scan) 2px, var(--scan) 3px);
+    opacity: .5;
+}
+:root[data-theme="control"] h1,
+:root[data-theme="control"] h2,
+:root[data-theme="control"] h3 { text-transform: uppercase; letter-spacing: .06em; }
+
+/* geometrische clip-paths: abgeschnittene Ecken oben rechts und unten links,
+   die Schnittkante wird als HUD-Linie nachgezeichnet (::before/::after) */
+:where(:root[data-theme="control"]) :where(.glass-card, .dkz-card, .btn, .modal-content, .info-popover,
+        .provider-card, .pattern-item, .skill-chip, .eval-results, .dkz-cut) { position: relative; }
+:root[data-theme="control"] :is(.glass-card, .dkz-card, .btn, .modal-content, .info-popover,
+        .provider-card, .pattern-item, .skill-chip, .eval-results, .dkz-cut) {
+    clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut),
+                       100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
+}
+:root[data-theme="control"] :is(.glass-card, .dkz-card, .btn, .modal-content, .info-popover,
+        .provider-card, .pattern-item, .skill-chip, .eval-results, .dkz-cut)::before,
+:root[data-theme="control"] :is(.glass-card, .dkz-card, .btn, .modal-content, .info-popover,
+        .provider-card, .pattern-item, .skill-chip, .eval-results, .dkz-cut)::after {
+    content: ""; position: absolute; width: var(--cut); height: var(--cut); pointer-events: none;
+}
+:root[data-theme="control"] :is(.glass-card, .dkz-card, .btn, .modal-content, .info-popover,
+        .provider-card, .pattern-item, .skill-chip, .eval-results, .dkz-cut)::before {
+    top: 0; right: 0;
+    background: linear-gradient(to bottom left, transparent calc(50% - 1px), var(--hud) calc(50% - 1px),
+                                var(--hud) 50%, transparent 50%);
+}
+:root[data-theme="control"] :is(.glass-card, .dkz-card, .btn, .modal-content, .info-popover,
+        .provider-card, .pattern-item, .skill-chip, .eval-results, .dkz-cut)::after {
+    bottom: 0; left: 0;
+    background: linear-gradient(to top right, transparent calc(50% - 1px), var(--hud) calc(50% - 1px),
+                                var(--hud) 50%, transparent 50%);
+}
+/* Knöpfe: kleinerer Schnitt */
+:root[data-theme="control"] .btn { --cut: 6px; }
+
+/* ══════════════ Theme content — Pill-Formen ══════════════ */
+:root[data-theme="content"] :is(.btn, .tag, .chip, .badge, .edition-chip, .ampel-chip,
+        .project-chip, .provider-kind, .dkz-tag, .pill, .skill-chip, .tab-btn, .theme-btn,
+        .drawer-item) { border-radius: var(--radius-pill); }
+:root[data-theme="content"] .skill-chip { padding-inline: var(--space-md); }
+:root[data-theme="content"] h1, :root[data-theme="content"] h2 { letter-spacing: -.01em; }
+
+/* ══════════════ Theme contrast — Feinheiten ══════════════ */
+:root[data-theme="contrast"] * { text-shadow: none; }
+:root[data-theme="contrast"] img, :root[data-theme="contrast"] video { filter: grayscale(1); }
+:root[data-theme="contrast"] .btn:hover,
+:root[data-theme="contrast"] .btn:focus-visible { box-shadow: var(--shadow-glow); }
+
+/* Bewegung zurücknehmen, wenn das System es wünscht */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* Kontrast-Theme: nur Schwarz und Neongrün — das Blinken der Info-Knöpfe
+   darf keine fremde Farbe als Schatten erzeugen. */
+:root[data-theme="contrast"] .info-btn {
+    animation: none;
+    box-shadow: none;
+}
+:root[data-theme="contrast"] .info-btn:hover,
+:root[data-theme="contrast"] .info-btn.open {
+    box-shadow: 0 0 0 2px var(--accent);
+}
