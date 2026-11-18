@@ -119,18 +119,42 @@ static void gitviz_load(const char *path) {
     gitviz_github();
 }
 
-/* Repos unter den Wurzeln finden und auswählen (fzf-Stil). */
+/* Zuletzt benutztes Repo nach vorn in repos.txt schreiben (max. 16 Einträge). */
+static void gitviz_mru(const char *path) {
+    char p[600]; snprintf(p, sizeof p, "%s/repos.txt", cfgdir);
+    char old[16][512]; int nold = 0;
+    FILE *f = fopen(p, "r");
+    if (f) {
+        char line[512];
+        while (fgets(line, sizeof line, f) && nold < 16) {
+            chomp(line);
+            if (line[0] && strcmp(line, path)) snprintf(old[nold++], 512, "%s", line);
+        }
+        fclose(f);
+    }
+    f = fopen(p, "w"); if (!f) return;
+    fprintf(f, "%s\n", path);
+    for (int i = 0; i < nold && i < 15; i++) fprintf(f, "%s\n", old[i]);
+    fclose(f);
+}
+
+/* Repos finden und auswählen (fzf-Stil): aktuelles Repo, MRU, dann Scan. */
 static void gitviz_pick(void) {
     static char buf[64 * 1024];
     static char *items[256];
     int n = 0; size_t used = 0;
     const char *home = getenv("HOME"); if (!home) home = ".";
-    char roots[600];
-    snprintf(roots, sizeof roots, "'%s' .", home);   /* HOME + cwd */
-    char cmd[900];
+    /* Reihenfolge: (1) das Repo, in dem wir stehen — .git liegt oft OBERHALB
+     * von cwd, ein reiner Abwärts-Scan fände es nie; (2) zuletzt benutzte
+     * Repos aus repos.txt; (3) Scan unter $HOME und cwd. awk entdoppelt und
+     * erhält dabei die Reihenfolge (sort -u würde sie zerstören). */
+    char cmd[1200];
     snprintf(cmd, sizeof cmd,
-             "for r in %s; do find \"$r\" -maxdepth 4 -type d -name .git 2>/dev/null; done"
-             " | sed 's:/\\.git$::' | sort -u | head -256", roots);
+             "{ git rev-parse --show-toplevel 2>/dev/null; "
+             "cat '%s/repos.txt' 2>/dev/null; "
+             "for r in '%s' .; do find \"$r\" -maxdepth 4 -type d -name .git 2>/dev/null"
+             " | sed 's:/\\.git$::'; done; } "
+             "| awk 'NF && !seen[$0]++' | head -256", cfgdir, home);
     FILE *p = popen(cmd, "r");
     if (p) {
         char line[600];
@@ -147,6 +171,7 @@ static void gitviz_pick(void) {
                              "No git repos found under $HOME/cwd.")); return; }
     int i = fuzzy_pick(L("Git-Repo wählen", "Pick git repo"), items, n);
     if (i < 0) return;
+    gitviz_mru(items[i]);
     gitviz_load(items[i]);
     push(SC_GITVIZ);
 }
